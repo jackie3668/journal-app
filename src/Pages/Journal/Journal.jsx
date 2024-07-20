@@ -33,7 +33,7 @@ const Journal = () => {
   };
 
   const handleEntrySaved = () => {
-    console.log('saved in journal');
+    console.log('Entry saved in journal');
     setRefreshEntries(prev => !prev); // Toggle refresh flag
   };
 
@@ -55,7 +55,6 @@ const Journal = () => {
           onEntrySelect={handleSelectEntry} 
           onEntrySaved={handleEntrySaved} 
           selectedFolder={selectedFolder}
-          setSelectedFolder={selectedFolder}
           onFolderChange={handleFolderChange} // Pass the handler for folder changes
         />
       </div>

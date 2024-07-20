@@ -4,11 +4,12 @@ import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
 
-const QuillContainer = ({ handleKeyDown, onEntrySaved }) => {
+const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
   const { authState, login, userData } = useAuth();
   const [entryTitle, setEntryTitle] = useState('');
   const [entryText, setEntryText] = useState('');
   const [tags, setTags] = useState([]);
+  const [newTag, setNewTag] = useState('');
   const [selectedFolder, setSelectedFolder] = useState('Default');
   const [folders, setFolders] = useState([]);
   const [newFolderName, setNewFolderName] = useState('');
@@ -57,30 +58,47 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved }) => {
     fetchFolders();
   }, [authState.isAuthenticated, authState.user]);
 
+  useEffect(() => {
+    if (selectedEntry) {
+      console.log(selectedEntry._id);
+      setEntryTitle(selectedEntry.entryTitle || '');
+      setEntryText(selectedEntry.entryText || '');
+      setTags(selectedEntry.tags || []);
+      setSelectedFolder(selectedEntry.folderName || 'Default');
+    }
+  }, [selectedEntry]);
+
   const handleSave = async () => {
     if (!authState.isAuthenticated) {
       localStorage.setItem('pendingEntry', entryText);
       login();
       return;
     }
-
+  
     setLoading(true);
     try {
-      console.log("Saving Entry with Folder:", selectedFolder); // Debugging line
-      await axios.post('http://localhost:5000/api/entries', {
-        userId: authState.user.sub,
-        entryTitle,
-        entryText,
-        folderName: selectedFolder,
-        tags,
-        createdAt: new Date(),
+      const url = selectedEntry ? `http://localhost:5000/api/entries/${selectedEntry._id}` : 'http://localhost:5000/api/entries';
+      const method = selectedEntry ? 'PUT' : 'POST';
+  
+      await axios({
+        method,
+        url,
+        data: {
+          userId: authState.user.sub,
+          entryTitle,
+          entryText,
+          folderName: selectedFolder,
+          tags,
+          createdAt: new Date(),
+        },
       });
+  
       setEntryTitle('');
       setEntryText('');
       setTags([]);
+      setNewTag('');
       if (onEntrySaved) {
-        console.log('save');
-        onEntrySaved(); // Notify parent component that entry is saved
+        onEntrySaved();
       }
     } catch (error) {
       console.error('Error saving journal entry:', error);
@@ -88,13 +106,24 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved }) => {
       setLoading(false);
     }
   };
-
+  
   const handleTextChange = (content) => {
     setEntryText(content);
   };
 
   const handleTitleChange = (e) => {
     setEntryTitle(e.target.value);
+  };
+
+  const handleAddTag = () => {
+    if (newTag.trim() && !tags.includes(newTag.trim())) {
+      setTags([...tags, newTag.trim()]);
+      setNewTag('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
   const handleAddNewFolder = async () => {
@@ -126,7 +155,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved }) => {
           id="folder-select"
           value={selectedFolder}
           onChange={(e) => {
-            console.log('Folder Selected:', e.target.value); // Debugging line
             setSelectedFolder(e.target.value);
           }}
         >
@@ -173,6 +201,27 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved }) => {
         modules={modules}
         placeholder="Start writing here..."
       />
+      <div>
+        <input
+          type="text"
+          value={newTag}
+          onChange={(e) => setNewTag(e.target.value)}
+          placeholder="Add a tag"
+        />
+        <button onClick={handleAddTag}>Add Tag</button>
+      </div>
+      <div>
+        {tags.length > 0 && (
+          <ul>
+            {tags.map((tag, index) => (
+              <li key={index} style={{ display: 'inline', marginRight: '5px' }}>
+                <span>{tag}</span>
+                <button onClick={() => handleRemoveTag(tag)} style={{ marginLeft: '5px' }}>Remove</button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
       <button onClick={handleSave} disabled={loading}>
         {loading ? 'Saving...' : 'Save Entry'}
       </button>

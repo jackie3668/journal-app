@@ -13,6 +13,9 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
   const [error, setError] = useState(null);
   const [newFolderName, setNewFolderName] = useState('');
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
+  const [filterTags, setFilterTags] = useState([]);
+  const [availableTags, setAvailableTags] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Fetch folders on component mount and when `onEntrySaved` triggers a refresh
   useEffect(() => {
@@ -39,7 +42,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
     fetchFolders();
   }, [isAuthenticated, isLoading, user, onEntrySaved]); // Add onEntrySaved to dependency array
 
-  // Fetch entries when selectedFolder changes or when `onEntrySaved` triggers a refresh
+  // Fetch entries when selectedFolder changes, filterTags changes, or when `onEntrySaved` triggers a refresh
   useEffect(() => {
     const fetchEntries = async () => {
       if (!isAuthenticated || isLoading) {
@@ -50,7 +53,12 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
 
       try {
         const response = await axios.get('http://localhost:5000/api/entries', {
-          params: { folderName: selectedFolder, userId: user.sub }
+          params: {
+            folderName: selectedFolder,
+            userId: user.sub,
+            tags: filterTags.join(','), // Send tags as a comma-separated string
+            searchQuery
+          }
         });
         setEntries(response.data);
       } catch (error) {
@@ -62,7 +70,29 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
     };
 
     fetchEntries();
-  }, [selectedFolder, isAuthenticated, isLoading, user, onEntrySaved]); // Add onEntrySaved to dependency array
+  }, [selectedFolder, isAuthenticated, isLoading, user, onEntrySaved, filterTags, searchQuery]); // Add filterTags and searchQuery to dependency array
+
+  // Fetch available tags
+  useEffect(() => {
+    const fetchTags = async () => {
+      if (!isAuthenticated || isLoading) {
+        return;
+      }
+    
+      try {
+        const response = await axios.get('http://localhost:5000/api/tags', {
+          params: { userId: user.sub }
+        });
+        setAvailableTags(response.data);
+      } catch (error) {
+        console.error('Error fetching tags:', error.response ? error.response.data : error.message);
+        setError('Failed to fetch tags');
+      }
+    };
+    
+    fetchTags();
+  }, [isAuthenticated, isLoading, user]);
+  
 
   // Handle adding a new folder
   const handleAddNewFolder = async () => {
@@ -91,6 +121,23 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
     } catch (error) {
       console.error('Error adding new folder:', error.response ? error.response.data : error.message);
     }
+  };
+
+  // Handle tag selection
+  const handleTagChange = (event) => {
+    const selectedTags = Array.from(event.target.selectedOptions, option => option.value);
+    setFilterTags(selectedTags);
+  };
+
+  // Handle search input change
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  // Clear filters
+  const clearFilters = () => {
+    setFilterTags([]);
+    setSearchQuery('');
   };
 
   if (loading) return <div>Loading...</div>;
@@ -137,6 +184,27 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
           <button onClick={() => setShowNewFolderInput(true)}>Add New Folder</button>
         )}
       </div>
+
+      <h2>Filter Entries by Tags</h2>
+      <select 
+        multiple 
+        value={filterTags} 
+        onChange={handleTagChange}
+      >
+        {availableTags.map((tag) => (
+          <option key={tag} value={tag}>{tag}</option>
+        ))}
+      </select>
+
+      <h2>Search Entries</h2>
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={handleSearchChange}
+        placeholder="Search by title, text, or tags"
+      />
+
+      <button onClick={clearFilters}>Clear Filters</button>
 
       <h2>Entries</h2>
       <ul>
