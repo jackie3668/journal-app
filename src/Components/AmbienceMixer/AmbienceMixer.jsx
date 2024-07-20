@@ -22,7 +22,7 @@ const AmbienceMixer = () => {
   const handleSelectSound = (sound) => {
     if (selectedSounds.length < 3 && !selectedSounds.some(s => s._id === sound._id)) {
       setSelectedSounds([...selectedSounds, sound]);
-      setVolumes({ ...volumes, [sound._id]: 1 });
+      setVolumes({ ...volumes, [sound._id]: 0.5 });
     }
   };
 

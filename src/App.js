@@ -17,7 +17,7 @@ function App() {
       {/* <ClockWidget /> */}
       {/* <QuotesWidget /> */}
       {/* <JournalEditor /> */}
-      <AssetUploader />
+      {/* <AssetUploader /> */}
     </div>
   );
 }

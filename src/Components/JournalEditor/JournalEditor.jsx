@@ -1,22 +1,21 @@
+// JournalEditor.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../Context/AuthContext';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
-import './JournalEditor.css'
+import './JournalEditor.css';
 import TypingSound from '../TypingSound/TypingSound';
-import s1 from '../../Assets/Typing Sounds/01.mp3'
-
 import QuillContainer from '../QuillContainer/QuillContainer';
 import AmbienceMixer from '../AmbienceMixer/AmbienceMixer';
 
 const JournalEditor = () => {
-
-  const { authState, login, userData } = useAuth(); 
-  const [entry, setEntry] = useState(''); 
-  const [loading, setLoading] = useState(false); 
-  const [typingSound, setTypingSound] = useState(s1);
-  const [audio, setAudio] = useState(null); 
+  const { authState, login, userData } = useAuth();
+  const [entry, setEntry] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [typingSound, setTypingSound] = useState({ url: '', volume: 1 });
+  const [audio, setAudio] = useState(null);
+  
   const modules = {
     toolbar: [
       [{ 'font': [] },{ 'header': [1, 2, 3, 4, 5, 6, false] }],
@@ -25,16 +24,15 @@ const JournalEditor = () => {
     ],
   };
 
-  
-  
   useEffect(() => {
     if (audio) {
       audio.pause();
       audio.src = '';
     }
 
-    if (typingSound) {
-      const newAudio = new Audio(typingSound);
+    if (typingSound.url) {
+      const newAudio = new Audio(typingSound.url);
+      newAudio.volume = typingSound.volume; // Set volume
       setAudio(newAudio);
     }
   }, [typingSound]);
@@ -44,7 +42,7 @@ const JournalEditor = () => {
       const savedEntry = localStorage.getItem('pendingEntry');
       if (savedEntry) {
         setEntry(savedEntry);
-        localStorage.removeItem('pendingEntry'); 
+        localStorage.removeItem('pendingEntry');
       }
     }
   }, [authState.isAuthenticated, userData]);
@@ -64,7 +62,7 @@ const JournalEditor = () => {
         createdAt: new Date(),
       });
       console.log('Entry saved:', response.data);
-      setEntry(''); 
+      setEntry('');
     } catch (error) {
       console.error('Error saving journal entry:', error);
     } finally {
@@ -75,7 +73,7 @@ const JournalEditor = () => {
   const handleChange = (content) => {
     if (audio) {
       audio.pause();
-      audio.currentTime = 0; 
+      audio.currentTime = 0;
       audio.play().catch((error) => {
         console.error('Error playing audio:', error);
       });
@@ -87,8 +85,9 @@ const JournalEditor = () => {
   return (
     <div className='journal-editor'>
       <AmbienceMixer />
-      <TypingSound onSoundChange={setTypingSound} /> 
+      <TypingSound onSoundChange={setTypingSound} />
       <QuillContainer 
+        className='quill-container'
         entry={entry}
         handleChange={handleChange}
       />

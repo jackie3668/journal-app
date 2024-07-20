@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// TypingSound.jsx
+import React, { useState, useEffect } from 'react';
 import sound1 from '../../Assets/Typing Sounds/01.mp3';
 import sound2 from '../../Assets/Typing Sounds/02.mp3';
 import sound3 from '../../Assets/Typing Sounds/03.mp3';
@@ -13,11 +14,18 @@ const TypingSound = ({ onSoundChange }) => {
   ];
 
   const [selectedSound, setSelectedSound] = useState(localSounds[0].url);
+  const [volume, setVolume] = useState(1); // Default volume
+
+  useEffect(() => {
+    onSoundChange({ url: selectedSound, volume }); // Notify parent with both URL and volume
+  }, [selectedSound, volume, onSoundChange]);
 
   const handleSoundChange = (event) => {
-    const soundUrl = event.target.value;
-    setSelectedSound(soundUrl);
-    onSoundChange(soundUrl); 
+    setSelectedSound(event.target.value);
+  };
+
+  const handleVolumeChange = (event) => {
+    setVolume(parseFloat(event.target.value)); // Update volume state
   };
 
   return (
@@ -30,6 +38,17 @@ const TypingSound = ({ onSoundChange }) => {
           </option>
         ))}
       </select>
+
+      <label htmlFor="volume">Volume:</label>
+      <input
+        type="range"
+        id="volume"
+        min="0"
+        max="1"
+        step="0.01"
+        value={volume}
+        onChange={handleVolumeChange}
+      />
     </div>
   );
 };

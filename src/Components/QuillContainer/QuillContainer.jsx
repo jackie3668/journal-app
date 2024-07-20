@@ -15,7 +15,6 @@ const QuillContainer = ({ entry, handleChange }) => {
     <div>
       <ReactQuill
       theme="snow"
-      className='quill'
       value={entry}
       onChange={handleChange}
       modules={modules}
