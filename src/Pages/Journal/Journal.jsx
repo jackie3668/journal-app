@@ -1,16 +1,27 @@
-import React from 'react'
-import JournalEditor from '../../Components/JournalEditor/JournalEditor'
-import Profile from '../../Components/AuthTemp/Profile'
-import Background from '../../Components/Background/Background'
+import React, { useState } from 'react';
+import JournalEditor from '../../Components/JournalEditor/JournalEditor';
+import Background from '../../Components/Background/Background';
+import Drawer from '../../Components/Drawer/Drawer';
+import './Journal.css';
 
 const Journal = () => {
-  return (
-    <div>
-      <Background />
-      <Profile />
-      <JournalEditor />
-    </div>
-  )
-}
+  const [selectedEntry, setSelectedEntry] = useState(null);
 
-export default Journal
+  const handleSelectEntry = (entry) => {
+    setSelectedEntry(entry);
+  };
+
+  return (
+    <div className='journal-page'>
+      <div className="left">
+        <Drawer onSelectEntry={handleSelectEntry} />
+      </div>
+      <div className="right">
+        <Background />
+        <JournalEditor selectedEntry={selectedEntry} />
+      </div>
+    </div>
+  );
+};
+
+export default Journal;

@@ -1,0 +1,24 @@
+.drawer {
+  width: 300px; /* Adjust width as needed */
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px);
+  border-right: 1px solid #ccc;
+}
+
+.entry-item {
+  margin-bottom: 20px;
+}
+
+.entry-item h3 {
+  margin: 0;
+  font-size: 1.2em;
+}
+
+.entry-item p {
+  margin: 5px 0;
+}
+
+.entry-item small {
+  color: #888;
+}

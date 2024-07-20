@@ -7,7 +7,7 @@ import TypingSound from '../TypingSound/TypingSound';
 import QuillContainer from '../QuillContainer/QuillContainer';
 import AmbienceMixer from '../AmbienceMixer/AmbienceMixer';
 
-const JournalEditor = () => {
+const JournalEditor = ({ selectedEntry }) => { // Accept selectedEntry as a prop
   const { authState, login, userData } = useAuth();
   const [entryTitle, setEntryTitle] = useState('');
   const [entryText, setEntryText] = useState('');
@@ -37,6 +37,13 @@ const JournalEditor = () => {
       }
     }
   }, [authState.isAuthenticated, userData]);
+
+  useEffect(() => {
+    if (selectedEntry) {
+      setEntryTitle(selectedEntry.title);
+      setEntryText(selectedEntry.entryText);
+    }
+  }, [selectedEntry]);
 
   const handleSave = async () => {
     console.log(entryTitle, entryText);

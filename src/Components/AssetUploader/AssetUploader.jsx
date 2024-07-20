@@ -13,7 +13,7 @@ const AssetUploader = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/upload', {
+      const response = await axios.post('http://localhost:5000/api/assets', {
         type,
         name,
         url

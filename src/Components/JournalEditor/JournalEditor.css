@@ -1,7 +1,7 @@
 .journal-editor {
   background-color: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(30px);
-  width: 80vw;
+  width: 30vw;
   height: 100vh;
   color: #ccc;
 }
@@ -14,3 +14,4 @@
 button.save {
   margin: 100px;
 }
+
