@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
 import 'react-quill/dist/quill.snow.css';
-import axios from 'axios';
+import ReactQuill from 'react-quill';
 import './JournalEditor.css';
 import TypingSound from '../TypingSound/TypingSound';
 import QuillContainer from '../QuillContainer/QuillContainer';
 import AmbienceMixer from '../AmbienceMixer/AmbienceMixer';
 
-const JournalEditor = ({ selectedEntry }) => { // Accept selectedEntry as a prop
+const JournalEditor = () => {
   const { authState, login, userData } = useAuth();
   const [entryTitle, setEntryTitle] = useState('');
   const [entryText, setEntryText] = useState('');
+  const [selectedFolder, setSelectedFolder] = useState('Default');
+  const [folders, setFolders] = useState([]);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const [typingSound, setTypingSound] = useState({ url: '', volume: 1 });
   const [audio, setAudio] = useState(null);
@@ -39,14 +44,19 @@ const JournalEditor = ({ selectedEntry }) => { // Accept selectedEntry as a prop
   }, [authState.isAuthenticated, userData]);
 
   useEffect(() => {
-    if (selectedEntry) {
-      setEntryTitle(selectedEntry.title);
-      setEntryText(selectedEntry.entryText);
+    fetchFolders();
+  }, []);
+
+  const fetchFolders = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/folders');
+      setFolders(response.data);
+    } catch (error) {
+      console.error('Error fetching folders:', error);
     }
-  }, [selectedEntry]);
+  };
 
   const handleSave = async () => {
-    console.log(entryTitle, entryText);
     if (!authState.isAuthenticated) {
       localStorage.setItem('pendingEntry', entryText);
       login();
@@ -55,15 +65,15 @@ const JournalEditor = ({ selectedEntry }) => { // Accept selectedEntry as a prop
 
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/entries', {
+      await axios.post('http://localhost:5000/api/entries', {
         userId: authState.user.sub,
-        entryTitle: entryTitle, 
-        entryText: entryText,
+        entryTitle,
+        entryText,
+        folderName: selectedFolder,
         createdAt: new Date(),
       });
-      console.log('Entry saved:', response.data);
-      setEntryTitle(''); 
-      setEntryText(''); 
+      setEntryTitle('');
+      setEntryText('');
     } catch (error) {
       console.error('Error saving journal entry:', error);
     } finally {
@@ -79,14 +89,24 @@ const JournalEditor = ({ selectedEntry }) => { // Accept selectedEntry as a prop
         console.error('Error playing audio:', error);
       });
     }
-  }
-
-  const handleTitleChange = (content) => {
-    setEntryTitle(content);
   };
+
 
   const handleChange = (content) => {
     setEntryText(content);
+  };
+
+  const handleAddNewFolder = async () => {
+    try {
+      await axios.post('http://localhost:5000/api/folders', { name: newFolderName });
+      setNewFolderName('');
+      setShowNewFolderInput(false);
+
+      const response = await axios.get('http://localhost:5000/api/folders');
+      setFolders(response.data);
+    } catch (error) {
+      console.error('Error adding new folder:', error.response ? error.response.data : error.message);
+    }
   };
 
   return (
@@ -94,13 +114,21 @@ const JournalEditor = ({ selectedEntry }) => { // Accept selectedEntry as a prop
       <AmbienceMixer />
       <TypingSound onSoundChange={setTypingSound} />
       <QuillContainer 
-        className='quill-container'
         entryText={entryText}
-        handleChange={handleChange}
-        handleTitleChange={handleTitleChange}
-        setEntryText={setEntryText}
+        entryTitle={entryTitle}
         setEntryTitle={setEntryTitle}
         handleKeyDown={handleKeyDown}
+        handleChange={handleChange}
+        handleAddNewFolder={handleAddNewFolder}
+        selectedFolder={selectedFolder}
+        setSelectedFolder={setSelectedFolder}
+        newFolderName={newFolderName}
+        setNewFolderName={setNewFolderName}
+        folders={folders}
+        fetchFolders={fetchFolders}
+        showNewFolderInput={showNewFolderInput}
+        setShowNewFolderInput={setShowNewFolderInput}
+
       />
       <button className='save' onClick={handleSave} disabled={loading}>
         {loading ? 'Saving...' : 'Save Entry'}
