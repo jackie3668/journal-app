@@ -34,11 +34,6 @@ const JournalEditor = ({selectedEntry, onEntrySaved}) => {
   };
 
   // Define the handleEntrySaved function
-  useEffect(() => {
-    if (onEntrySaved) {
-      console.log('onEntrySaved is defined');
-    }
-  }, [onEntrySaved]);
   return (
     <div className='journal-editor'>
       <AmbienceMixer />

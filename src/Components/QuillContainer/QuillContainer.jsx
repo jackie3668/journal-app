@@ -60,7 +60,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
 
   useEffect(() => {
     if (selectedEntry) {
-      console.log(selectedEntry._id);
       setEntryTitle(selectedEntry.entryTitle || '');
       setEntryText(selectedEntry.entryText || '');
       setTags(selectedEntry.tags || []);

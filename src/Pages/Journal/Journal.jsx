@@ -6,6 +6,7 @@ import JournalEditor from '../../Components/JournalEditor/JournalEditor';
 import Background from '../../Components/Background/Background';
 import Drawer from '../../Components/Drawer/Drawer';
 import './Journal.css';
+import BackgroundSelector from '../../Components/BackgroundSelector/BackgroundSelector';
 
 const Journal = () => {
   const { authState } = useAuth();
@@ -20,12 +21,10 @@ const Journal = () => {
   };
 
   const fetchEntries = async (folderName, userId) => {
-    console.log('Fetching entries with:', { folderName, userId }); // Debugging line
     try {
       const response = await axios.get('http://localhost:5000/api/entries', {
         params: { folderName, userId }
       });
-      console.log('Entries fetched:', response.data); // Debugging line
       setEntries(response.data);
     } catch (error) {
       console.error('Error fetching entries:', error);
@@ -33,7 +32,6 @@ const Journal = () => {
   };
 
   const handleEntrySaved = () => {
-    console.log('Entry saved in journal');
     setRefreshEntries(prev => !prev); // Toggle refresh flag
   };
 
@@ -42,7 +40,6 @@ const Journal = () => {
   };
 
   useEffect(() => {
-    console.log('Refresh Entries:', refreshEntries); // Debugging line
     if (user) {
       fetchEntries(selectedFolder, user.sub); // Fetch entries based on folder and user ID
     }
@@ -59,6 +56,7 @@ const Journal = () => {
         />
       </div>
       <div className="right">
+        <BackgroundSelector />
         <Background />
         <JournalEditor 
           selectedEntry={selectedEntry} 

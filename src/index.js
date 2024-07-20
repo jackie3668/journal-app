@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Auth0Provider } from '@auth0/auth0-react';
 import { AuthProvider } from './Context/AuthContext';
+import { ThemeProvider } from './Context/ThemeContext';
 import App from './App';
 
 const root = createRoot(document.getElementById('root'));
@@ -15,7 +16,9 @@ root.render(
     }}
   >
     <AuthProvider>
-      <App />
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
     </AuthProvider>
   </Auth0Provider>
 );
