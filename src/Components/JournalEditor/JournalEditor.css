@@ -2,10 +2,15 @@
   background-color: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(30px);
   width: 80vw;
+  height: 100vh;
   color: #ccc;
 }
 
 .quill {
   border: 1px solid #ccc;
   height: 50vh;
+}
+
+button.save {
+  margin: 100px;
 }
