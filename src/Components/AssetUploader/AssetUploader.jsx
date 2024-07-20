@@ -13,7 +13,7 @@ const AssetUploader = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/assets', {
+      const response = await axios.post('http://localhost:5000/api/upload', {
         type,
         name,
         url
@@ -38,7 +38,7 @@ const AssetUploader = () => {
           <label>Type:</label>
           <select value={type} onChange={(e) => setType(e.target.value)}>
             <option value="music">Music</option>
-            <option value="typing_sound">Typing Sound</option>
+            <option value="sound">Sound</option>
             <option value="video">Video</option>
           </select>
         </div>

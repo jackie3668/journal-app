@@ -1,26 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../Context/AuthContext';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
+import './JournalEditor.css'
 import TypingSound from '../TypingSound/TypingSound';
 import s1 from '../../Assets/Typing Sounds/01.mp3'
-import s2 from '../../Assets/Typing Sounds/02.mp3'
+
+import QuillContainer from '../QuillContainer/QuillContainer';
+import AmbienceMixer from '../AmbienceMixer/AmbienceMixer';
 
 const JournalEditor = () => {
-  const { authState, login, userData } = useAuth(); // Get auth state, login function, and user data
-  const [entryText, setEntryText] = useState(''); // State for journal entry
-  const [loading, setLoading] = useState(false); // Loading state for save operation
-  const [typingSound, setTypingSound] = useState(null); // Default typing sound
-  const [audio, setAudio] = useState(null); // State for current audio object
 
+  const { authState, login, userData } = useAuth(); 
+  const [entry, setEntry] = useState(''); 
+  const [loading, setLoading] = useState(false); 
+  const [typingSound, setTypingSound] = useState(s1);
+  const [audio, setAudio] = useState(null); 
+  const modules = {
+    toolbar: [
+      [{ 'font': [] },{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
+      ['bold', 'italic', 'underline']
+    ],
+  };
+
+  
+  
   useEffect(() => {
-    // Cleanup the previous audio if exists
     if (audio) {
       audio.pause();
-      audio.src = ''; // Reset source
+      audio.src = '';
     }
 
     if (typingSound) {
-      // Create a new Audio object and set its source when typingSound changes
       const newAudio = new Audio(typingSound);
       setAudio(newAudio);
     }
@@ -28,20 +41,18 @@ const JournalEditor = () => {
 
   useEffect(() => {
     if (authState.isAuthenticated && userData) {
-      // Load the entry from local storage if user is authenticated
       const savedEntry = localStorage.getItem('pendingEntry');
       if (savedEntry) {
-        setEntryText(savedEntry);
-        localStorage.removeItem('pendingEntry'); // Remove entry from local storage after loading
+        setEntry(savedEntry);
+        localStorage.removeItem('pendingEntry'); 
       }
     }
   }, [authState.isAuthenticated, userData]);
 
   const handleSave = async () => {
     if (!authState.isAuthenticated) {
-      // Save entry to local storage if not authenticated
-      localStorage.setItem('pendingEntry', entryText);
-      login(); // Prompt user to login if not authenticated
+      localStorage.setItem('pendingEntry', entry);
+      login();
       return;
     }
 
@@ -49,11 +60,11 @@ const JournalEditor = () => {
     try {
       const response = await axios.post('http://localhost:5000/api/entries', {
         userId: authState.user.sub,
-        entryText,
+        entryText: entry,
         createdAt: new Date(),
       });
       console.log('Entry saved:', response.data);
-      setEntryText(''); // Clear text area after saving
+      setEntry(''); 
     } catch (error) {
       console.error('Error saving journal entry:', error);
     } finally {
@@ -61,44 +72,29 @@ const JournalEditor = () => {
     }
   };
 
-  const handleTextChange = (event) => {
-    setEntryText(event.target.value);
+  const handleChange = (content) => {
     if (audio) {
-      audio.pause(); // Stop the current audio
-      audio.currentTime = 0; // Reset the audio to the beginning
+      audio.pause();
+      audio.currentTime = 0; 
       audio.play().catch((error) => {
         console.error('Error playing audio:', error);
       });
     }
-  };
-
-  const handlePlaySound = () => {
-    if (audio) {
-      audio.play().catch((error) => {
-        console.error('Error playing audio:', error);
-      });
-    }
+    console.log(content);
+    setEntry(content);
   };
 
   return (
-    <div>
-      <TypingSound onSoundChange={setTypingSound} /> {/* TypingSound component */}
-      <h2>Journal Entry</h2>
-      <textarea
-        rows="10"
-        cols="50"
-        value={entryText}
-        onChange={handleTextChange} // Update entryText and play sound on change
-        placeholder="Write your journal entry here..."
+    <div className='journal-editor'>
+      <AmbienceMixer />
+      <TypingSound onSoundChange={setTypingSound} /> 
+      <QuillContainer 
+        entry={entry}
+        handleChange={handleChange}
       />
-      <br />
       <button onClick={handleSave} disabled={loading}>
         {loading ? 'Saving...' : 'Save Entry'}
       </button>
-      <audio controls id="beep">
-        <source src={s1} type="audio/mp3" />
-        Your browser does not support the audio tag.
-      </audio>
     </div>
   );
 };
