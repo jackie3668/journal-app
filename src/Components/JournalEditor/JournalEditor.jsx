@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useAuth } from '../../Context/AuthContext';
+import { useAuth } from '../../Context/AuthContext'; // Ensure this path and export are correct
 import 'react-quill/dist/quill.snow.css';
 import './JournalEditor.css';
-import TypingSound from '../TypingSound/TypingSound';
-import QuillContainer from '../QuillContainer/QuillContainer';
-import AmbienceMixer from '../AmbienceMixer/AmbienceMixer';
+import TypingSound from '../TypingSound/TypingSound'; // Ensure this path and export are correct
+import QuillContainer from '../QuillContainer/QuillContainer'; // Ensure this path and export are correct
+import AmbienceMixer from '../AmbienceMixer/AmbienceMixer'; // Ensure this path and export are correct
 
-const JournalEditor = () => {
-  const { authState, login, userData } = useAuth();
+const JournalEditor = ({selectedEntry, onEntrySaved}) => {
   const [typingSound, setTypingSound] = useState({ url: '', volume: 1 });
   const [audio, setAudio] = useState(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (audio) {
@@ -26,38 +23,6 @@ const JournalEditor = () => {
     }
   }, [typingSound]);
 
-  useEffect(() => {
-    if (authState.isAuthenticated && userData) {
-      const savedEntry = localStorage.getItem('pendingEntry');
-      if (savedEntry) {
-        localStorage.removeItem('pendingEntry');
-      }
-    }
-  }, [authState.isAuthenticated, userData]);
-
-  const handleSave = async (entryTitle, entryText, selectedFolder) => {
-    if (!authState.isAuthenticated) {
-      localStorage.setItem('pendingEntry', entryText);
-      login();
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await axios.post('http://localhost:5000/api/entries', {
-        userId: authState.user.sub,
-        entryTitle,
-        entryText,
-        folderName: selectedFolder,
-        createdAt: new Date(),
-      });
-    } catch (error) {
-      console.error('Error saving journal entry:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleKeyDown = () => {
     if (audio) {
       audio.pause();
@@ -68,14 +33,17 @@ const JournalEditor = () => {
     }
   };
 
+  // Define the handleEntrySaved function
+  useEffect(() => {
+    if (onEntrySaved) {
+      console.log('onEntrySaved is defined');
+    }
+  }, [onEntrySaved]);
   return (
     <div className='journal-editor'>
       <AmbienceMixer />
       <TypingSound onSoundChange={setTypingSound} />
-      <QuillContainer 
-        handleKeyDown={handleKeyDown}
-        handleSave={handleSave}
-      />
+      <QuillContainer handleKeyDown={handleKeyDown} selectedEntry={selectedEntry} onEntrySaved={onEntrySaved} />
     </div>
   );
 };

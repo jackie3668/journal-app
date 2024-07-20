@@ -11,8 +11,8 @@ import Journal from './Pages/Journal/Journal';
 function App() {  
   return (
     <div className="App">
-      {/* <LoginButton />
-      <LogoutButton /> */}
+      <LoginButton />
+      <LogoutButton />
       <Journal />
       {/* <ClockWidget /> */}
       {/* <QuotesWidget /> */}
