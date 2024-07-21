@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../Context/AuthContext'; // Ensure this path and export are correct
 import 'react-quill/dist/quill.snow.css';
 import './JournalEditor.css';
 import TypingSound from '../TypingSound/TypingSound'; // Ensure this path and export are correct
@@ -33,7 +32,6 @@ const JournalEditor = ({selectedEntry, onEntrySaved}) => {
     }
   };
 
-  // Define the handleEntrySaved function
   return (
     <div className='journal-editor'>
       <AmbienceMixer />

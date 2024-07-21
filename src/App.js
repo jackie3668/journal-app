@@ -5,6 +5,7 @@ import LogoutButton from './Components/AuthTemp/LogoutButton';
 import ClockWidget from './Components/ClockWidget/ClockWidget';
 import JournalEditor from './Components/JournalEditor/JournalEditor';
 import QuotesWidget from './Components/QuotesWidget/QuotesWidget';
+import Home from './Pages/Home/Home';
 import Journal from './Pages/Journal/Journal';
 
 
@@ -13,11 +14,13 @@ function App() {
     <div className="App">
       {/* <LoginButton />
       <LogoutButton /> */}
+      <Home />
       <Journal />
       {/* <ClockWidget /> */}
       {/* <QuotesWidget /> */}
       {/* <JournalEditor /> */}
-      {/* <AssetUploader /> */}
+      <AssetUploader />
+
     </div>
   );
 }

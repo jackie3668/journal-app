@@ -3,6 +3,8 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
+import { saveAs } from 'file-saver';
+import Export from '../Export/Export';
 
 const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
   const { authState, login, userData } = useAuth();
@@ -60,6 +62,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
 
   useEffect(() => {
     if (selectedEntry) {
+
       setEntryTitle(selectedEntry.entryTitle || '');
       setEntryText(selectedEntry.entryText || '');
       setTags(selectedEntry.tags || []);
@@ -148,6 +151,9 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
 
   return (
     <div>
+      <div>
+        <Export entryTitle={entryTitle} entryText={entryText} />
+      </div>
       <div>
         <label htmlFor="folder-select">Select Folder:</label>
         <select

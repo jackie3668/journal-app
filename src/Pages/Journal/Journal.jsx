@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext'; // Adjust the import path as necessary
-
 import JournalEditor from '../../Components/JournalEditor/JournalEditor';
 import Background from '../../Components/Background/Background';
 import Drawer from '../../Components/Drawer/Drawer';
@@ -32,7 +31,7 @@ const Journal = () => {
   };
 
   const handleEntrySaved = () => {
-    setRefreshEntries(prev => !prev); // Toggle refresh flag
+    setRefreshEntries(prev => !prev); 
   };
 
   const handleFolderChange = (folderName) => {
@@ -41,7 +40,7 @@ const Journal = () => {
 
   useEffect(() => {
     if (user) {
-      fetchEntries(selectedFolder, user.sub); // Fetch entries based on folder and user ID
+      fetchEntries(selectedFolder, user.sub); 
     }
   }, [refreshEntries, selectedFolder, user]);
 
