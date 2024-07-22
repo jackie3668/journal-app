@@ -5,35 +5,28 @@ import { useAuth } from '../../Context/AuthContext';
 const Achievements = () => {
   const { authState } = useAuth();
   const { user } = authState;
-
-  // Ensure user is available before attempting to fetch achievements
-  const [achievements, setAchievements] = useState(null); 
+  const [achievements, setAchievements] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAchievements = async () => {
-      // Check if user is available
-
       try {
-      
-        const response = await axios.get(`http://localhost:5000/api/achievements/${authState.user.sub}`);
-        console.log(response.data);
+        const userId = user.sub;
+        const response = await axios.get(`http://localhost:5000/api/achievements/${userId}`);
         setAchievements(response.data);
       } catch (err) {
         setError('Error fetching achievements: ' + (err.response?.data?.message || err.message));
-        console.error(err);
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchAchievements();
-  }, [user]); // Include user in the dependency array to refetch when user changes
+  }, [user]);
+  
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
-
   if (!achievements) return <p>No achievements data available.</p>;
 
   return (
