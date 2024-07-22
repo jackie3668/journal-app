@@ -56,10 +56,10 @@ const Journal = () => {
       </div>
       <div className="right">
         <BackgroundSelector />
-        <Background />
         <JournalEditor 
           selectedEntry={selectedEntry} 
           onEntrySaved={handleEntrySaved} 
+          setSelectedEntry={setSelectedEntry}
         />
       </div>
     </div>

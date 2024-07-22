@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
-import { saveAs } from 'file-saver';
 import Export from '../Export/Export';
+import { useTheme } from '../../Context/ThemeContext';
+import { fetchFolders, saveEntry, addNewFolder, extractPlainText, calculateWordCount } from '../../Utils/utils';
+import { useAchievements } from '../../Context/AchievementContext'; // Import the hook
 
-const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
+const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry }) => {
   const { authState, login, userData } = useAuth();
+  const { selectedPrompt } = useTheme();
+  const { achievements, updateAchievements } = useAchievements(); // Use the hook
   const [entryTitle, setEntryTitle] = useState('');
   const [entryText, setEntryText] = useState('');
   const [tags, setTags] = useState([]);
@@ -17,6 +20,14 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
   const [newFolderName, setNewFolderName] = useState('');
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [startTime, setStartTime] = useState(null); 
+  const [elapsedTime, setElapsedTime] = useState(0); 
+  const [wordCount, setWordCount] = useState(0); 
+  const [isTyping, setIsTyping] = useState(false); 
+  const [initialWordCount, setInitialWordCount] = useState(0);
+  const [initialText, setInitialText] = useState('');
+  
+  const quillRef = useRef(null); 
 
   useEffect(() => {
     if (authState.isAuthenticated && userData) {
@@ -28,49 +39,48 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
   }, [authState.isAuthenticated, userData]);
 
   useEffect(() => {
-    const fetchFolders = async () => {
-      if (!authState.isAuthenticated || !authState.user) {
-        return;
-      }
+    const fetchAndSetFolders = async () => {
+      if (!authState.isAuthenticated || !authState.user) return;
 
       try {
-        const response = await axios.get('http://localhost:5000/api/folders', {
-          params: { userId: authState.user.sub },
-        });
-
-        if (response.data.length === 0) {
-          await axios.post('http://localhost:5000/api/folders', { 
-            name: 'Default',
-            userId: authState.user.sub 
-          });
-
-          const updatedResponse = await axios.get('http://localhost:5000/api/folders', {
-            params: { userId: authState.user.sub },
-          });
-
-          setFolders(updatedResponse.data);
-        } else {
-          setFolders(response.data);
-        }
+        const folders = await fetchFolders(authState.user.sub);
+        setFolders(folders);
       } catch (error) {
         console.error('Error fetching folders:', error);
       }
     };
 
-    fetchFolders();
+    fetchAndSetFolders();
   }, [authState.isAuthenticated, authState.user]);
 
   useEffect(() => {
     if (selectedEntry) {
-
       setEntryTitle(selectedEntry.entryTitle || '');
       setEntryText(selectedEntry.entryText || '');
       setTags(selectedEntry.tags || []);
       setSelectedFolder(selectedEntry.folderName || 'Default');
+      setInitialText(selectedEntry.entryText || '');
+      setInitialWordCount(calculateWordCount(extractPlainText(selectedEntry.entryText || '')));
+    } else if (selectedPrompt) {
+      setEntryText(selectedPrompt.text); // Set the selected prompt as the entry text
     }
-  }, [selectedEntry]);
+  }, [selectedEntry, selectedPrompt]);
+  
+
+  useEffect(() => {
+    let timerId;
+
+    if (isTyping) {
+      timerId = setInterval(() => {
+        setElapsedTime(prev => prev + 1000); 
+      }, 1000); 
+    }
+
+    return () => clearInterval(timerId); 
+  }, [isTyping]);
 
   const handleSave = async () => {
+    
     if (!authState.isAuthenticated) {
       localStorage.setItem('pendingEntry', entryText);
       login();
@@ -82,23 +92,30 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
       const url = selectedEntry ? `http://localhost:5000/api/entries/${selectedEntry._id}` : 'http://localhost:5000/api/entries';
       const method = selectedEntry ? 'PUT' : 'POST';
   
-      await axios({
-        method,
-        url,
-        data: {
-          userId: authState.user.sub,
-          entryTitle,
-          entryText,
-          folderName: selectedFolder,
-          tags,
-          createdAt: new Date(),
-        },
-      });
+      await saveEntry({
+        userId: authState.user.sub,
+        entryTitle: entryTitle || '',
+        entryText,
+        folderName: selectedFolder,
+        tags,
+        createdAt: new Date(),
+      }, url, method);
+  
+      if (!selectedEntry) {
+        updateAchievements('incrementEntryCount', 1);
+      }
+      const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
+      updateAchievements('incrementWordCount', wordDelta);
+      updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000); 
+      updateAchievements('updateTagUsage', tags);
   
       setEntryTitle('');
       setEntryText('');
       setTags([]);
       setNewTag('');
+      setElapsedTime(0);
+      setIsTyping(false);
+      setSelectedEntry(null);
       if (onEntrySaved) {
         onEntrySaved();
       }
@@ -109,10 +126,18 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
     }
   };
   
+
   const handleTextChange = (content) => {
     setEntryText(content);
+    const newWordCount = calculateWordCount(extractPlainText(content));
+    setWordCount(newWordCount);
+  
+    if (!isTyping) {
+      setStartTime(Date.now()); 
+      setIsTyping(true);
+    }
   };
-
+  
   const handleTitleChange = (e) => {
     setEntryTitle(e.target.value);
   };
@@ -133,19 +158,12 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
       return;
     }
     try {
-      await axios.post('http://localhost:5000/api/folders', {
-        name: newFolderName,
-        userId: authState.user.sub
-      });
+      const updatedFolders = await addNewFolder(authState.user.sub, newFolderName);
+      setFolders(updatedFolders);
       setNewFolderName('');
       setShowNewFolderInput(false);
-
-      const response = await axios.get('http://localhost:5000/api/folders', {
-        params: { userId: authState.user.sub }
-      });
-      setFolders(response.data);
     } catch (error) {
-      console.error('Error adding new folder:', error.response ? error.response.data : error.message);
+      console.error('Error adding new folder:', error);
     }
   };
 
@@ -159,9 +177,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
         <select
           id="folder-select"
           value={selectedFolder}
-          onChange={(e) => {
-            setSelectedFolder(e.target.value);
-          }}
+          onChange={(e) => setSelectedFolder(e.target.value)}
         >
           {folders.length ? (
             folders.map((folder) => (
@@ -204,7 +220,8 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
         onChange={handleTextChange}
         onKeyDown={handleKeyDown}
         modules={modules}
-        placeholder="Start writing here..."
+        placeholder={selectedPrompt ? selectedPrompt.text : "Start writing here..."} 
+        ref={quillRef}
       />
       <div>
         <input
@@ -226,6 +243,10 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, selectedEntry }) => {
             ))}
           </ul>
         )}
+      </div>
+      <div>
+        <p>Word Count: {wordCount}</p>
+        <p>Time Spent: {Math.floor(elapsedTime / 60000)}m {Math.floor((elapsedTime % 60000) / 1000)}s</p>
       </div>
       <button onClick={handleSave} disabled={loading}>
         {loading ? 'Saving...' : 'Save Entry'}

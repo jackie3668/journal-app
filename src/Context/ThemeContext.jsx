@@ -11,6 +11,7 @@ export const ThemeProvider = ({ children }) => {
   const [sounds, setSounds] = useState([]);
   const [backgroundUrl, setBackgroundUrl] = useState(''); // Added backgroundUrl
   const [assets, setAssets] = useState([]);
+  const [selectedPrompt, setSelectedPrompt] = useState(null); // Added selectedPrompt
 
   // Fetch assets on component mount
   useEffect(() => {
@@ -51,7 +52,12 @@ export const ThemeProvider = ({ children }) => {
   };
 
   return (
-    <ThemeContext.Provider value={{ backgroundName, setBackgroundName, typingSoundName,setTypingSoundName, sounds, backgroundUrl, setBackgroundUrl, selectPreset }}>
+    <ThemeContext.Provider value={{
+      backgroundName, setBackgroundName,
+      typingSoundName, setTypingSoundName,
+      sounds, backgroundUrl, setBackgroundUrl,
+      selectPreset, selectedPrompt, setSelectedPrompt // Added selectedPrompt and setSelectedPrompt
+    }}>
       {children}
     </ThemeContext.Provider>
   );

@@ -4,6 +4,7 @@ import { Auth0Provider } from '@auth0/auth0-react';
 import { AuthProvider } from './Context/AuthContext';
 import { ThemeProvider } from './Context/ThemeContext';
 import App from './App';
+import { AchievementProvider } from './Context/AchievementContext';
 
 const root = createRoot(document.getElementById('root'));
 
@@ -16,9 +17,11 @@ root.render(
     }}
   >
     <AuthProvider>
-      <ThemeProvider>
-        <App />
-      </ThemeProvider>
+      <AchievementProvider>
+        <ThemeProvider>
+          <App />
+        </ThemeProvider>
+      </AchievementProvider>
     </AuthProvider>
   </Auth0Provider>
 );

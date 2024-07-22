@@ -5,7 +5,7 @@ import TypingSound from '../TypingSound/TypingSound'; // Ensure this path and ex
 import QuillContainer from '../QuillContainer/QuillContainer'; // Ensure this path and export are correct
 import AmbienceMixer from '../AmbienceMixer/AmbienceMixer'; // Ensure this path and export are correct
 
-const JournalEditor = ({selectedEntry, onEntrySaved}) => {
+const JournalEditor = ({selectedEntry, onEntrySaved, setSelectedEntry}) => {
   const [typingSound, setTypingSound] = useState({ url: '', volume: 1 });
   const [audio, setAudio] = useState(null);
 
@@ -36,7 +36,7 @@ const JournalEditor = ({selectedEntry, onEntrySaved}) => {
     <div className='journal-editor'>
       <AmbienceMixer />
       <TypingSound onSoundChange={setTypingSound} />
-      <QuillContainer handleKeyDown={handleKeyDown} selectedEntry={selectedEntry} onEntrySaved={onEntrySaved} />
+      <QuillContainer handleKeyDown={handleKeyDown} setSelectedEntry={setSelectedEntry} selectedEntry={selectedEntry} onEntrySaved={onEntrySaved} />
     </div>
   );
 };
