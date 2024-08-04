@@ -1,23 +1,54 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const SOUND_CATEGORIES = [
+  'Ambient',
+  'Effects',
+  'Human',
+  'Music',
+  'Nature',
+  'Urban'
+];
+
+const PRESET_CATEGORIES = [
+  'Cyberpunk',
+  'Cozy Cottage',
+  'Futuristic',
+  'Retro',
+  'Rustic',
+  'Urban',
+  'Nature',
+  'Adventure'
+];
+
+const VIDEO_CATEGORIES = [
+  'Urban',
+  'Rustic',
+  'Indoor',
+  'Nature',
+  'Scenic',
+  'Fantasy',
+  'Other'
+];
+
 const AssetUploader = () => {
   const [assets, setAssets] = useState([]);
   const [presets, setPresets] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editFields, setEditFields] = useState({});
-  const [type, setType] = useState('music');
+  const [type, setType] = useState('sound');
   const [name, setName] = useState('');
   const [url, setUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [category, setCategory] = useState('Ambient');
+  const [presetCategory, setPresetCategory] = useState('Cyberpunk');
+  const [videoCategory, setVideoCategory] = useState('Urban');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  
-  // State for Dropbox URL conversion
   const [dropboxUrl, setDropboxUrl] = useState('');
   const [directDownloadUrl, setDirectDownloadUrl] = useState('');
 
-  // Fetch assets and presets on component mount
   useEffect(() => {
     const fetchAssets = async () => {
       try {
@@ -41,7 +72,6 @@ const AssetUploader = () => {
     fetchPresets();
   }, []);
 
-  // Handle form submission for uploading a new asset
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -52,80 +82,109 @@ const AssetUploader = () => {
       const response = await axios.post('http://localhost:5000/api/assets', {
         type,
         name,
-        url
+        url,
+        imageUrl,  // Added this field for image URL
+        category
       });
 
       setSuccess('Asset uploaded successfully!');
-      console.log('Response:', response.data);
       setName('');
       setUrl('');
-      setAssets([...assets, response.data.asset]); // Add the new asset to the list
+      setImageUrl('');  // Reset the image URL field
+      setCategory('Ambient');
+      setAssets([...assets, response.data.asset]);
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to upload asset');
+      setError(err.response?.data?.error || 'Failed to upload asset');
       console.error('Error:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle form submission for creating a new preset
-  const handlePresetSubmit = async (e) => {
-    e.preventDefault();
-    const presetName = e.target.elements.presetName.value;
-    const selectedAssets = {
-      video: e.target.elements.video.value,
-      typing: e.target.elements.typing.value,
-      sound1: e.target.elements.sound1.value,
-      sound2: e.target.elements.sound2.value,
-      sound3: e.target.elements.sound3.value,
-    };
+const handlePresetSubmit = async (e) => {
+  e.preventDefault();
+  const presetName = e.target.elements.presetName.value;
+  const selectedVideoId = e.target.elements.video.value; // Ensure this field is not empty
+  const selectedAssets = [
+    e.target.elements.typing.value,
+    e.target.elements.sound1.value,
+    e.target.elements.sound2.value,
+    e.target.elements.sound3.value,
+  ].filter(id => id);
+
+  // Log values to verify correct data is being sent
+  console.log('Preset Name:', presetName);
+  console.log('Selected Video ID:', selectedVideoId);
+  console.log('Selected Assets:', selectedAssets);
+
+  const video = assets.find(asset => asset._id === selectedVideoId);
+  if (!video || video.type !== 'video') {
+    setError('Invalid video selection');
+    return;
+  }
+
+  const assetURLs = selectedAssets.map(id => assets.find(asset => asset._id === id)?.name);
+
+  try {
+    const response = await axios.post('http://localhost:5000/api/presets', {
+      name: presetName,
+      assets: assetURLs,
+      videoId: selectedVideoId, 
+      imageUrl: video.imageUrl,
+      category: presetCategory
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    setSuccess('Preset created successfully!');
+    setPresets([...presets, {
+      _id: response.data.presetId,
+      name: presetName,
+      assets: assetURLs,
+      imageUrl: video.imageUrl,
+      category: presetCategory
+    }]);
+  } catch (err) {
+    console.error('Error response:', err.response);
+    setError(err.response?.data?.error || 'Failed to create preset');
+  }
+};
+
   
-    const assetURLs = Object.values(selectedAssets)
-      .filter(id => id) // Filter out empty values
-      .map(id => assets.find(asset => asset._id === id)?.name); // Map to URLs
-  
-    try {
-      const response = await axios.post('http://localhost:5000/api/presets', {
-        name: presetName,
-        assets: assetURLs
-      });
-      
-      setSuccess('Preset created successfully!');
-      setPresets([...presets, { name: presetName, assets: assetURLs }]);
-    } catch (err) {
-      setError(err.response?.data?.error || 'Failed to create preset');
-      console.error('Error:', err);
-    }
-  };
-  
-  // Handle input changes during editing
   const handleChange = (e, field) => {
     setEditFields({ ...editFields, [field]: e.target.value });
   };
+  
 
-  // Start editing an asset
-  const handleEdit = (id, field, value) => {
-    setEditingId(id);
-    setEditFields({ [field]: value });
+  const handleEdit = (id) => {
+    const asset = assets.find(a => a._id === id);
+    if (asset) {
+      setEditingId(id);
+      setEditFields({
+        name: asset.name,
+        url: asset.url,
+        imageUrl: asset.imageUrl,
+        category: asset.category
+      });
+    }
   };
-
-  // Update an asset
-  const handleUpdate = async (id) => {
+  
+  const handleUpdate = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/assets/${id}`, editFields);
-      
+      await axios.put(`http://localhost:5000/api/assets/${editingId}`, editFields);
       setAssets(assets.map(asset =>
-        asset._id === id ? { ...asset, ...editFields } : asset
+        asset._id === editingId ? { ...asset, ...editFields } : asset
       ));
-      
       setEditingId(null);
       setEditFields({});
     } catch (err) {
       console.error('Error updating asset:', err);
     }
   };
+  
 
-  // Delete an asset
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/assets/${id}`);
@@ -135,7 +194,6 @@ const AssetUploader = () => {
     }
   };
 
-  // Convert Dropbox link to direct download link
   const convertToDirectDownload = (url) => {
     const regex = /https:\/\/www\.dropbox\.com\/scl\/fi\/(.+?)\?(.+?)&dl=0/;
     const match = url.match(regex);
@@ -145,20 +203,29 @@ const AssetUploader = () => {
     return '';
   };
 
-  // Handle Dropbox URL input and conversion
   const handleDropboxSubmit = (e) => {
     e.preventDefault();
     const directDownloadUrl = convertToDirectDownload(dropboxUrl);
     setDirectDownloadUrl(directDownloadUrl);
   };
 
-  // Handle deleting a preset
   const handlePresetDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/presets/${id}`);
       setPresets(presets.filter(preset => preset._id !== id));
     } catch (err) {
       console.error('Error deleting preset:', err);
+    }
+  };
+
+  const getCategoryOptions = () => {
+    switch (type) {
+      case 'sound':
+        return SOUND_CATEGORIES;
+      case 'video':
+        return VIDEO_CATEGORIES;
+      default:
+        return [];
     }
   };
 
@@ -171,10 +238,9 @@ const AssetUploader = () => {
         <div>
           <label htmlFor="type">Type:</label>
           <select id="type" value={type} onChange={(e) => setType(e.target.value)}>
-            <option value="music">Music</option>
-            <option value="typing">Typing Sound</option>
             <option value="sound">Sound</option>
             <option value="video">Video</option>
+            <option value="typing">Typing Sound</option>
           </select>
         </div>
         <div>
@@ -197,6 +263,27 @@ const AssetUploader = () => {
             required
           />
         </div>
+        <div>
+          <label htmlFor="imageUrl">Image URL:</label>
+          <input
+            id="imageUrl"
+            type="text"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+          />
+        </div>
+        <div>
+          <label htmlFor="category">Category:</label>
+          <select
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          >
+            {getCategoryOptions().map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+        </div>
         <button type="submit" disabled={loading}>
           {loading ? 'Uploading...' : 'Upload'}
         </button>
@@ -206,59 +293,75 @@ const AssetUploader = () => {
       <form onSubmit={handlePresetSubmit}>
         <div>
           <label htmlFor="presetName">Preset Name:</label>
-          <input id="presetName" type="text" required />
+          <input
+            id="presetName"
+            type="text"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="presetImageUrl">Preset Image URL:</label>
+          <input
+            id="presetImageUrl"
+            type="text"
+          />
+        </div>
+        <div>
+          <label htmlFor="presetCategory">Category:</label>
+          <select
+            id="presetCategory"
+            value={presetCategory}
+            onChange={(e) => setPresetCategory(e.target.value)}
+          >
+            {PRESET_CATEGORIES.map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
         </div>
         <div>
           <label htmlFor="video">Video:</label>
-          <select id="video">
-            <option value="">Select Video</option>
-            {assets.filter(asset => asset.type === 'video').map(asset => (
-              <option key={asset._id} value={asset._id}>{asset.name}</option>
+          <select id="video" name="video">
+            {assets.filter(a => a.type === 'video').map(video => (
+              <option key={video._id} value={video._id}>{video.name}</option>
             ))}
           </select>
         </div>
         <div>
           <label htmlFor="typing">Typing Sound:</label>
-          <select id="typing">
-            <option value="">Select Typing Sound</option>
-            {assets.filter(asset => asset.type === 'typing').map(asset => (
-              <option key={asset._id} value={asset._id}>{asset.name}</option>
+          <select id="typing" name="typing">
+            {assets.filter(a => a.type === 'typing').map(sound => (
+              <option key={sound._id} value={sound._id}>{sound.name}</option>
             ))}
           </select>
         </div>
         <div>
           <label htmlFor="sound1">Sound 1:</label>
-          <select id="sound1">
-            <option value="">Select Sound 1</option>
-            {assets.filter(asset => asset.type === 'sound').map(asset => (
-              <option key={asset._id} value={asset._id}>{asset.name}</option>
+          <select id="sound1" name="sound1">
+            {assets.filter(a => a.type === 'sound').map(sound => (
+              <option key={sound._id} value={sound._id}>{sound.name}</option>
             ))}
           </select>
         </div>
         <div>
           <label htmlFor="sound2">Sound 2:</label>
-          <select id="sound2">
-            <option value="">Select Sound 2</option>
-            {assets.filter(asset => asset.type === 'sound').map(asset => (
-              <option key={asset._id} value={asset._id}>{asset.name}</option>
+          <select id="sound2" name="sound2">
+            {assets.filter(a => a.type === 'sound').map(sound => (
+              <option key={sound._id} value={sound._id}>{sound.name}</option>
             ))}
           </select>
         </div>
         <div>
           <label htmlFor="sound3">Sound 3:</label>
-          <select id="sound3">
-            <option value="">Select Sound 3</option>
-            {assets.filter(asset => asset.type === 'sound').map(asset => (
-              <option key={asset._id} value={asset._id}>{asset.name}</option>
+          <select id="sound3" name="sound3">
+            {assets.filter(a => a.type === 'sound').map(sound => (
+              <option key={sound._id} value={sound._id}>{sound.name}</option>
             ))}
           </select>
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Creating...' : 'Create Preset'}
-        </button>
+        <button type="submit">Create Preset</button>
       </form>
 
-      <h2>Convert Dropbox URL to Direct Download Link</h2>
+      <h2>Convert Dropbox Link</h2>
       <form onSubmit={handleDropboxSubmit}>
         <div>
           <label htmlFor="dropboxUrl">Dropbox URL:</label>
@@ -270,104 +373,69 @@ const AssetUploader = () => {
             required
           />
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Converting...' : 'Convert'}
-        </button>
+        <button type="submit">Convert</button>
       </form>
       {directDownloadUrl && (
         <div>
-          <h3>Direct Download Link:</h3>
+          <p>Direct Download URL:</p>
           <a href={directDownloadUrl} target="_blank" rel="noopener noreferrer">
             {directDownloadUrl}
           </a>
         </div>
       )}
 
-      <h2>Assets</h2>
-      {loading && <p>Loading assets...</p>}
-      <table>
-        <thead>
-          <tr>
-            <th>Type</th>
-            <th>Name</th>
-            <th>URL</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {assets.map(asset => (
-            <tr key={asset._id}>
-              <td>
-                {editingId === asset._id ? (
-                  <input
-                    type="text"
-                    value={editFields.type || asset.type}
-                    onChange={(e) => handleChange(e, 'type')}
-                  />
-                ) : (
-                  asset.type
-                )}
-              </td>
-              <td>
-                {editingId === asset._id ? (
-                  <input
-                    type="text"
-                    value={editFields.name || asset.name}
-                    onChange={(e) => handleChange(e, 'name')}
-                  />
-                ) : (
-                  asset.name
-                )}
-              </td>
-              <td>
-                {editingId === asset._id ? (
-                  <input
-                    type="text"
-                    value={editFields.url || asset.url}
-                    onChange={(e) => handleChange(e, 'url')}
-                  />
-                ) : (
-                  asset.url
-                )}
-              </td>
-              <td>
-                {editingId === asset._id ? (
-                  <button onClick={() => handleUpdate(asset._id)}>Save</button>
-                ) : (
-                  <>
-                    <button onClick={() => handleEdit(asset._id, 'type', asset.type)}>Edit</button>
-                    <button onClick={() => handleDelete(asset._id)}>Delete</button>
-                  </>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+<h2>Assets</h2>
+      <ul>
+        {assets.map(asset => (
+          <li key={asset._id}>
+            {asset.name} ({asset.type}) - {asset.category}
+            {asset.imageUrl && (
+              <div>
+                <img src={asset.imageUrl} alt={asset.name} style={{ width: '150px', height: 'auto' }} />
+                <p>Thumbnail</p>
+              </div>
+            )}
+            <button onClick={() => handleEdit(asset._id)}>Edit</button>
+            <button onClick={() => handleDelete(asset._id)}>Delete</button>
+            {editingId === asset._id && (
+              <div>
+                <input
+                  type="text"
+                  value={editFields.name}
+                  onChange={(e) => handleChange(e, 'name')}
+                />
+                <input
+                  type="text"
+                  value={editFields.url}
+                  onChange={(e) => handleChange(e, 'url')}
+                />
+                <input
+                  type="text"
+                  value={editFields.imageUrl}
+                  onChange={(e) => handleChange(e, 'imageUrl')}
+                />
+                <input
+                  type="text"
+                  value={editFields.category}
+                  onChange={(e) => handleChange(e, 'category')}
+                />
+                <button onClick={handleUpdate}>Update</button>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
 
       <h2>Presets</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Assets</th>
-            <th>Actions</th> {/* New column for actions */}
-          </tr>
-        </thead>
-        <tbody>
-          {presets.map(preset => (
-            <tr key={preset._id}>
-              <td>{preset.name}</td>
-              <td>
-                {preset.assets.join(', ')}
-              </td>
-              <td>
-                <button onClick={() => handlePresetDelete(preset._id)}>Delete</button> {/* Delete button */}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <ul>
+        {presets.map(preset => (
+          <li key={preset._id}>
+            {preset.name} - {preset.category}
+            {preset.imageUrl && <img src={preset.imageUrl} alt={preset.name} style={{ width: '100px', height: 'auto' }} />}
+            <button onClick={() => handlePresetDelete(preset._id)}>Delete</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

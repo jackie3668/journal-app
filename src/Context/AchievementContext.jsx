@@ -18,7 +18,7 @@ export const AchievementProvider = ({ children }) => {
   });
 
   const updateAchievements = async (type, payload) => {
-    // Update local state
+
     setAchievements(prev => {
       const updatedAchievements = { ...prev };
       switch (type) {
@@ -48,7 +48,7 @@ export const AchievementProvider = ({ children }) => {
       return updatedAchievements;
     });
   
-    // Send update to the backend
+
     try {
       if (!user || !user.sub) {
         throw new Error('User information is missing.');

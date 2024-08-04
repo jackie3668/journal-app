@@ -10,7 +10,7 @@ const PromptUploader = () => {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
 
-  // Fetch prompts and categories on component mount
+
   useEffect(() => {
     const fetchPrompts = async () => {
       try {
@@ -26,14 +26,13 @@ const PromptUploader = () => {
     fetchPrompts();
   }, []);
 
-  // Handle form submission
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     setError('');
     setSuccess('');
 
-    // Parse input
     const promptEntries = inputText.split('///').filter(entry => entry.trim() !== '');
     const parsedPrompts = [];
 
@@ -48,13 +47,11 @@ const PromptUploader = () => {
     }
 
     try {
-      // Send data to backend
       await axios.post('http://localhost:5000/api/prompts', {
         prompts: parsedPrompts
       });
       setSuccess('Prompts uploaded successfully!');
       setInputText('');
-      // Refresh prompts list
       const response = await axios.get('http://localhost:5000/api/prompts');
       setPrompts(response.data);
     } catch (err) {
@@ -64,12 +61,10 @@ const PromptUploader = () => {
     }
   };
 
-  // Handle delete prompt
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:5000/api/prompts/${id}`);
       setSuccess('Prompt deleted successfully!');
-      // Refresh prompts list
       const response = await axios.get('http://localhost:5000/api/prompts');
       setPrompts(response.data);
     } catch (err) {
@@ -77,7 +72,6 @@ const PromptUploader = () => {
     }
   };
 
-  // Filter prompts by category
   const filteredPrompts = selectedCategory
     ? prompts.filter(prompt => prompt.category === selectedCategory)
     : prompts;

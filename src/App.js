@@ -17,14 +17,14 @@ function App() {
     <div className="App">
       <LoginButton />
       <LogoutButton />
-      <Home />
+      {/* <Home /> */}
       <Background />
-      {/* <BackgroundSelector /> */}
+      <BackgroundSelector />
       {/* <PromptUploader /> */}
-      <Journal />
+      {/* <Journal /> */}
       {/* <ClockWidget /> */}
       {/* <JournalEditor /> */}
-      {/* <AssetUploader /> */}
+      <AssetUploader />
 
     </div>
   );
