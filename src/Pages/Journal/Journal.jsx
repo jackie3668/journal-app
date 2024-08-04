@@ -51,7 +51,7 @@ const Journal = () => {
           onEntrySelect={handleSelectEntry} 
           onEntrySaved={handleEntrySaved} 
           selectedFolder={selectedFolder}
-          onFolderChange={handleFolderChange} // Pass the handler for folder changes
+          onFolderChange={handleFolderChange} 
         />
       </div>
       <div className="right">

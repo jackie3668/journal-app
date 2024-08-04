@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { useTheme } from '../../Context/ThemeContext'; // Adjust the import path as necessary
+import { useTheme } from '../../Context/ThemeContext'; 
 import './Background.css';
 
 const Background = () => {
@@ -8,7 +8,7 @@ const Background = () => {
 
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.load(); // Reload video when backgroundUrl changes
+      videoRef.current.load(); 
     }
   }, [backgroundUrl]);
 

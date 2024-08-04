@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useTheme } from '../../Context/ThemeContext';
 
 const BackgroundSelector = () => {
-  const { backgroundName, setBackgroundName, backgroundUrl, setBackgroundUrl } = useTheme(); // Use backgroundUrl and setBackgroundUrl
+  const { backgroundName, setBackgroundName, backgroundUrl, setBackgroundUrl } = useTheme(); 
   const [assets, setAssets] = useState([]);
   const [selectedAsset, setSelectedAsset] = useState('');
 
@@ -14,24 +14,21 @@ const BackgroundSelector = () => {
         const videoAssets = response.data.filter(asset => asset.type === 'video');
         setAssets(videoAssets);
 
-        // Set default selected asset from the preset, if available
         if (videoAssets.length > 0) {
           if (backgroundName) {
             const matchingAsset = videoAssets.find(asset => asset.name === backgroundName);
             if (matchingAsset) {
               setSelectedAsset(matchingAsset.url);
-              setBackgroundUrl(matchingAsset.url); // Update backgroundUrl
+              setBackgroundUrl(matchingAsset.url); 
             } else {
-              // If no matching asset is found, set to empty and use default
-              setSelectedAsset(videoAssets[0].url); // Default to the first asset
-              setBackgroundUrl(videoAssets[0].url); // Ensure context is updated
-              setBackgroundName(videoAssets[0].name); // Ensure context is updated
+              setSelectedAsset(videoAssets[0].url); 
+              setBackgroundUrl(videoAssets[0].url); 
+              setBackgroundName(videoAssets[0].name); 
             }
           } else {
-            // If no backgroundName, set default to the first asset
             setSelectedAsset(videoAssets[0].url);
-            setBackgroundUrl(videoAssets[0].url); // Ensure context is updated
-            setBackgroundName(videoAssets[0].name); // Ensure context is updated
+            setBackgroundUrl(videoAssets[0].url); 
+            setBackgroundName(videoAssets[0].name); 
           }
         }
       } catch (error) {
@@ -47,7 +44,7 @@ const BackgroundSelector = () => {
       const selectedAssetName = assets.find(asset => asset.url === selectedAsset)?.name || '';
       if (selectedAssetName) {
         setBackgroundName(selectedAssetName);
-        setBackgroundUrl(selectedAsset); // Update backgroundUrl
+        setBackgroundUrl(selectedAsset); 
       }
     }
   }, [selectedAsset, assets, setBackgroundName, setBackgroundUrl]);

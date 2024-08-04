@@ -23,18 +23,15 @@ const AmbienceMixer = () => {
     fetchSounds();
   }, []);
 
-  // Update selected sounds based on the preset
   useEffect(() => {
     if (presetSounds.length > 0) {
-      // Match preset sounds with available sounds
       const matchedSounds = presetSounds
         .map(name => sounds.find(sound => sound.name === name))
-        .filter(Boolean); // Filter out any null/undefined
+        .filter(Boolean); 
 
       setSelectedSounds(matchedSounds);
-      // Set default volumes for matched sounds
       const initialVolumes = matchedSounds.reduce((acc, sound) => {
-        acc[sound._id] = 0.5; // Default volume
+        acc[sound._id] = 0.2; 
         return acc;
       }, {});
       setVolumes(initialVolumes);
@@ -44,7 +41,7 @@ const AmbienceMixer = () => {
   const handleSelectSound = (sound) => {
     if (selectedSounds.length < 3 && !selectedSounds.some(s => s._id === sound._id)) {
       setSelectedSounds([...selectedSounds, sound]);
-      setVolumes({ ...volumes, [sound._id]: 0.5 });
+      setVolumes({ ...volumes, [sound._id]: 0.2 });
     }
   };
 
@@ -62,9 +59,8 @@ const AmbienceMixer = () => {
       delete newVolumes[soundId];
       return newVolumes;
     });
-    // Remove the audio reference as well
     if (audioRefs.current[soundId]) {
-      audioRefs.current[soundId].pause(); // Stop playing
+      audioRefs.current[soundId].pause(); 
       delete audioRefs.current[soundId];
     }
   };
