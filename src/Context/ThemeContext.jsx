@@ -1,19 +1,16 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
-// Create a Context for the theme
 const ThemeContext = createContext();
 
-// Create a Provider component
 export const ThemeProvider = ({ children }) => {
   const [backgroundName, setBackgroundName] = useState('');
   const [typingSoundName, setTypingSoundName] = useState('');
   const [sounds, setSounds] = useState([]);
-  const [backgroundUrl, setBackgroundUrl] = useState(''); // Added backgroundUrl
+  const [backgroundUrl, setBackgroundUrl] = useState('https://cdn.pixabay.com/video/2023/10/26/186611-878455887_large.mp4'); 
   const [assets, setAssets] = useState([]);
-  const [selectedPrompt, setSelectedPrompt] = useState(null); // Added selectedPrompt
+  const [selectedPrompt, setSelectedPrompt] = useState(null); 
 
-  // Fetch assets on component mount
   useEffect(() => {
     const fetchAssets = async () => {
       try {
@@ -27,27 +24,30 @@ export const ThemeProvider = ({ children }) => {
     fetchAssets();
   }, []);
 
-  // Function to update the theme based on the selected preset
   const selectPreset = (preset) => {
     if (preset) {
-      const backgroundAsset = assets.find(asset => asset.name === preset.assets[0]);
-      const typingSoundAsset = assets.find(asset => asset.name === preset.assets[1]);
-      const otherSoundAssets = preset.assets.slice(2).map(name => assets.find(asset => asset.name === name));
+      const backgroundAsset = assets.find(asset => asset._id === preset.videoId);
+      const typingSoundAsset = assets.find(asset => asset.name === preset.assets[0]);
+      const otherSoundAssets = preset.assets.slice(1).map(name => assets.find(asset => asset.name === name));
 
-      setBackgroundName(preset.assets[0]); // Set background name
-      setTypingSoundName(preset.assets[1]); // Set typing sound name
-      setSounds(otherSoundAssets.map(asset => asset.name)); // Set other sound names
+      console.log('Background Asset:', backgroundAsset);
+
+
+      setBackgroundName(preset.assets[0]); 
+      setTypingSoundName(preset.assets[1]); 
+      setSounds(otherSoundAssets.map(asset => asset ? asset.name : 'Unknown'));
 
       if (backgroundAsset) {
-        setBackgroundUrl(backgroundAsset.url); // Set background URL
+        setBackgroundUrl(backgroundAsset.url);
+        console.log('Background URL from preset:', backgroundAsset.url);
       } else {
-        setBackgroundUrl(''); // Default if no matching asset
+        setBackgroundUrl('');
       }
     } else {
       setBackgroundName('');
       setTypingSoundName('');
       setSounds([]);
-      setBackgroundUrl(''); // Clear URL if no preset
+      setBackgroundUrl('');
     }
   };
 
@@ -56,7 +56,7 @@ export const ThemeProvider = ({ children }) => {
       backgroundName, setBackgroundName,
       typingSoundName, setTypingSoundName,
       sounds, backgroundUrl, setBackgroundUrl,
-      selectPreset, selectedPrompt, setSelectedPrompt // Added selectedPrompt and setSelectedPrompt
+      selectPreset, selectedPrompt, setSelectedPrompt
     }}>
       {children}
     </ThemeContext.Provider>

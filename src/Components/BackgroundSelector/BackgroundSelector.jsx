@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useTheme } from '../../Context/ThemeContext';
 
 const BackgroundSelector = () => {
-  const { backgroundName, setBackgroundName, backgroundUrl, setBackgroundUrl } = useTheme(); 
+  const { setBackgroundName, setBackgroundUrl, backgroundUrl } = useTheme(); 
   const [assets, setAssets] = useState([]);
   const [selectedAsset, setSelectedAsset] = useState('');
 
@@ -13,44 +13,35 @@ const BackgroundSelector = () => {
         const response = await axios.get('http://localhost:5000/api/assets');
         const videoAssets = response.data.filter(asset => asset.type === 'video');
         setAssets(videoAssets);
-
-        if (videoAssets.length > 0) {
-          if (backgroundName) {
-            const matchingAsset = videoAssets.find(asset => asset.name === backgroundName);
-            if (matchingAsset) {
-              setSelectedAsset(matchingAsset.url);
-              setBackgroundUrl(matchingAsset.url); 
-            } else {
-              setSelectedAsset(videoAssets[0].url); 
-              setBackgroundUrl(videoAssets[0].url); 
-              setBackgroundName(videoAssets[0].name); 
-            }
-          } else {
-            setSelectedAsset(videoAssets[0].url);
-            setBackgroundUrl(videoAssets[0].url); 
-            setBackgroundName(videoAssets[0].name); 
-          }
-        }
+        console.log('Fetched video assets:', videoAssets);
       } catch (error) {
         console.error('Error fetching assets:', error);
       }
     };
 
     fetchAssets();
-  }, [backgroundName, setBackgroundName, setBackgroundUrl]);
+  }, []);
 
   useEffect(() => {
-    if (selectedAsset) {
-      const selectedAssetName = assets.find(asset => asset.url === selectedAsset)?.name || '';
-      if (selectedAssetName) {
-        setBackgroundName(selectedAssetName);
-        setBackgroundUrl(selectedAsset); 
-      }
-    }
-  }, [selectedAsset, assets, setBackgroundName, setBackgroundUrl]);
+    setSelectedAsset(backgroundUrl);
+  }, [backgroundUrl]);
 
   const handleAssetChange = (event) => {
-    setSelectedAsset(event.target.value);
+    const selectedUrl = event.target.value;
+    setSelectedAsset(selectedUrl);
+
+    if (selectedUrl) {
+      const selectedAssetName = assets.find(asset => asset.url === selectedUrl)?.name || '';
+      if (selectedAssetName) {
+        setBackgroundName(selectedAssetName);
+        setBackgroundUrl(selectedUrl);
+        console.log('Selected asset name and URL set:', selectedAssetName, selectedUrl);
+      }
+    } else {
+      setBackgroundName('');
+      setBackgroundUrl('');
+      console.log('No asset selected, background reset');
+    }
   };
 
   return (
@@ -61,6 +52,7 @@ const BackgroundSelector = () => {
         value={selectedAsset} 
         onChange={handleAssetChange}
       >
+        <option value="">None</option>
         {assets.map((asset) => (
           <option key={asset._id} value={asset.url}>
             {asset.name}

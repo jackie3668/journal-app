@@ -4,10 +4,9 @@ import LoginButton from './Components/AuthTemp/LoginButton';
 import LogoutButton from './Components/AuthTemp/LogoutButton';
 import Background from './Components/Background/Background';
 import BackgroundSelector from './Components/BackgroundSelector/BackgroundSelector';
-import ClockWidget from './Components/ClockWidget/ClockWidget';
 import JournalEditor from './Components/JournalEditor/JournalEditor';
 import PromptUploader from './Components/PromptUploader/PromptUploader';
-import Achievements from './Pages/Achievements/Achievements';
+import Achievements from './Components/AchievementsWidget/AchievementsWidget';
 import Home from './Pages/Home/Home';
 import Journal from './Pages/Journal/Journal';
 
@@ -17,15 +16,13 @@ function App() {
     <div className="App">
       <LoginButton />
       <LogoutButton />
-      {/* <Home /> */}
+      <Home />
       <Background />
-      <BackgroundSelector />
+      {/* <BackgroundSelector /> */}
       {/* <PromptUploader /> */}
       {/* <Journal /> */}
-      {/* <ClockWidget /> */}
       {/* <JournalEditor /> */}
-      <AssetUploader />
-
+      {/* <AssetUploader /> */}
     </div>
   );
 }

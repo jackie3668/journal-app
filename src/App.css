@@ -8,3 +8,28 @@
 li {
   list-style: none;
 }
+
+/* Mobile (up to 480px) */
+@media (max-width: 480px) {
+
+}
+
+/* Tablet (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+
+}
+
+/* Laptop (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+}
+
+/* Desktop (1025px to 1200px) */
+@media (min-width: 1025px) and (max-width: 1200px) {
+
+}
+
+/* Larger screens (1201px and above) */
+@media (min-width: 1201px) {
+
+}

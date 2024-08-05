@@ -13,7 +13,7 @@ const Journal = () => {
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [entries, setEntries] = useState([]);
   const [refreshEntries, setRefreshEntries] = useState(false);
-  const [selectedFolder, setSelectedFolder] = useState('Default'); // Default folder
+  const [selectedFolder, setSelectedFolder] = useState('Default'); 
 
   const handleSelectEntry = (entry) => {
     setSelectedEntry(entry);

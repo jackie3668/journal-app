@@ -9,7 +9,6 @@ const AmbienceMixer = () => {
   const [volumes, setVolumes] = useState({});
   const audioRefs = useRef({});
 
-  // Fetch available sounds from the server
   useEffect(() => {
     const fetchSounds = async () => {
       try {
@@ -27,11 +26,11 @@ const AmbienceMixer = () => {
     if (presetSounds.length > 0) {
       const matchedSounds = presetSounds
         .map(name => sounds.find(sound => sound.name === name))
-        .filter(Boolean); 
+        .filter(Boolean);
 
       setSelectedSounds(matchedSounds);
       const initialVolumes = matchedSounds.reduce((acc, sound) => {
-        acc[sound._id] = 0.2; 
+        acc[sound._id] = 0.1; 
         return acc;
       }, {});
       setVolumes(initialVolumes);
@@ -39,9 +38,9 @@ const AmbienceMixer = () => {
   }, [presetSounds, sounds]);
 
   const handleSelectSound = (sound) => {
-    if (selectedSounds.length < 3 && !selectedSounds.some(s => s._id === sound._id)) {
+    if (selectedSounds.length < 8 && !selectedSounds.some(s => s._id === sound._id)) {
       setSelectedSounds([...selectedSounds, sound]);
-      setVolumes({ ...volumes, [sound._id]: 0.2 });
+      setVolumes({ ...volumes, [sound._id]: 0.1 }); 
     }
   };
 
@@ -60,10 +59,18 @@ const AmbienceMixer = () => {
       return newVolumes;
     });
     if (audioRefs.current[soundId]) {
-      audioRefs.current[soundId].pause(); 
+      audioRefs.current[soundId].pause();
       delete audioRefs.current[soundId];
     }
   };
+
+  useEffect(() => {
+    selectedSounds.forEach(sound => {
+      if (audioRefs.current[sound._id]) {
+        audioRefs.current[sound._id].volume = volumes[sound._id] || 0.1; 
+      }
+    });
+  }, [selectedSounds, volumes]);
 
   return (
     <div>
@@ -89,11 +96,16 @@ const AmbienceMixer = () => {
               max="1"
               step="0.01"
               value={volumes[sound._id]}
-              onChange={(e) => handleVolumeChange(sound._id, e.target.value)}
+              onChange={(e) => handleVolumeChange(sound._id, parseFloat(e.target.value))}
             />
             <button onClick={() => handleRemoveSound(sound._id)}>Remove</button>
             <audio
-              ref={(el) => (audioRefs.current[sound._id] = el)}
+              ref={(el) => {
+                if (el) {
+                  audioRefs.current[sound._id] = el;
+                  el.volume = volumes[sound._id] || 0.1; 
+                }
+              }}
               src={sound.url}
               autoPlay
               loop

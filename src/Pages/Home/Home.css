@@ -1,0 +1,50 @@
+.home-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.widget-container {
+  display: grid;
+  gap: 20px;
+  max-width: 800px;
+  width: 100%;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.widget {
+  background: #f0f0f0; /* Example background color */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 20vw;
+  height: 20vw;
+}
+
+.widget:nth-child(4) {
+  grid-column: span 2; /* Spans two columns */
+}
+
+/* Media Queries */
+
+/* Mobile (up to 480px) */
+@media (max-width: 480px) {
+}
+
+/* Tablet (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+
+}
+
+/* Laptop (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+}
+
+/* Desktop (1025px and above) */
+@media (min-width: 1025px) {
+
+}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
 
-const Achievements = () => {
+const AchievementsWidget = () => {
   const { authState } = useAuth();
   const { user } = authState;
   const [achievements, setAchievements] = useState(null);
@@ -72,4 +72,4 @@ const Achievements = () => {
   );
 };
 
-export default Achievements;
+export default AchievementsWidget;

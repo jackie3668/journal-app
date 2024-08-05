@@ -11,14 +11,13 @@ const SOUND_CATEGORIES = [
 ];
 
 const PRESET_CATEGORIES = [
-  'Cyberpunk',
-  'Cozy Cottage',
-  'Futuristic',
-  'Retro',
-  'Rustic',
   'Urban',
+  'Rustic',
+  'Indoor',
   'Nature',
-  'Adventure'
+  'Scenic',
+  'Fantasy',
+  'Other'
 ];
 
 const VIDEO_CATEGORIES = [
@@ -83,14 +82,14 @@ const AssetUploader = () => {
         type,
         name,
         url,
-        imageUrl,  // Added this field for image URL
+        imageUrl,  
         category
       });
 
       setSuccess('Asset uploaded successfully!');
       setName('');
       setUrl('');
-      setImageUrl('');  // Reset the image URL field
+      setImageUrl('');  
       setCategory('Ambient');
       setAssets([...assets, response.data.asset]);
     } catch (err) {
@@ -101,57 +100,60 @@ const AssetUploader = () => {
     }
   };
 
-const handlePresetSubmit = async (e) => {
-  e.preventDefault();
-  const presetName = e.target.elements.presetName.value;
-  const selectedVideoId = e.target.elements.video.value; // Ensure this field is not empty
-  const selectedAssets = [
-    e.target.elements.typing.value,
-    e.target.elements.sound1.value,
-    e.target.elements.sound2.value,
-    e.target.elements.sound3.value,
-  ].filter(id => id);
+  const handlePresetSubmit = async (e) => {
+    e.preventDefault();
+    const presetName = e.target.elements.presetName.value;
+    const selectedVideoId = e.target.elements.video.value;
+  
+    const selectedAssets = [
+      e.target.elements.typing.value,
+      e.target.elements.sound1.value,
+      e.target.elements.sound2.value,
+      e.target.elements.sound3.value,
+      e.target.elements.sound4.value,
+      e.target.elements.sound5.value,
+      e.target.elements.sound6.value,
+      e.target.elements.sound7.value,
+      e.target.elements.sound8.value
+    ].filter(id => id);
+  
+    const uniqueAssetIds = [...new Set(selectedAssets)];
 
-  // Log values to verify correct data is being sent
-  console.log('Preset Name:', presetName);
-  console.log('Selected Video ID:', selectedVideoId);
-  console.log('Selected Assets:', selectedAssets);
-
-  const video = assets.find(asset => asset._id === selectedVideoId);
-  if (!video || video.type !== 'video') {
-    setError('Invalid video selection');
-    return;
-  }
-
-  const assetURLs = selectedAssets.map(id => assets.find(asset => asset._id === id)?.name);
-
-  try {
-    const response = await axios.post('http://localhost:5000/api/presets', {
-      name: presetName,
-      assets: assetURLs,
-      videoId: selectedVideoId, 
-      imageUrl: video.imageUrl,
-      category: presetCategory
-    }, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    });
-
-    setSuccess('Preset created successfully!');
-    setPresets([...presets, {
-      _id: response.data.presetId,
-      name: presetName,
-      assets: assetURLs,
-      imageUrl: video.imageUrl,
-      category: presetCategory
-    }]);
-  } catch (err) {
-    console.error('Error response:', err.response);
-    setError(err.response?.data?.error || 'Failed to create preset');
-  }
-};
-
+    const video = assets.find(asset => asset._id === selectedVideoId);
+    if (!video || video.type !== 'video') {
+      setError('Invalid video selection');
+      return;
+    }
+  
+    const assetURLs = uniqueAssetIds.map(id => assets.find(asset => asset._id === id)?.name);
+  
+    try {
+      const response = await axios.post('http://localhost:5000/api/presets', {
+        name: presetName,
+        assets: assetURLs,
+        videoId: selectedVideoId, 
+        imageUrl: video.imageUrl,
+        category: presetCategory
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      setSuccess('Preset created successfully!');
+      setPresets([...presets, {
+        _id: response.data.presetId,
+        name: presetName,
+        assets: assetURLs,
+        imageUrl: video.imageUrl,
+        category: presetCategory
+      }]);
+    } catch (err) {
+      console.error('Error response:', err.response);
+      setError(err.response?.data?.error || 'Failed to create preset');
+    }
+  }  
+  
   
   const handleChange = (e, field) => {
     setEditFields({ ...editFields, [field]: e.target.value });
@@ -288,31 +290,19 @@ const handlePresetSubmit = async (e) => {
           {loading ? 'Uploading...' : 'Upload'}
         </button>
       </form>
-
       <h2>Create Preset</h2>
       <form onSubmit={handlePresetSubmit}>
         <div>
           <label htmlFor="presetName">Preset Name:</label>
-          <input
-            id="presetName"
-            type="text"
-            required
-          />
+          <input id="presetName" type="text" required />
         </div>
         <div>
           <label htmlFor="presetImageUrl">Preset Image URL:</label>
-          <input
-            id="presetImageUrl"
-            type="text"
-          />
+          <input id="presetImageUrl" type="text" />
         </div>
         <div>
           <label htmlFor="presetCategory">Category:</label>
-          <select
-            id="presetCategory"
-            value={presetCategory}
-            onChange={(e) => setPresetCategory(e.target.value)}
-          >
+          <select id="presetCategory" value={presetCategory} onChange={(e) => setPresetCategory(e.target.value)}>
             {PRESET_CATEGORIES.map(cat => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
@@ -329,6 +319,7 @@ const handlePresetSubmit = async (e) => {
         <div>
           <label htmlFor="typing">Typing Sound:</label>
           <select id="typing" name="typing">
+            <option value="">None</option>
             {assets.filter(a => a.type === 'typing').map(sound => (
               <option key={sound._id} value={sound._id}>{sound.name}</option>
             ))}
@@ -337,6 +328,7 @@ const handlePresetSubmit = async (e) => {
         <div>
           <label htmlFor="sound1">Sound 1:</label>
           <select id="sound1" name="sound1">
+            <option value="">None</option>
             {assets.filter(a => a.type === 'sound').map(sound => (
               <option key={sound._id} value={sound._id}>{sound.name}</option>
             ))}
@@ -345,6 +337,7 @@ const handlePresetSubmit = async (e) => {
         <div>
           <label htmlFor="sound2">Sound 2:</label>
           <select id="sound2" name="sound2">
+            <option value="">None</option>
             {assets.filter(a => a.type === 'sound').map(sound => (
               <option key={sound._id} value={sound._id}>{sound.name}</option>
             ))}
@@ -353,6 +346,52 @@ const handlePresetSubmit = async (e) => {
         <div>
           <label htmlFor="sound3">Sound 3:</label>
           <select id="sound3" name="sound3">
+            <option value="">None</option>
+            {assets.filter(a => a.type === 'sound').map(sound => (
+              <option key={sound._id} value={sound._id}>{sound.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="sound4">Sound 4:</label>
+          <select id="sound4" name="sound4">
+            <option value="">None</option>
+            {assets.filter(a => a.type === 'sound').map(sound => (
+              <option key={sound._id} value={sound._id}>{sound.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="sound5">Sound 5:</label>
+          <select id="sound5" name="sound5">
+            <option value="">None</option>
+            {assets.filter(a => a.type === 'sound').map(sound => (
+              <option key={sound._id} value={sound._id}>{sound.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="sound6">Sound 6:</label>
+          <select id="sound6" name="sound6">
+            <option value="">None</option>
+            {assets.filter(a => a.type === 'sound').map(sound => (
+              <option key={sound._id} value={sound._id}>{sound.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="sound7">Sound 7:</label>
+          <select id="sound7" name="sound7">
+            <option value="">None</option>
+            {assets.filter(a => a.type === 'sound').map(sound => (
+              <option key={sound._id} value={sound._id}>{sound.name}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor="sound8">Sound 8:</label>
+          <select id="sound8" name="sound8">
+            <option value="">None</option>
             {assets.filter(a => a.type === 'sound').map(sound => (
               <option key={sound._id} value={sound._id}>{sound.name}</option>
             ))}
@@ -377,14 +416,12 @@ const handlePresetSubmit = async (e) => {
       </form>
       {directDownloadUrl && (
         <div>
-          <p>Direct Download URL:</p>
-          <a href={directDownloadUrl} target="_blank" rel="noopener noreferrer">
-            {directDownloadUrl}
-          </a>
+          <p>Direct Download URL: {directDownloadUrl}</p>
+          <button onClick={() => navigator.clipboard.writeText(directDownloadUrl)}>Copy URL</button>
         </div>
       )}
 
-<h2>Assets</h2>
+      <h2>Assets</h2>
       <ul>
         {assets.map(asset => (
           <li key={asset._id}>
