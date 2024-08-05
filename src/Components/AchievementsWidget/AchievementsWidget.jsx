@@ -37,34 +37,19 @@ const AchievementsWidget = () => {
       ) : (
         <ul className="achievements-list">
           <li className="achievement-item">
-            <h3>Total Word Count</h3>
             <p>{achievements.totalWordCount}</p>
           </li>
           <li className="achievement-item">
-            <h3>Entry Count</h3>
             <p>{achievements.entryCount}</p>
           </li>
           <li className="achievement-item">
-            <h3>Folder Count</h3>
             <p>{achievements.folderCount}</p>
           </li>
           <li className="achievement-item">
-            <h3>Prompt Usage</h3>
             <p>{achievements.promptUsage}</p>
           </li>
           <li className="achievement-item">
-            <h3>Time Spent Writing</h3>
             <p>{Math.floor(achievements.timeSpentWriting / 60)}m {achievements.timeSpentWriting % 60}s</p>
-          </li>
-          <li className="achievement-item">
-            <h3>Tag Usage</h3>
-            <ul>
-              {Object.entries(achievements.tagUsage || {}).map(([tag, count]) => (
-                <li key={tag}>
-                  {tag}: {count}
-                </li>
-              ))}
-            </ul>
           </li>
         </ul>
       )}

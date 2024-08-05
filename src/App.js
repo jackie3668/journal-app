@@ -1,30 +1,34 @@
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import './App.css';
-import AssetUploader from './Components/AssetUploader/AssetUploader';
-import LoginButton from './Components/AuthTemp/LoginButton';
-import LogoutButton from './Components/AuthTemp/LogoutButton';
 import Background from './Components/Background/Background';
-import BackgroundSelector from './Components/BackgroundSelector/BackgroundSelector';
-import JournalEditor from './Components/JournalEditor/JournalEditor';
-import PromptUploader from './Components/PromptUploader/PromptUploader';
-import Achievements from './Components/AchievementsWidget/AchievementsWidget';
 import Home from './Pages/Home/Home';
 import Journal from './Pages/Journal/Journal';
+import NavBar from './Components/NavBar/NavBar';
 
+const App = () => {
+  const location = useLocation();
+  const isJournalRoute = location.pathname === '/journal';
 
-function App() {  
   return (
-    <div className="App">
-      <LoginButton />
-      <LogoutButton />
-      <Home />
+    <div className="container">
       <Background />
-      {/* <BackgroundSelector /> */}
-      {/* <PromptUploader /> */}
-      {/* <Journal /> */}
-      {/* <JournalEditor /> */}
-      {/* <AssetUploader /> */}
+      <div className={`container-border ${isJournalRoute ? 'hidden' : ''}`}>
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/account" element={<Home />} />
+          <Route path="/journal" element={<Journal />} />
+        </Routes>
+      </div>
     </div>
   );
-}
+};
 
-export default App;
+const AppWithRouter = () => (
+  <Router>
+    <App />
+  </Router>
+);
+
+export default AppWithRouter;

@@ -1,12 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Quicksand:wght@300..700&display=swap');
+
 * {
   margin: 0;
   padding: 0;
-  background: rgba(0, 0, 0, 0.01);
   color: white;
+}
+
+body, p, li, a, input, button {
+  font-family: "Quicksand", sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Outfit", sans-serif;
 }
 
 li {
   list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Reusable Class */
+.glass {
+  background-color: rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(15px);
+}
+
+.container-border {
+  display: flex;
+  width: 80%;
+  height: 100vh;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  border: 1px solid white;
+  border-radius: 2rem;
+  padding: 3rem;
+  overflow-y: hidden;
+}
+
+.container-border.hidden {
+  border: none;
 }
 
 /* Mobile (up to 480px) */
@@ -32,4 +69,40 @@ li {
 /* Larger screens (1201px and above) */
 @media (min-width: 1201px) {
 
+}
+
+/* Responsive */
+/* Mobile (up to 480px) */
+@media (max-width: 480px) {
+  html {
+    font-size: 12px;
+  }
+}
+
+/* Tablet (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+/* Laptop (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+/* Desktop (1025px to 1200px) */
+@media (min-width: 1025px) and (max-width: 1200px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Larger screens (1201px and above) */
+@media (min-width: 1201px) {
+  html {
+    font-size: 18px;
+  }
 }

@@ -8,14 +8,12 @@ import './Home.css';
 
 const Home = () => {
   return (
-    <div className="home-container">
-      <div className="widget-container">
-        <div className="widget"><ClockWidget /></div>
-        <div className="widget"><CTAWidget /></div>
-        <div className="widget"><AchievementsWidget /></div>
-        <div className="widget"><PresetWidget /></div>
-        <div className="widget"><PromptWidget /></div>
-      </div>
+    <div className="widget-container">
+      <div class="widget widget1 glass"><ClockWidget /></div>
+      <div class="widget widget2"><CTAWidget /></div>
+      <div class="widget widget3 glass"><AchievementsWidget /></div>
+      <div class="widget widget4"><PresetWidget /></div>
+      <div class="widget widget5 glass"><PromptWidget /></div>
     </div>
   );
 }

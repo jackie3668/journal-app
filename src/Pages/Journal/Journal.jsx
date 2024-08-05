@@ -45,7 +45,7 @@ const Journal = () => {
   }, [refreshEntries, selectedFolder, user]);
 
   return (
-    <div className='journal-page'>
+    <div className='journal-container'>
       <div className="left">
         <Drawer 
           onEntrySelect={handleSelectEntry} 

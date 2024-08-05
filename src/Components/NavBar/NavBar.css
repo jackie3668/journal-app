@@ -1,0 +1,130 @@
+nav {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav>div:first-child,
+nav>div:last-child {
+  flex: 1;
+}
+
+nav .clock {
+  display: flex;
+  align-items: center;
+}
+
+nav .clock>div {
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+nav .clock>div:first-child {
+  font-size: 1.5rem;
+  border-right: 1px solid white;
+}
+
+nav .toggle-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 2rem;
+  padding: 0.2rem;
+  box-shadow: inset 2px 2px 4px 2px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+nav .toggle-nav li {
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  width: 4rem;
+  position: relative;
+  z-index: 1;
+  transition: all ease-in-out 0.3s;
+  text-align: center;
+}
+
+nav .toggle-nav li.active {
+  color: black;
+  font-weight: 600;
+}
+
+nav .toggle-nav .slider {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  left: 0;
+  width: 33%; 
+  height: 90%;
+  background-color: white;
+  box-shadow: 4px 0 4px rgba(0, 0, 0, 0.3);
+  border-radius: 2rem;
+  transition: transform 0.3s ease;
+  z-index: 0;
+}
+
+.auth {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem;
+  border-radius: 50%;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Mobile (up to 480px) */
+@media (max-width: 480px) {
+  nav .clock>div:first-child {
+    font-size: 0.875rem;
+    border-right: 1px solid white;
+  }
+}
+
+/* Tablet (481px to 768px) */
+@media  (max-width: 768px) {
+  nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 1rem; 
+  }
+
+  nav .clock {
+    justify-content: flex-start;
+  }
+
+  nav .auth {
+    justify-content: flex-end;
+  }
+
+  nav .toggle-nav {
+    grid-column: span 2;
+    justify-content: center;
+  }
+
+  nav .clock { order: 1; }
+  nav .auth { order: 2; }
+  nav .toggle-nav { order: 3;}
+
+  nav .toggle-nav li {
+    width: 10rem;
+  }
+}
+
+/* Laptop (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+}
+
+/* Desktop (1025px to 1200px) */
+@media (min-width: 1025px) and (max-width: 1200px) {
+
+}
+
+/* Larger screens (1201px and above) */
+@media (min-width: 1201px) {
+
+}
