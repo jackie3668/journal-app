@@ -94,38 +94,6 @@ a {
 
 }
 
-/* Responsive */
-/* Mobile (up to 480px) */
-@media (max-width: 480px) {
-  html {
-    font-size: 13px;
-  }
-}
-
-@media (min-width: 481px) and (max-width: 768px) {
-  html {
-    font-size: 14px;
-  }
-}
-
-@media (min-width: 769px) and (max-width: 1024px) {
-  html {
-    font-size: 15px;
-  }
-}
-
-@media (min-width: 1025px) and (max-width: 1200px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-@media (min-width: 1201px) {
-  html {
-    font-size: 18px;
-  }
-}
-
 @media (max-height: 800px) {
   html {
     font-size: 12px;
@@ -153,5 +121,41 @@ a {
   .container {
     margin: 1rem 0;
     padding: 0.25rem;
+  }
+}
+
+/* Responsive */
+/* Mobile (up to 480px) */
+@media (max-width: 480px) {
+  html {
+    font-size: 13px;
+  }
+}
+
+/* Tablet (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+/* Laptop (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+/* Desktop (1025px to 1200px) */
+@media (min-width: 1025px) and (max-width: 1200px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Larger screens (1201px and above) */
+@media (min-width: 1201px) {
+  html {
+    font-size: 18px;
   }
 }
