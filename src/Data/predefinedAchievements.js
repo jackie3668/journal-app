@@ -158,7 +158,7 @@ export const predefinedAchievements = [
   {
     name: 'Label Lover',
     description: 'Use a specific tag in 10 entries',
-    target: 10,
+    target: 9,
     category: 'specificTagUsage',
   },
   {
@@ -192,7 +192,7 @@ export const predefinedAchievements = [
     category: 'folderCount',
   },
   {
-    name: 'Folder Enthusiast',
+    name: 'Folder Creator',
     description: 'Create 5 folders',
     target: 5,
     category: 'folderCount',

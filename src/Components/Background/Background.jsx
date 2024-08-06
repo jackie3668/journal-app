@@ -9,7 +9,6 @@ const Background = () => {
   useEffect(() => {
     if (videoRef.current && backgroundUrl) {
       videoRef.current.load(); 
-      console.log('Video reloaded with URL:', backgroundUrl);
     }
   }, [backgroundUrl]);
 

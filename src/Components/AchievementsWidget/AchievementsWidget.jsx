@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
-import { getClosestAchievements } from '../../Utils/achievementUtil';
+import { getAchievements } from '../../Utils/achievementUtil';
 import './AchievementsWidget.css';
 
 const AchievementsWidget = ({ setLoading }) => {
@@ -31,29 +31,39 @@ const AchievementsWidget = ({ setLoading }) => {
   useEffect(() => {
     const fetchClosestAchievements = async () => {
       if (achievements) {
-        const closest = await getClosestAchievements(achievements, user.sub);
-        setClosestAchievements(closest);
+        const { closestAchievements } = await getAchievements(achievements, user.sub);
+        setClosestAchievements(closestAchievements);
       }
     };
 
     fetchClosestAchievements();
   }, [achievements, user]);
 
-
-
   if (!achievements) return <p>No achievements data available.</p>;
 
   return (
     <div className="achievements-container">
-      <h2>Your Achievements</h2>
+      <h2 className="achievements-title">Achievements</h2>
       {Array.isArray(closestAchievements) && closestAchievements.length === 0 ? (
         <p>No achievements to display.</p>
       ) : (
         <ul className="achievements-list">
           {Array.isArray(closestAchievements) && closestAchievements.map((achievement, index) => (
             <li key={index} className="achievement-item">
-              <p>{achievement.name}: {achievement.userProgress} / {achievement.target}</p>
-              <p>{achievement.description}</p>
+              <div className="achievement-icon-placeholder"></div>
+              <div className="achievement-details">
+                <p className="achievement-name">
+                  {achievement.name}
+                </p>
+                <p className="achievement-progress">{achievement.userProgress} / {achievement.target} {achievement.unit}  {achievement.additionalInfo && `${achievement.additionalInfo}`}</p>
+              </div>
+              <div className="achievement-progress-bar">
+                <div 
+                  className="achievement-progress-fill" 
+                  style={{ width: `${achievement.progressPercentage}%` }}>
+                </div>
+              </div>
+              <p className="achievement-percentage">{Math.round(achievement.progressPercentage)}%</p>
             </li>
           ))}
         </ul>
