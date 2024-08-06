@@ -3,7 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { useLoading } from '../../Context/LoadingContext';
 import './ClockWidget.css';
-import logo from '../../Assets/UI/Brand/writing.png';
+import logo from '../../Assets/Brand/writing.png';
 import clearIcon from '../../Assets/UI/Weather/sunny.png';
 import partlyCloudyIcon from '../../Assets/UI/Weather/cloud.png';
 import cloudyIcon from '../../Assets/UI/Weather/cloud.png';
