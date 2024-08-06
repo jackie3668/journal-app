@@ -1,7 +1,4 @@
-// src/utils/utils.js
-
 import axios from 'axios';
-
 /**
  * Fetch folders from the server.
  * @param {string} userId - The ID of the user.
