@@ -70,8 +70,33 @@
   }
 }
 
-/* Desktop (1025px and above) */
-@media (min-width: 1025px) {
+@media  (min-width:600px) and (max-height: 800px) {
+  .widget {
+    max-height: 13rem;
+  }
 
+  .widget-container {
+    overflow-y: hidden;
+
+  }
 }
 
+@media (min-width: 481px) and (max-width: 1024px) and (max-height: 800px) {
+  .widget-container {
+    grid-row-gap: 2rem;
+    grid-column-gap: 2rem;
+    grid-template-columns: 1fr 1fr;
+    margin: 2rem;
+    max-width: 100%;
+  }
+
+  .widget1 { order: 1; }
+  .widget2 { order: 2; }
+  .widget3 { order: 3; }
+  .widget4 { order: 5; }
+  .widget5 { order: 4; }
+  
+  .widget {
+    max-height: 24rem;
+  }
+}
