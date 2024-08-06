@@ -50,15 +50,20 @@ a {
   border: 1px solid white;
   border-radius: 2rem;
   padding: 3rem;
-  gap: 3rem;
+  gap: 2rem;
   overflow-y: hidden;
 }
 
-.container-border.hidden {
-  /* border: none; */
+.white-button {
+  background-color: white;
+  color: black;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.4rem 1.2rem;
+  border-radius: 2rem;
+  cursor: pointer;
 }
-
-
 /* Mobile (up to 480px) */
 @media (max-width: 480px) {
   .container-border {
