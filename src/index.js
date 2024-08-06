@@ -5,6 +5,7 @@ import { AuthProvider } from './Context/AuthContext';
 import { ThemeProvider } from './Context/ThemeContext';
 import App from './App';
 import { AchievementProvider } from './Context/AchievementContext';
+import { LoadingProvider } from './Context/LoadingContext';
 
 const root = createRoot(document.getElementById('root'));
 
@@ -17,11 +18,13 @@ root.render(
     }}
   >
     <AuthProvider>
-      <AchievementProvider>
-        <ThemeProvider>
-          <App />
-        </ThemeProvider>
-      </AchievementProvider>
+      <LoadingProvider>
+        <AchievementProvider>
+          <ThemeProvider>
+            <App />
+          </ThemeProvider>
+        </AchievementProvider>
+      </LoadingProvider>
     </AuthProvider>
   </Auth0Provider>
 );

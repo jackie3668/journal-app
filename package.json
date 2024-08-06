@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@auth0/auth0-react": "^2.2.4",
+    "@babel/polyfill": "^7.12.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -28,6 +29,7 @@
     "react-quill": "^2.0.0",
     "react-router-dom": "^6.26.0",
     "react-scripts": "5.0.1",
+    "react-scrollbars-custom": "^4.1.1",
     "react-transition-group": "^4.4.5",
     "rtf.js": "^3.0.9",
     "stream-browserify": "^3.0.0",

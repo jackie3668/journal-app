@@ -58,6 +58,7 @@ a {
   /* border: none; */
 }
 
+
 /* Mobile (up to 480px) */
 @media (max-width: 480px) {
   .container-border {
