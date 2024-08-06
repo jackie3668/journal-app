@@ -39,7 +39,8 @@ nav .toggle-nav {
 nav .toggle-nav li {
   padding: 0.25rem 0.75rem;
   border-radius: 2rem;
-  width: 4rem;
+  width: 6rem;
+  font-size: 1rem;
   position: relative;
   z-index: 1;
   transition: all ease-in-out 0.3s;
@@ -110,7 +111,7 @@ nav .toggle-nav .slider {
   nav .toggle-nav { order: 3;}
 
   nav .toggle-nav li {
-    width: 10rem;
+    width: 20rem;
   }
 }
 

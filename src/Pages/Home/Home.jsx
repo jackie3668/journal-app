@@ -10,9 +10,9 @@ const Home = () => {
   return (
     <div className="widget-container">
       <div class="widget widget1 glass"><ClockWidget /></div>
-      <div class="widget widget2"><CTAWidget /></div>
+      <div class="widget widget2 glass"><CTAWidget /></div>
       <div class="widget widget3 glass"><AchievementsWidget /></div>
-      <div class="widget widget4"><PresetWidget /></div>
+      <div class="widget widget4 glass"><PresetWidget /></div>
       <div class="widget widget5 glass"><PromptWidget /></div>
     </div>
   );

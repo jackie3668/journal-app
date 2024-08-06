@@ -1,18 +1,13 @@
-.container {
-  height: 90vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 2rem;
-}
+
 
 .widget-container {
   display: grid;
+  height: 100%;
+  align-items: center;
   justify-content: center;
   grid-template-columns: repeat(3, 1fr);
-  grid-gap: 1.5rem;
-  max-width: 1000px;
+  grid-row-gap: 0.5rem;
+  grid-column-gap: 1.5rem; 
 }
 
 .widget {
@@ -21,6 +16,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 1.5rem;
+  max-height: 15rem; 
 }
 
 .widget1, .widget2, .widget3, .widget5 {
@@ -67,6 +63,12 @@
   
 }
 
+@media (max-width: 769px) {
+  .container-border {
+    overflow-y: scroll;
+  }
+}
+
 /* Laptop (769px to 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
 }
@@ -76,16 +78,3 @@
 
 }
 
-/* Laptop (769px to 1024px) */
-@media (max-height: 600px)  {
-  .widget {
-    max-height: 225px; 
-  }
-}
-
-/* Desktop (1025px and above) */
-@media (min-height: 600px) and (max-height: 800px) {
-  .widget {
-    max-height: 275px; 
-  }
-}

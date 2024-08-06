@@ -4,6 +4,8 @@
   margin: 0;
   padding: 0;
   color: white;
+  box-sizing: border-box;
+  font-weight: 400;
 }
 
 body, p, li, a, input, button {
@@ -29,9 +31,18 @@ a {
   backdrop-filter: blur(15px);
 }
 
+.container {
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem;
+}
+
 .container-border {
   display: flex;
-  width: 80%;
+  width: 90%;
   height: 100vh;
   flex-direction: column;
   justify-content: flex-start;
@@ -39,21 +50,26 @@ a {
   border: 1px solid white;
   border-radius: 2rem;
   padding: 3rem;
+  gap: 3rem;
   overflow-y: hidden;
 }
 
 .container-border.hidden {
-  border: none;
+  /* border: none; */
 }
 
 /* Mobile (up to 480px) */
 @media (max-width: 480px) {
-
+  .container-border {
+    width: 100%;
+  }
 }
 
 /* Tablet (481px to 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
-
+  .container-border {
+    width: 100%;
+  }
 }
 
 /* Laptop (769px to 1024px) */

@@ -1,0 +1,65 @@
+.clock-widget {
+  width: 100%;
+  height: 100%;
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+}
+
+.clock-widget .date-section {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.clock-widget .logo-icon img {
+  width: 1.75rem;
+  height: 1.75rem;
+  cursor: pointer;
+}
+
+.clock-widget .lower-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  gap: 0.5rem;
+}
+
+.clock-widget .weather-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.clock-widget .weather-section .weather {
+  font-size: 2rem;
+}
+
+.clock-widget .weather-section img {
+  width: 2rem;
+  height: 2rem;
+}
+
+.clock-widget .time-section {
+  font-size: 1rem;
+  line-height: 110%;
+
+}
+
+.clock-widget .time-section .day {
+  opacity: 0.8;
+}
+.clock-widget .time-section .time {
+  opacity: 0.4;
+}
+
+.clock-widget .welcome-section {
+  font-size: 0.75rem;
+}
