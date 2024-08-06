@@ -1,7 +1,52 @@
 import { predefinedAchievements } from '../Data/predefinedAchievements';
+import axios from 'axios';
 
-export const getClosestAchievements = (userAchievements) => {
-  const categoryProgress = predefinedAchievements.reduce((acc, achievement) => {
+export const getClosestAchievements = async (userAchievements, userId) => {
+  const categoryProgress = {};
+
+  let allEntries = [];
+  try {
+    const response = await axios.get(`http://localhost:5000/api/entries/all`, {
+      params: { userId: userId }
+    });
+    allEntries = response.data || [];
+  } catch (err) {
+    console.error('Error fetching all entries:', err);
+  }
+
+  const tagUsageMap = {};
+  const folderEntryCountMap = {};
+  const distinctFolders = new Set();
+
+  allEntries.forEach(entry => {
+    entry.tags.forEach(tag => {
+      if (!tagUsageMap[tag]) {
+        tagUsageMap[tag] = 0;
+      }
+      tagUsageMap[tag]++;
+    });
+
+    const folderName = entry.folderName || 'Default';
+    if (folderName !== 'Default') {
+      if (!folderEntryCountMap[folderName]) {
+        folderEntryCountMap[folderName] = 0;
+      }
+      folderEntryCountMap[folderName]++;
+      distinctFolders.add(folderName);
+    }
+  });
+
+  const highestTagUsage = Math.max(...Object.values(tagUsageMap), 0);
+  const highestFolderEntryCount = Math.max(...Object.values(folderEntryCountMap), 0);
+  const folderCount = distinctFolders.size;
+
+  console.log('Tag Usage Map:', tagUsageMap);
+  console.log('Folder Entry Count Map:', folderEntryCountMap);
+  console.log('Highest Tag Usage:', highestTagUsage);
+  console.log('Highest Folder Entry Count:', highestFolderEntryCount);
+  console.log('Distinct Folder Count:', folderCount);
+
+  for (const achievement of predefinedAchievements) {
     let userProgress = 0;
     switch (achievement.category) {
       case 'wordCount':
@@ -11,16 +56,19 @@ export const getClosestAchievements = (userAchievements) => {
         userProgress = userAchievements.entryCount;
         break;
       case 'folderCount':
-        userProgress = userAchievements.folderCount;
+        userProgress = folderCount;
+        console.log(`Folder Count - User Progress: ${userProgress}`);
         break;
       case 'tagUsage':
         userProgress = Object.keys(userAchievements.tagUsage).length;
         break;
       case 'specificTagUsage':
-        userProgress = userAchievements.tagUsage[achievement.name] || 0;
+        userProgress = highestTagUsage;
+        console.log(`Specific Tag Usage - User Progress: ${userProgress}`);
         break;
       case 'entriesInFolder':
-        userProgress = userAchievements.entriesInFolder || 0;
+        userProgress = highestFolderEntryCount;
+        console.log(`Entries in Folder - User Progress: ${userProgress}`);
         break;
       case 'timeSpentWriting':
         userProgress = userAchievements.timeSpentWriting;
@@ -30,23 +78,27 @@ export const getClosestAchievements = (userAchievements) => {
     }
     const remaining = achievement.target - userProgress;
 
-    // Logging for debugging
-    console.log(`Processing achievement: ${achievement.name}`);
-    console.log(`Category: ${achievement.category}, User Progress: ${userProgress}, Target: ${achievement.target}`);
-    console.log(`Remaining: ${remaining}`);
-
-    if (!acc[achievement.category]) {
-      acc[achievement.category] = [];
+    if (!categoryProgress[achievement.category]) {
+      categoryProgress[achievement.category] = [];
     }
 
-    acc[achievement.category].push({ ...achievement, userProgress, remaining });
+    categoryProgress[achievement.category].push({ ...achievement, userProgress, remaining });
 
-    return acc;
-  }, {});
+    console.log(`Achievement added: ${achievement.name}, User Progress: ${userProgress}, Remaining: ${remaining}`);
+  }
 
-  // Filter out the closest achievement for each category
   Object.keys(categoryProgress).forEach((category) => {
-    categoryProgress[category] = categoryProgress[category].filter(a => a.remaining > 0).sort((a, b) => a.remaining - b.remaining)[0];
+    console.log(`Processing category: ${category}`);
+    console.log('Before filter:', categoryProgress[category]);
+
+    categoryProgress[category] = categoryProgress[category]
+      .filter(a => {
+        console.log(`Filtering achievement: ${a.name}, Remaining: ${a.remaining}`);
+        return a.remaining > 0;
+      })
+      .sort((a, b) => a.remaining - b.remaining)[0];
+
+    console.log('After filter and sort:', categoryProgress[category]);
   });
 
   console.log('Category Progress:', categoryProgress);
