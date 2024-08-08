@@ -1,0 +1,68 @@
+.preset-widget {
+  width: 100%; 
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 1.5rem;
+}
+
+.preset-widget .slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.preset-widget .preset-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  filter: brightness(0.5);
+  z-index: -1;
+  width: 100%; 
+  height: 100%;
+  border-radius: 1.5rem;
+  background-size: cover;
+}
+
+.preset-widget .preset-item {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; 
+  padding: 2rem;
+  text-align: start;
+}
+
+
+.preset-widget .preset-item span {
+  font-size: 0.875rem;
+}
+
+.preset-widget .preset-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.preset-widget .dots {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+}
+
+.preset-widget .custom-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: gray;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.preset-widget .custom-dot.active {
+  background: white;
+  transform: scale(1.3);
+}

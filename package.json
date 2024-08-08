@@ -32,6 +32,7 @@
     "react-scrollbars-custom": "^4.1.1",
     "react-transition-group": "^4.4.5",
     "rtf.js": "^3.0.9",
+    "slick-carousel": "^1.8.1",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "url": "^0.11.3",
