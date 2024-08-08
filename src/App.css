@@ -25,6 +25,11 @@ a {
   color: inherit;
 }
 
+/* TEMP */
+button, select, input {
+  background-color: black;
+}
+
 /* Reusable Class */
 .glass {
   background-color: rgba(0, 0, 0, 0.15);

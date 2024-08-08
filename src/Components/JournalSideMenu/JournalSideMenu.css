@@ -1,0 +1,18 @@
+.side-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.side-menu img {
+  width: 2rem;
+}
+
+.menu-icon {
+  padding: 0.25rem;
+  border-radius: 3px;
+}
+
+.menu-icon:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import 'react-quill/dist/quill.snow.css';
 import './JournalEditor.css';
-import TypingSound from '../TypingSound/TypingSound'; // Ensure this path and export are correct
-import QuillContainer from '../QuillContainer/QuillContainer'; // Ensure this path and export are correct
-import AmbienceMixer from '../AmbienceMixer/AmbienceMixer'; // Ensure this path and export are correct
+import TypingSound from '../TypingSound/TypingSound'; 
+import QuillContainer from '../QuillContainer/QuillContainer'; 
+import AmbienceMixer from '../AmbienceMixer/AmbienceMixer'; 
 
 const JournalEditor = ({selectedEntry, onEntrySaved, setSelectedEntry}) => {
   const [typingSound, setTypingSound] = useState({ url: '', volume: 1 });

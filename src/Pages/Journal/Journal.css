@@ -1,3 +1,19 @@
 .journal-container {
-  overflow-y: scroll;
+  width: 100%;
+  height: 65vh;
+  overflow-y: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border: 1px solid red;
+}
+
+.journal-container .menu {
+  position: absolute;
+  right: 0; 
+}
+
+.journal-container .editor {
+  width: 800px;
 }

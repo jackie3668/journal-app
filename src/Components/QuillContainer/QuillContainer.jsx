@@ -5,29 +5,30 @@ import { useAuth } from '../../Context/AuthContext';
 import Export from '../Export/Export';
 import { useTheme } from '../../Context/ThemeContext';
 import { fetchFolders, saveEntry, addNewFolder, extractPlainText, calculateWordCount } from '../../Utils/utils';
-import { useAchievements } from '../../Context/AchievementContext'; // Import the hook
+import { useAchievements } from '../../Context/AchievementContext';
+import './QuillContainer.css';
 
 const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry }) => {
   const { authState, login, userData } = useAuth();
   const { selectedPrompt } = useTheme();
-  const { achievements, updateAchievements } = useAchievements(); // Use the hook
+  const { achievements, updateAchievements } = useAchievements();
   const [entryTitle, setEntryTitle] = useState('');
-  const [entryText, setEntryText] = useState('');
+  const [entryText, setEntryText] = useState(selectedPrompt ? selectedPrompt.replace(/['"]+/g, '') : '');
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState('');
   const [selectedFolder, setSelectedFolder] = useState('Default');
   const [folders, setFolders] = useState([]);
   const [newFolderName, setNewFolderName] = useState('');
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [startTime, setStartTime] = useState(null); 
-  const [elapsedTime, setElapsedTime] = useState(0); 
-  const [wordCount, setWordCount] = useState(0); 
-  const [isTyping, setIsTyping] = useState(false); 
+  const [startTime, setStartTime] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [wordCount, setWordCount] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
   const [initialWordCount, setInitialWordCount] = useState(0);
   const [initialText, setInitialText] = useState('');
   
-  const quillRef = useRef(null); 
+  const quillRef = useRef(null);
+  const saveTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (authState.isAuthenticated && userData) {
@@ -62,36 +63,43 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       setInitialText(selectedEntry.entryText || '');
       setInitialWordCount(calculateWordCount(extractPlainText(selectedEntry.entryText || '')));
     } else if (selectedPrompt) {
-      setEntryText(selectedPrompt.text); // Set the selected prompt as the entry text
+      setEntryText(selectedPrompt.replace(/['"]+/g, ''));
     }
   }, [selectedEntry, selectedPrompt]);
-  
 
   useEffect(() => {
     let timerId;
 
     if (isTyping) {
       timerId = setInterval(() => {
-        setElapsedTime(prev => prev + 1000); 
-      }, 1000); 
+        setElapsedTime(prev => prev + 1000);
+      }, 1000);
     }
 
-    return () => clearInterval(timerId); 
+    return () => clearInterval(timerId);
   }, [isTyping]);
 
+  useEffect(() => {
+    if (entryText || entryTitle) {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      saveTimeoutRef.current = setTimeout(handleSave, 1000); // Auto-save after 1 second of inactivity
+    }
+  }, [entryText, entryTitle]);
+
   const handleSave = async () => {
-    
     if (!authState.isAuthenticated) {
       localStorage.setItem('pendingEntry', entryText);
       login();
       return;
     }
-  
-    setLoading(true);
+
+
     try {
       const url = selectedEntry ? `http://localhost:5000/api/entries/${selectedEntry._id}` : 'http://localhost:5000/api/entries';
       const method = selectedEntry ? 'PUT' : 'POST';
-  
+
       await saveEntry({
         userId: authState.user.sub,
         entryTitle: entryTitle || '',
@@ -100,44 +108,37 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
         tags,
         createdAt: new Date(),
       }, url, method);
-  
+
       if (!selectedEntry) {
         updateAchievements('incrementEntryCount', 1);
       }
       const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
       updateAchievements('incrementWordCount', wordDelta);
-      updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000); 
+      updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
       updateAchievements('updateTagUsage', tags);
-  
-      setEntryTitle('');
-      setEntryText('');
-      setTags([]);
-      setNewTag('');
-      setElapsedTime(0);
+
+      setInitialText(entryText);
+      setInitialWordCount(wordCount);
       setIsTyping(false);
-      setSelectedEntry(null);
       if (onEntrySaved) {
         onEntrySaved();
       }
     } catch (error) {
       console.error('Error saving journal entry:', error);
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
-  
 
   const handleTextChange = (content) => {
     setEntryText(content);
     const newWordCount = calculateWordCount(extractPlainText(content));
     setWordCount(newWordCount);
-  
+
     if (!isTyping) {
-      setStartTime(Date.now()); 
+      setStartTime(Date.now());
       setIsTyping(true);
     }
   };
-  
+
   const handleTitleChange = (e) => {
     setEntryTitle(e.target.value);
   };
@@ -168,7 +169,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   };
 
   return (
-    <div>
+    <div className='quill-container'>
       <div>
         <Export entryTitle={entryTitle} entryText={entryText} />
       </div>
@@ -248,9 +249,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
         <p>Word Count: {wordCount}</p>
         <p>Time Spent: {Math.floor(elapsedTime / 60000)}m {Math.floor((elapsedTime % 60000) / 1000)}s</p>
       </div>
-      <button onClick={handleSave} disabled={loading}>
-        {loading ? 'Saving...' : 'Save Entry'}
-      </button>
     </div>
   );
 };

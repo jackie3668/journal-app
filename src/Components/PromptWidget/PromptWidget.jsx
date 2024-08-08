@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTheme } from '../../Context/ThemeContext';
+import { Link } from 'react-router-dom';
 import './PromptWidget.css';
 import image1 from '../../Assets/Images/prompt (1).jpg'
 import image2 from '../../Assets/Images/prompt (2).jpg'
@@ -57,10 +58,12 @@ const PromptWidget = () => {
               style={{ display: index === currentSlide ? 'block' : 'none' }}
             >
               <h4>Get started with a prompt</h4>
-              <div onClick={() => handleSelect(prompt)} className="image-wrapper">
-                <img src={images[index]} alt={`Prompt ${index}`} className="prompt-image clickable" />
-                <p className='clickable'>{prompt.category}</p>
-              </div>
+              <Link to="./journal" key={index} onClick={() => handleSelect(prompt)}>
+                <div className="image-wrapper">
+                  <img src={images[index]} alt={`Prompt ${index}`} className="prompt-image clickable" />
+                  <p className='clickable'>{prompt.category}</p>
+                </div>
+              </Link>
             </div>
           ))}
           <div className="dots">
