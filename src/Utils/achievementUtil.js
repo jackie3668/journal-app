@@ -98,8 +98,6 @@ export const getAchievements = async (userAchievements, userId) => {
     .filter(a => a.progressPercentage < 100)
     .sort((a, b) => b.progressPercentage - a.progressPercentage)
     .slice(0, 3);
-
-    console.log(allAchievements);
     
   return {
     allAchievements,
