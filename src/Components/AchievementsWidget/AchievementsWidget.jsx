@@ -29,8 +29,6 @@ const AchievementsWidget = ({ setLoading }) => {
   };
 
   useEffect(() => {
-    console.log(authState.isAuthenticated);
-    
     const fetchAchievements = async () => {
       setLoading(true);
       try {

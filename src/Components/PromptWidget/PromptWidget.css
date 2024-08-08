@@ -1,0 +1,80 @@
+.prompt-widget {
+  width: 100%; 
+  height: 100%;
+  position: relative;
+  border-radius: 1.5rem;
+}
+
+.prompt-widget .slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.prompt-widget .prompt-item {
+  width: 100%;
+  height: 100%;
+  padding: 2rem 1rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.prompt-widget .prompt-item h4 {
+  margin-bottom: 1rem;
+  font-weight: 400;
+}
+
+.prompt-widget .prompt-image {
+  width: 55%;
+  aspect-ratio: 1;
+  border-radius: 100%;
+  background-size: cover;
+  cursor: pointer;
+}
+
+.prompt-widget .image-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.prompt-widget .image-wrapper img {
+  filter: brightness(0.8);
+}
+
+.prompt-widget .image-wrapper p {
+  position: absolute;
+  font-weight: 600;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.prompt-widget .prompt-content {
+  font-size: 1rem;
+}
+
+.prompt-widget .dots {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+}
+
+.prompt-widget .custom-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: gray;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.prompt-widget .custom-dot.active {
+  background: white;
+  transform: scale(1.3);
+}

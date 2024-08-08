@@ -13,7 +13,6 @@ const BackgroundSelector = () => {
         const response = await axios.get('http://localhost:5000/api/assets');
         const videoAssets = response.data.filter(asset => asset.type === 'video');
         setAssets(videoAssets);
-        console.log('Fetched video assets:', videoAssets);
       } catch (error) {
         console.error('Error fetching assets:', error);
       }
