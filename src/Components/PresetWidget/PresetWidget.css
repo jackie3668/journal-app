@@ -4,6 +4,7 @@
   position: relative;
   overflow: hidden;
   border-radius: 1.5rem;
+  cursor: pointer;
 }
 
 .preset-widget .slider {

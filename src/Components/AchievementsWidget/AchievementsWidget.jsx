@@ -59,10 +59,10 @@ const AchievementsWidget = ({ setLoading }) => {
   return (
     <div className="achievements-container">
       <h2 className="achievements-title">Achievements</h2>
-        {authState.isAuthenticated ? (
+        {!authState.isAuthenticated ? (
         <div className='achievement-auth glass'>
             <img src={lock} alt="lock" />
-            <p>Please log</p>
+            <p>Please log in</p>
         </div>
         ):(
         <ul className="achievements-list">

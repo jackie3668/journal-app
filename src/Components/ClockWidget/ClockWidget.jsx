@@ -107,7 +107,7 @@ const ClockWidget = ({ setLoading }) => {
       <div className="date-section">
         <p>{date}</p>
         <div className="logo-icon">
-          <Link to='./journal'><img src={logo} alt="logo Icon" /></Link>
+          <Link to='./journal'><img src={logo} className='clickable' alt="logo Icon" /></Link>
         </div>
       </div>
       {error ? (

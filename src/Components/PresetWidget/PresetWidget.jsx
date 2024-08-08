@@ -46,7 +46,7 @@ const PresetWidget = () => {
   };
 
   return (
-    <div className="preset-widget">
+    <div className="preset-widget clickable">
       <div className="slider">
         {presets.slice(0, 5).map((preset, index) => (
           <div
@@ -68,7 +68,7 @@ const PresetWidget = () => {
           {presets.slice(0, 5).map((_, index) => (
             <div
               key={index}
-              className={`custom-dot ${index === currentSlide ? 'active' : ''}`}
+              className={`custom-dot clickable ${index === currentSlide ? 'active' : ''}`}
               onClick={() => handleDotClick(index)}
             />
           ))}

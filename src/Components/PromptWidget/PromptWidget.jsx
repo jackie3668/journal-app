@@ -58,8 +58,8 @@ const PromptWidget = () => {
             >
               <h4>Get started with a prompt</h4>
               <div onClick={() => handleSelect(prompt)} className="image-wrapper">
-                <img src={images[index]} alt={`Prompt ${index}`} className="prompt-image" />
-                <p>{prompt.category}</p>
+                <img src={images[index]} alt={`Prompt ${index}`} className="prompt-image clickable" />
+                <p className='clickable'>{prompt.category}</p>
               </div>
             </div>
           ))}
@@ -67,7 +67,7 @@ const PromptWidget = () => {
             {prompts.map((_, index) => (
               <div
                 key={index}
-                className={`custom-dot ${index === currentSlide ? 'active' : ''}`}
+                className={`custom-dot clickable ${index === currentSlide ? 'active' : ''}`}
                 onClick={() => handleDotClick(index)}
               />
             ))}

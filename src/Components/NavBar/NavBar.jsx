@@ -64,7 +64,7 @@ const NavBar = () => {
           <Link to="/account" className={isActive('/account')}>Account</Link>
         </li>
       </ul>
-      <div className="auth">
+      <div className="auth clickable">
         {isAuthenticated ? (
           <p onClick={() => logout({ returnTo: window.location.origin })}>Log out</p>
         ) : (
