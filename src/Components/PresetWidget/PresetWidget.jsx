@@ -27,11 +27,14 @@ const PresetWidget = () => {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentSlide(prevSlide => (prevSlide + 1) % presets.slice(0, 5).length);
-    }, 3000);
+    const timeout = setTimeout(() => {
+      const interval = setInterval(() => {
+        setCurrentSlide(prevSlide => (prevSlide + 1) % presets.length);
+      }, 3000);
+      return () => clearInterval(interval);
+    }, 5000);
 
-    return () => clearInterval(interval);
+    return () => clearTimeout(timeout);
   }, [presets]);
 
   const handlePresetClick = (preset) => {
