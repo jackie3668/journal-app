@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { debounce } from 'lodash';
+
 /**
  * Fetch folders from the server.
  * @param {string} userId - The ID of the user.
@@ -29,6 +31,7 @@ export const fetchFolders = async (userId) => {
     throw error;
   }
 };
+
 /**
  * Save a journal entry to the server.
  * @param {Object} data - The data to save.
@@ -38,19 +41,21 @@ export const fetchFolders = async (userId) => {
  */
 export const saveEntry = async (data, url, method) => {
   try {
-    console.log('Saving entry with data:', data);
     const response = await axios({
       method,
       url,
       data,
     });
-    console.log('Entry saved successfully:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error saving journal entry:', error);
     throw error;
   }
 };
+
+
+// Create a debounced version of saveEntry
+export const debouncedSaveEntry = debounce(saveEntry, 3000);
 
 /**
  * Add a new folder.

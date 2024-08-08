@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from '../../Context/AuthContext'; // Adjust the import path as necessary
-import { extractPlainText } from '../../Utils/utils'; // Ensure this utility function exists
+import { useAuth } from '../../Context/AuthContext'; 
+import { extractPlainText } from '../../Utils/utils'; 
 import './Drawer.css';
 
 const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange }) => {
@@ -17,7 +17,6 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
   const [availableTags, setAvailableTags] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch folders on component mount and when `onEntrySaved` triggers a refresh
   useEffect(() => {
     const fetchFolders = async () => {
       if (!isAuthenticated || isLoading) {
@@ -40,9 +39,8 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
     };
 
     fetchFolders();
-  }, [isAuthenticated, isLoading, user, onEntrySaved]); // Add onEntrySaved to dependency array
+  }, [isAuthenticated, isLoading, user, onEntrySaved]); 
 
-  // Fetch entries when selectedFolder changes, filterTags changes, or when `onEntrySaved` triggers a refresh
   useEffect(() => {
     const fetchEntries = async () => {
       if (!isAuthenticated || isLoading) {
@@ -56,7 +54,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
           params: {
             folderName: selectedFolder,
             userId: user.sub,
-            tags: filterTags.join(','), // Send tags as a comma-separated string
+            tags: filterTags.join(','), 
             searchQuery
           }
         });
@@ -72,7 +70,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
     fetchEntries();
   }, [selectedFolder, isAuthenticated, isLoading, user, onEntrySaved, filterTags, searchQuery]); // Add filterTags and searchQuery to dependency array
 
-  // Fetch available tags
+
   useEffect(() => {
     const fetchTags = async () => {
       if (!isAuthenticated || isLoading) {
@@ -84,6 +82,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
           params: { userId: user.sub }
         });
         setAvailableTags(response.data);
+        
       } catch (error) {
         console.error('Error fetching tags:', error.response ? error.response.data : error.message);
         setError('Failed to fetch tags');
@@ -94,10 +93,10 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
   }, [isAuthenticated, isLoading, user]);
   
 
-  // Handle adding a new folder
+
   const handleAddNewFolder = async () => {
     if (!newFolderName.trim() || !isAuthenticated || isLoading) {
-      return; // Avoid adding empty folder names or if user is not authenticated
+      return; 
     }
 
     try {
@@ -108,33 +107,29 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
       setNewFolderName('');
       setShowNewFolderInput(false);
 
-      // Refresh the folder list
       const response = await axios.get('http://localhost:5000/api/folders', {
         params: { userId: user.sub }
       });
       setFolders(response.data);
 
-      // Notify parent about the new folder
       if (typeof onFolderChange === 'function') {
-        onFolderChange(selectedFolder); // Notify about the current folder
+        onFolderChange(selectedFolder); 
       }
     } catch (error) {
       console.error('Error adding new folder:', error.response ? error.response.data : error.message);
     }
   };
 
-  // Handle tag selection
+
   const handleTagChange = (event) => {
     const selectedTags = Array.from(event.target.selectedOptions, option => option.value);
     setFilterTags(selectedTags);
   };
 
-  // Handle search input change
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
 
-  // Clear filters
   const clearFilters = () => {
     setFilterTags([]);
     setSearchQuery('');
@@ -142,7 +137,6 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
 
   if (loading) return <div>Loading...</div>;
 
-  // Handle entry click
   const handleEntryClick = (entry) => {
     if (typeof onEntrySelect === 'function') {
       onEntrySelect(entry);

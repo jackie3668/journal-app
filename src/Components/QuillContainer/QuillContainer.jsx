@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useAuth } from '../../Context/AuthContext';
 import Export from '../Export/Export';
 import { useTheme } from '../../Context/ThemeContext';
-import { fetchFolders, saveEntry, addNewFolder, extractPlainText, calculateWordCount } from '../../Utils/utils';
+import { fetchFolders, saveEntry, debouncedSaveEntry, addNewFolder, extractPlainText, calculateWordCount } from '../../Utils/utils';
 import { useAchievements } from '../../Context/AchievementContext';
 import './QuillContainer.css';
 
@@ -87,74 +87,71 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   }, [isTyping]);
 
   useEffect(() => {
-    if ((entryText || entryTitle) && !isSaving) {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
+    const timer = setTimeout(() => {
+      handleSave();
+    }, 1000); 
+  
+
+  }, [entryText, entryTitle, tags]);
+  
+
+  const handleSave = useCallback(
+    async () => {
+
+      if (!entryText) {
+        return
       }
-      saveTimeoutRef.current = setTimeout(handleAutoSave, 1000); 
-    }
-  }, [entryText, entryTitle]);
-
-  const handleAutoSave = async () => {
-    if (entryText === lastSavedText && entryTitle === lastSavedTitle) {
-      return; 
-    }
-
-    await handleSave();
-  };
-
-  const handleSave = async () => {
-    if (!authState.isAuthenticated) {
-      localStorage.setItem('pendingEntry', entryText);
-      login();
-      return;
-    }
-
-    const payload = {
-      userId: authState.user.sub,
-      entryTitle: entryTitle || '',
-      entryText,
-      folderName: selectedFolder,
-      tags,
-      createdAt: new Date(),
-    };
-
-
-    try {
-      const url = entryId ? `http://localhost:5000/api/entries/${entryId}` : 'http://localhost:5000/api/entries';
-      const method = entryId ? 'PUT' : 'POST';
-
-
-      const savedEntry = await saveEntry(payload, url, method);
-
-
-      if (!entryId) {
-        setEntryId(savedEntry._id);
-      updateAchievements('incrementEntryCount', 1);
-      }
-      const wordDelta = entryId ? wordCount - initialWordCount : wordCount;
-      updateAchievements('incrementWordCount', wordDelta);
-      updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
-      updateAchievements('updateTagUsage', tags);
-
-
-      setInitialText(entryText);
-      setInitialWordCount(wordCount);
-      setIsTyping(false);
-      setLastSavedText(entryText);
-      setLastSavedTitle(entryTitle);
-
-      if (onEntrySaved) {
-        onEntrySaved();
+      if (!authState.isAuthenticated) {
+        localStorage.setItem('pendingEntry', entryText);
+        login();
+        return;
       }
 
-      console.log('Save process completed.');
-    } catch (error) {
-      console.error('Error saving journal entry:', error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
+      const payload = {
+        userId: authState.user.sub,
+        entryTitle: entryTitle || '',
+        entryText,
+        folderName: selectedFolder,
+        tags,
+        createdAt: new Date(),
+      };
+
+      try {
+        const url = entryId ? `http://localhost:5000/api/entries/${entryId}` : 'http://localhost:5000/api/entries';
+        const method = entryId ? 'PUT' : 'POST';
+
+        const savedEntry = entryId
+          ? await saveEntry(payload, url, method)
+          : await debouncedSaveEntry(payload, url, method);
+
+        if (!entryId) {
+          setEntryId(savedEntry._id);
+          updateAchievements('incrementEntryCount', 1);
+        }
+        const wordDelta = entryId ? wordCount - initialWordCount : wordCount;
+        updateAchievements('incrementWordCount', wordDelta);
+        updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
+        updateAchievements('updateTagUsage', tags);
+
+        setInitialText(entryText);
+        setInitialWordCount(wordCount);
+        setIsTyping(false);
+        setLastSavedText(entryText);
+        setLastSavedTitle(entryTitle);
+        
+        if (onEntrySaved) {
+          onEntrySaved();
+        }
+
+        console.log('Save process completed.');
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsSaving(false);
+      }
+    },
+    [entryText, entryTitle, tags, selectedFolder, entryId, wordCount, initialWordCount, elapsedTime, onEntrySaved, authState, login, updateAchievements]
+  );
 
   const handleTextChange = (content) => {
     setEntryText(content);
@@ -252,7 +249,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
         placeholder={selectedPrompt ? selectedPrompt.text : "Start writing here..."} 
         ref={quillRef}
       />
-      <div>
+      <div className='tag-input-wrapper'>
         <input
           type="text"
           value={newTag}
