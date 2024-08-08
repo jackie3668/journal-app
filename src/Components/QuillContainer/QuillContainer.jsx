@@ -11,7 +11,8 @@ import './QuillContainer.css';
 const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry }) => {
   const { authState, login, userData } = useAuth();
   const { selectedPrompt } = useTheme();
-  const { achievements, updateAchievements } = useAchievements();
+  const { updateAchievements } = useAchievements();
+  const [entryId, setEntryId] = useState(selectedEntry ? selectedEntry._id : null);
   const [entryTitle, setEntryTitle] = useState('');
   const [entryText, setEntryText] = useState(selectedPrompt ? selectedPrompt.replace(/['"]+/g, '') : '');
   const [tags, setTags] = useState([]);
@@ -26,7 +27,10 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   const [isTyping, setIsTyping] = useState(false);
   const [initialWordCount, setInitialWordCount] = useState(0);
   const [initialText, setInitialText] = useState('');
-  
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSavedText, setLastSavedText] = useState('');
+  const [lastSavedTitle, setLastSavedTitle] = useState('');
+
   const quillRef = useRef(null);
   const saveTimeoutRef = useRef(null);
 
@@ -56,12 +60,15 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
   useEffect(() => {
     if (selectedEntry) {
+      setEntryId(selectedEntry._id);
       setEntryTitle(selectedEntry.entryTitle || '');
       setEntryText(selectedEntry.entryText || '');
       setTags(selectedEntry.tags || []);
       setSelectedFolder(selectedEntry.folderName || 'Default');
       setInitialText(selectedEntry.entryText || '');
       setInitialWordCount(calculateWordCount(extractPlainText(selectedEntry.entryText || '')));
+      setLastSavedText(selectedEntry.entryText || '');
+      setLastSavedTitle(selectedEntry.entryTitle || '');
     } else if (selectedPrompt) {
       setEntryText(selectedPrompt.replace(/['"]+/g, ''));
     }
@@ -80,13 +87,21 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   }, [isTyping]);
 
   useEffect(() => {
-    if (entryText || entryTitle) {
+    if ((entryText || entryTitle) && !isSaving) {
       if (saveTimeoutRef.current) {
         clearTimeout(saveTimeoutRef.current);
       }
-      saveTimeoutRef.current = setTimeout(handleSave, 1000); // Auto-save after 1 second of inactivity
+      saveTimeoutRef.current = setTimeout(handleAutoSave, 1000); 
     }
   }, [entryText, entryTitle]);
+
+  const handleAutoSave = async () => {
+    if (entryText === lastSavedText && entryTitle === lastSavedTitle) {
+      return; 
+    }
+
+    await handleSave();
+  };
 
   const handleSave = async () => {
     if (!authState.isAuthenticated) {
@@ -95,37 +110,50 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       return;
     }
 
+    const payload = {
+      userId: authState.user.sub,
+      entryTitle: entryTitle || '',
+      entryText,
+      folderName: selectedFolder,
+      tags,
+      createdAt: new Date(),
+    };
+
 
     try {
-      const url = selectedEntry ? `http://localhost:5000/api/entries/${selectedEntry._id}` : 'http://localhost:5000/api/entries';
-      const method = selectedEntry ? 'PUT' : 'POST';
+      const url = entryId ? `http://localhost:5000/api/entries/${entryId}` : 'http://localhost:5000/api/entries';
+      const method = entryId ? 'PUT' : 'POST';
 
-      await saveEntry({
-        userId: authState.user.sub,
-        entryTitle: entryTitle || '',
-        entryText,
-        folderName: selectedFolder,
-        tags,
-        createdAt: new Date(),
-      }, url, method);
 
-      if (!selectedEntry) {
-        updateAchievements('incrementEntryCount', 1);
+      const savedEntry = await saveEntry(payload, url, method);
+
+
+      if (!entryId) {
+        setEntryId(savedEntry._id);
+      updateAchievements('incrementEntryCount', 1);
       }
-      const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
+      const wordDelta = entryId ? wordCount - initialWordCount : wordCount;
       updateAchievements('incrementWordCount', wordDelta);
       updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
       updateAchievements('updateTagUsage', tags);
 
+
       setInitialText(entryText);
       setInitialWordCount(wordCount);
       setIsTyping(false);
+      setLastSavedText(entryText);
+      setLastSavedTitle(entryTitle);
+
       if (onEntrySaved) {
         onEntrySaved();
       }
+
+      console.log('Save process completed.');
     } catch (error) {
       console.error('Error saving journal entry:', error);
-    } 
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleTextChange = (content) => {

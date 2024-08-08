@@ -1,9 +1,10 @@
 .drawer {
   width: 300px; /* Adjust width as needed */
-  padding: 20px;
+  height: 100%;
   background-color: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(20px);
   border-right: 1px solid #ccc;
+  overflow-y: scroll;
 }
 
 .entry-item {

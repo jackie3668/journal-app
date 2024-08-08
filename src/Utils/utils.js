@@ -29,21 +29,23 @@ export const fetchFolders = async (userId) => {
     throw error;
   }
 };
-
 /**
  * Save a journal entry to the server.
  * @param {Object} data - The data to save.
  * @param {string} url - The URL to send the request to.
  * @param {string} method - The HTTP method to use.
- * @returns {Promise<void>}
+ * @returns {Promise<Object>} - The saved entry response.
  */
 export const saveEntry = async (data, url, method) => {
   try {
-    await axios({
+    console.log('Saving entry with data:', data);
+    const response = await axios({
       method,
       url,
       data,
     });
+    console.log('Entry saved successfully:', response.data);
+    return response.data;
   } catch (error) {
     console.error('Error saving journal entry:', error);
     throw error;
