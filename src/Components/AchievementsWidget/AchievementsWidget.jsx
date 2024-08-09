@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
 import { getAchievements } from '../../Utils/achievementUtil';
+import { useAchievements } from '../../Context/AchievementContext';
 import achievementUnitMap from '../../Data/achievementUnitMap';
 import word from '../../Assets/UI/Achievements/font.png';
 import entry from '../../Assets/UI/Achievements/paper.png';
@@ -14,7 +15,7 @@ import './AchievementsWidget.css';
 const AchievementsWidget = ({ setLoading }) => {
   const { authState } = useAuth();
   const { user } = authState;
-  const [achievements, setAchievements] = useState(null);
+  const { achievements, fetchAchievements, setAchievements } = useAchievements();
   const [closestAchievements, setClosestAchievements] = useState([]);
   const [error, setError] = useState(null);
 
@@ -29,31 +30,56 @@ const AchievementsWidget = ({ setLoading }) => {
   };
 
   useEffect(() => {
-    const fetchAchievements = async () => {
-      setLoading(true);
-      try {
-        const userId = user.sub;
-        const response = await axios.get(`http://localhost:5000/api/achievements/${userId}`);
-        setAchievements(response.data);
-      } catch (err) {
-        setError('Error fetching achievements: ' + (err.response?.data?.message || err.message));
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAchievements();
+    if (user && user.sub) {
+      console.log(user);
+  
+      const fetchOrCreateAchievements = async () => {
+        try {
+          const response = await fetchAchievements();
+  
+          if (!response) {
+            const initialAchievements = {
+              userId: user.sub,
+              totalWordCount: 0,
+              entryCount: 0,
+              tagUsage: {},
+              folderCount: 0,
+              promptUsage: 0,
+              timeSpentWriting: 0,
+            };
+  
+            await axios.post('http://localhost:5000/api/achievements', initialAchievements);
+            setAchievements(initialAchievements);
+          }
+        } catch (err) {
+          setError('Error fetching or creating achievements: ' + err.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchOrCreateAchievements();
+    } else {
+      setLoading(false);
+    }
   }, [user]);
+  
 
   useEffect(() => {
     const fetchClosestAchievements = async () => {
-      if (achievements) {
+      console.log(user);
+      if (!user) {
+        return
+      }
+      if (achievements && user && user.sub) {
         const { closestAchievements } = await getAchievements(achievements, user.sub);
         setClosestAchievements(closestAchievements);
       }
     };
 
-    fetchClosestAchievements();
+    if (user && user.sub) {
+      fetchClosestAchievements();
+    }
   }, [achievements, user]);
 
   return (

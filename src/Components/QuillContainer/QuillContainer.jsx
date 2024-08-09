@@ -26,22 +26,20 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   const [wordCount, setWordCount] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [initialWordCount, setInitialWordCount] = useState(0);
-  const [initialText, setInitialText] = useState('');
   const lastSaveTime = useRef(0);
   const quillRef = useRef(null);
+  const loggedTagsRef = useRef([]);
 
+ 
   useEffect(() => {
-    if (authState.isAuthenticated && userData) {
-      const savedEntry = localStorage.getItem('pendingEntry');
-      if (savedEntry) {
-        localStorage.removeItem('pendingEntry');
-      }
+    if (authState.isAuthenticated) {
+      localStorage.removeItem('pendingEntry');
     }
-  }, [authState.isAuthenticated, userData]);
+  }, [authState.isAuthenticated]);
 
   useEffect(() => {
     const fetchAndSetFolders = async () => {
-      if (!authState.isAuthenticated || !authState.user) return;
+      if (!authState.user) return;
 
       try {
         const folders = await fetchFolders(authState.user.sub);
@@ -50,9 +48,8 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
         console.error('Error fetching folders:', error);
       }
     };
-
     fetchAndSetFolders();
-  }, [authState.isAuthenticated, authState.user]);
+  }, [authState.user]);
 
   useEffect(() => {
     if (selectedEntry) {
@@ -60,7 +57,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       setEntryText(selectedEntry.entryText || '');
       setTags(selectedEntry.tags || []);
       setSelectedFolder(selectedEntry.folderName || 'Default');
-      setInitialText(selectedEntry.entryText || '');
       setInitialWordCount(calculateWordCount(extractPlainText(selectedEntry.entryText || '')));
     } else if (selectedPrompt) {
       setEntryText(selectedPrompt.replace(/['"]+/g, ''));
@@ -68,51 +64,23 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   }, [selectedEntry, selectedPrompt]);
 
   useEffect(() => {
-    let timerId;
-
     if (isTyping) {
-      timerId = setInterval(() => {
+      const timerId = setInterval(() => {
         setElapsedTime(prev => prev + 1000);
       }, 1000);
+      return () => clearInterval(timerId);
     }
-
-    return () => clearInterval(timerId);
   }, [isTyping]);
 
-  useEffect(()=>{
-    console.log('entry', selectedEntry, selectedEntryId);
-  },[selectedEntry])
-
-  // useEffect(() => {
-  //   const handleBeforeUnload = async (event) => {
-  //     console.log('unload');
-      
-  //     await handleSave(); // Save the entry before the page unloads
-  //     console.log('saved');
-  
-  //     event.preventDefault();
-  //     event.returnValue = ''; // Display confirmation dialog
-  //   };
-  
-  //   window.addEventListener('beforeunload', handleBeforeUnload);
-  
-  //   return () => {
-  //     window.removeEventListener('beforeunload', handleBeforeUnload);
-  //   };
-  // }, [handleSave]); // Ensure `handleSave` is stable and does not change between renders
-
   const handleSave = async () => {
-    console.log('init save');
     const now = Date.now();
     if (!selectedEntryId && now - lastSaveTime.current < 5000) { 
       return;
-    } else if (selectedEntryId && now - lastSaveTime.current < 3000) { 
+    } else if (selectedEntryId && now - lastSaveTime.current < 1000) { 
       return;
     }
-
-    lastSaveTime.current = now; // Update the last save time
-
-    console.log('init save');
+  
+    lastSaveTime.current = now; 
     if (!entryText) {
       console.log('returned');
       return;
@@ -127,7 +95,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     try {
       const url = selectedEntryId ? `http://localhost:5000/api/entries/${selectedEntryId}` : 'http://localhost:5000/api/entries';
       const method = selectedEntryId ? 'PUT' : 'POST';
-      console.log('start saving via', method);
   
       const savedEntry = await saveEntry({
         userId: authState.user.sub,
@@ -137,17 +104,24 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
         tags,
         createdAt: new Date(),
       }, url, method);
-  
+      setSelectedEntry(savedEntry);
       if (method === 'POST') {
         setSelectedEntryId(savedEntry._id);
         updateAchievements('incrementEntryCount', 1);
       }
-      const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
-      updateAchievements('incrementWordCount', wordDelta);
-      updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
-      updateAchievements('updateTagUsage', tags);
   
-      setInitialText(entryText);
+      const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
+      if (wordDelta > 0) {
+        updateAchievements('incrementWordCount', wordDelta);
+      }
+      updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
+  
+      const newTags = tags.filter(tag => !loggedTagsRef.current.includes(tag));
+      if (newTags.length > 0) {
+        updateAchievements('updateTagUsage', newTags);
+        loggedTagsRef.current = [...loggedTagsRef.current, ...newTags];
+      }
+  
       setInitialWordCount(wordCount);
       setIsTyping(false);
       if (onEntrySaved) {
@@ -159,7 +133,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     }
     console.log('saved');
   };
-
+  
   useEffect(() => {
     handleSave()
   }, [entryText, entryTitle, tags]);
