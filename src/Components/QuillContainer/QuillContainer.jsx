@@ -58,10 +58,13 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       setTags(selectedEntry.tags || []);
       setSelectedFolder(selectedEntry.folderName || 'Default');
       setInitialWordCount(calculateWordCount(extractPlainText(selectedEntry.entryText || '')));
-    } else if (selectedPrompt) {
-      setEntryText(selectedPrompt.replace(/['"]+/g, ''));
+    } else {
+      setEntryTitle('');
+      setEntryText(selectedPrompt ? selectedPrompt.replace(/['"]+/g, '') : '');
+      setTags([]);
+      setSelectedFolder('Default');
     }
-  }, [selectedEntry, selectedPrompt]);
+  }, [selectedEntry, selectedPrompt]);  
 
   useEffect(() => {
     if (isTyping) {
@@ -82,7 +85,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   
     lastSaveTime.current = now; 
     if (!entryText) {
-      console.log('returned');
       return;
     }
     
@@ -139,7 +141,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   
   useEffect(() => {
     handleSave()
-  }, [entryText, entryTitle, tags]);
+  }, [entryText, entryTitle, tags, selectedFolder]);
 
   const handleTextChange = (content) => {
     setEntryText(content);

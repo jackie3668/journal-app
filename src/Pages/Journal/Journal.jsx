@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import 'react-quill/dist/quill.snow.css';
 import { useAuth } from '../../Context/AuthContext';
@@ -11,7 +11,6 @@ import BackgroundSelector from '../../Components/BackgroundSelector/BackgroundSe
 import JournalSideMenu from '../../Components/JournalSideMenu/JournalSideMenu'
 import { Scrollbar } from 'react-scrollbars-custom';
 
-
 const Journal = () => {
   const { authState } = useAuth();
   const { user } = authState;
@@ -23,6 +22,9 @@ const Journal = () => {
   const [typingSound, setTypingSound] = useState({ url: '', volume: 1 });
   const [audio, setAudio] = useState(null);
   const [selectedMenu, setSelectedMenu] = useState('drawer'); 
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const drawerRef = useRef(null);
 
   useEffect(() => {
     if (user) {
@@ -54,10 +56,13 @@ const Journal = () => {
   };
 
   const handleSelectEntry = (entry) => {
-    setSelectedEntry(entry);
-    console.log(entry);
-    console.log(entry._id);
-    setSelectedEntryId(entry._id)
+    if (entry === null) {
+      setSelectedEntry(null);
+      setSelectedEntryId(null);
+    } else {
+      setSelectedEntry(entry);
+      setSelectedEntryId(entry._id);
+    }
   };
 
   const fetchEntries = async (folderName, userId) => {
@@ -81,6 +86,11 @@ const Journal = () => {
 
   const handleMenuSelect = (menu) => {
     setSelectedMenu(menu);
+    if (menu === 'drawer') {
+      setIsDrawerOpen(!isDrawerOpen); 
+    } else {
+      setIsDrawerOpen(false); 
+    }
   };
 
   return (
@@ -100,12 +110,16 @@ const Journal = () => {
           <JournalSideMenu onSelect={handleMenuSelect} />
         </div>
         {selectedMenu === 'drawer' && (
-          <Drawer 
-            onEntrySelect={handleSelectEntry} 
-            onEntrySaved={handleEntrySaved} 
-            selectedFolder={selectedFolder}
-            onFolderChange={handleFolderChange} 
-          />
+          <div ref={drawerRef}>
+            <Drawer 
+              isOpen={isDrawerOpen}
+              onClose={() => setIsDrawerOpen(false)}
+              onEntrySelect={handleSelectEntry} 
+              onEntrySaved={handleEntrySaved} 
+              selectedFolder={selectedFolder}
+              onFolderChange={handleFolderChange} 
+            />
+          </div>
         )}
         {selectedMenu === 'background' && <BackgroundSelector />}
         {selectedMenu === 'ambience' && <AmbienceMixer />}
