@@ -6,7 +6,6 @@ import Export from '../Export/Export';
 import { useTheme } from '../../Context/ThemeContext';
 import { fetchFolders, saveEntry, addNewFolder, extractPlainText, calculateWordCount } from '../../Utils/utils';
 import { useAchievements } from '../../Context/AchievementContext';
-import { debounce } from 'lodash';
 import './QuillContainer.css';
 
 const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry, selectedEntryId, setSelectedEntryId }) => {

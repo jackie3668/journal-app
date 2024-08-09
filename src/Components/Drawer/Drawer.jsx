@@ -4,6 +4,13 @@ import { useAuth } from '../../Context/AuthContext';
 import { extractPlainText } from '../../Utils/utils';
 import { Scrollbar } from 'react-scrollbars-custom';
 import './Drawer.css';
+import folderIcon from '../../Assets/UI/Journal/folder (1).png'
+import arrow from '../../Assets/UI/Journal/down-arrow (3).png'
+import collapse from '../../Assets/UI/Journal/radix-icons_pin-left.png'
+import add from '../../Assets/UI/Journal/more.png'
+import file from '../../Assets/UI/Journal/file.png'
+import filter from '../../Assets/UI/Journal/filter.png'
+import search from '../../Assets/UI/Journal/search-interface-symbol (1).png'
 
 const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, isOpen, onClose }) => {
   const { authState } = useAuth();
@@ -17,7 +24,9 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
   const [filterTags, setFilterTags] = useState([]);
   const [availableTags, setAvailableTags] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [expandedFolders, setExpandedFolders] = useState({}); // Track expanded folders
+  const [expandedFolders, setExpandedFolders] = useState({}); 
+  const [hoveredFolder, setHoveredFolder] = useState(null);  
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
 
   useEffect(() => {
     const fetchFolders = async () => {
@@ -54,7 +63,6 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
           params: { userId: user.sub }
         });
         const tags = response.data;
-        console.log('Fetched tags:', tags); // Log the fetched tags
         setAvailableTags(tags);
       } catch (error) {
         console.error('Error fetching tags:', error.response ? error.response.data : error.message);
@@ -143,6 +151,11 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
     }
   };
 
+  const toggleFilterDropdown = () => {
+    setShowFilterDropdown(prev => !prev);
+  };
+  
+
   const handleFolderClick = (folder) => {
     const isExpanded = !!expandedFolders[folder.name];
     if (isExpanded) {
@@ -170,36 +183,61 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
 
   const handleAddEntryClick = () => {
     if (typeof onEntrySelect === 'function') {
-      onEntrySelect(null);  // Deselect any selected entry, indicating a new entry
+      onEntrySelect(null);  
     }
   };
 
+  const handleFolderHover = (folderName) => {
+    setHoveredFolder(folderName);
+  };
+
+  const handleFolderLeave = () => {
+    setHoveredFolder(null);
+  };
+
+  
+
   return (
-    <div className={`drawer ${isOpen ? 'open' : ''}`}>
+    <div className={`drawer glass ${isOpen ? 'open' : ''}`}>
       <button onClick={onClose} className="close-button">X</button>
 
-      <h2>Search and Filter</h2>
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={handleSearchChange}
-        placeholder="Search by title, text, or tags"
-        className="search-input"
+      <div className="search-bar">
+        <img src={search} alt="Search Icon" className="search-icon" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          placeholder="Search by title, text, or tags"
+          className="search-input"
+        />
+      </div>
+
+
+      <img
+        src={filter}
+        alt="Filter"
+        className="filter-icon"
+        onClick={toggleFilterDropdown}
       />
 
-      <h2>Filter Entries by Tags</h2>
-      <select
-        multiple
-        value={filterTags}
-        onChange={handleTagChange}
-        className="tags-select"
-      >
-        {availableTags.map((tag) => (
-          <option key={tag} value={tag}>{tag}</option>
-        ))}
-      </select>
+      {showFilterDropdown && (
+        <div className="filter-dropdown">
+          <h2>Filter Entries by Tags</h2>
+          <select
+            multiple
+            value={filterTags}
+            onChange={handleTagChange}
+            className="tags-select"
+          >
+            {availableTags.map((tag) => (
+              <option key={tag} value={tag}>{tag}</option>
+            ))}
+          </select>
 
-      <button onClick={clearFilters} className="clear-filters-button">Clear Filters</button>
+          <button onClick={clearFilters} className="clear-filters-button">Clear Filters</button>
+        </div>
+      )}
+
 
       <h2>Folders</h2>
       {showNewFolderInput ? (
@@ -214,19 +252,27 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
           <button onClick={() => setShowNewFolderInput(false)}>Cancel</button>
         </div>
       ) : (
-        <button onClick={() => setShowNewFolderInput(true)}>Add New Folder</button>
+        <div onClick={() => setShowNewFolderInput(true)}>
+          <img src={folderIcon} alt="" />
+          <p>Add New Folder</p>
+        </div>
       )}
       <Scrollbar style={{ height: '300px' }}>
         <ul>
           {folders.map((folder) => (
             <li key={folder._id} className="folder-item">
-             
               <div
-                className={`folder-header ${expandedFolders[folder.name] ? 'active' : ''}`}
-              >
-                <span onClick={() => handleFolderClick(folder)}>Open</span>
-                {folder.name}
-                <span className="add-entry" onClick={handleAddEntryClick}>Add Entry</span>
+                  className={`folder-header ${expandedFolders[folder.name] ? 'active' : ''}`}
+                >
+                <img 
+                  onMouseEnter={() => handleFolderHover(folder.name)}
+                  onMouseLeave={handleFolderLeave}
+                  src={hoveredFolder === folder.name ? arrow : folderIcon} 
+                  alt="" 
+                  onClick={() => handleFolderClick(folder)}
+                />
+                <p onClick={() => handleFolderClick(folder)}>{folder.name}</p>
+                <img className="add-entry" onClick={handleAddEntryClick} src={add} alt="" />
               </div>
               {expandedFolders[folder.name] && (
                 <ul className="entries-list">
