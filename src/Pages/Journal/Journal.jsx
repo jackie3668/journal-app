@@ -16,12 +16,13 @@ const Journal = () => {
   const { authState } = useAuth();
   const { user } = authState;
   const [selectedEntry, setSelectedEntry] = useState(null);
+  const [selectedEntryId, setSelectedEntryId] = useState(null);
   const [entries, setEntries] = useState([]);
   const [refreshEntries, setRefreshEntries] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState('Default');
   const [typingSound, setTypingSound] = useState({ url: '', volume: 1 });
   const [audio, setAudio] = useState(null);
-  const [selectedMenu, setSelectedMenu] = useState(null); 
+  const [selectedMenu, setSelectedMenu] = useState('drawer'); 
 
   useEffect(() => {
     if (user) {
@@ -54,6 +55,9 @@ const Journal = () => {
 
   const handleSelectEntry = (entry) => {
     setSelectedEntry(entry);
+    console.log(entry);
+    console.log(entry._id);
+    setSelectedEntryId(entry._id)
   };
 
   const fetchEntries = async (folderName, userId) => {
@@ -88,6 +92,8 @@ const Journal = () => {
             setSelectedEntry={setSelectedEntry} 
             selectedEntry={selectedEntry} 
             onEntrySaved={handleEntrySaved} 
+            selectedEntryId={selectedEntryId}
+            setSelectedEntryId={setSelectedEntryId}
           />
         </div>
         <div className="menu">
