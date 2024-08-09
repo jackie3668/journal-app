@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTheme } from '../../Context/ThemeContext';
 import { Link } from 'react-router-dom';
+import { useAchievements } from '../../Context/AchievementContext';
 import './PromptWidget.css';
 import image1 from '../../Assets/Images/prompt (1).jpg'
 import image2 from '../../Assets/Images/prompt (2).jpg'
@@ -11,6 +12,7 @@ import image5 from '../../Assets/Images/prompt (5).jpg'
 
 const PromptWidget = () => {
   const { setSelectedPrompt } = useTheme();
+  const { updateAchievements } = useAchievements();
   const [prompts, setPrompts] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -58,7 +60,14 @@ const PromptWidget = () => {
               style={{ display: index === currentSlide ? 'block' : 'none' }}
             >
               <h4>Get started with a prompt</h4>
-              <Link to="./journal" key={index} onClick={() => handleSelect(prompt)}>
+              <Link 
+                to="./journal" 
+                key={index} 
+                onClick={() => {
+                  handleSelect(prompt);
+                  updateAchievements('incrementPromptUsage', 1);
+                }}
+              >
                 <div className="image-wrapper">
                   <img src={images[index]} alt={`Prompt ${index}`} className="prompt-image clickable" />
                   <p className='clickable'>{prompt.category}</p>

@@ -117,9 +117,11 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
   
       const newTags = tags.filter(tag => !loggedTagsRef.current.includes(tag));
+      const removedTags = loggedTagsRef.current.filter(tag => !tags.includes(tag));
+
       if (newTags.length > 0) {
         updateAchievements('updateTagUsage', newTags);
-        loggedTagsRef.current = [...loggedTagsRef.current, ...newTags];
+        loggedTagsRef.current = [...loggedTagsRef.current, ...newTags].filter(tag => !removedTags.includes(tag));
       }
   
       setInitialWordCount(wordCount);
@@ -133,6 +135,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     }
     console.log('saved');
   };
+
   
   useEffect(() => {
     handleSave()
@@ -173,10 +176,12 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       setFolders(updatedFolders);
       setNewFolderName('');
       setShowNewFolderInput(false);
+      updateAchievements('incrementFolderCount', 1);
     } catch (error) {
       console.error('Error adding new folder:', error);
     }
   };
+  
 
   return (
     <div className='quill-container'>

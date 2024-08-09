@@ -23,19 +23,20 @@ export const AchievementProvider = ({ children }) => {
       return;
     }
   
-    
     try {
       const response = await fetch(`http://localhost:5000/api/achievements/${user.sub}`);
-      if (response.ok) {
-        const data = await response.json();
-        setAchievements(data);
+      if (response.ok || response.status === 210) {  
+        return response;
       } else {
-        console.error('Failed to fetch achievements');
+        console.error('Failed to fetch achievements, status:', response.status);
+        return response;
       }
     } catch (error) {
       console.error('Error fetching achievements:', error.message);
+      throw error;  
     }
   };
+  
 
   const updateAchievements = async (type, payload) => {
     if (!user || !user.sub) {

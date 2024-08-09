@@ -92,13 +92,10 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
     fetchTags();
   }, [isAuthenticated, isLoading, user]);
   
-
-
   const handleAddNewFolder = async () => {
     if (!newFolderName.trim() || !isAuthenticated || isLoading) {
       return; 
     }
-
     try {
       await axios.post('http://localhost:5000/api/folders', { 
         name: newFolderName,
@@ -119,7 +116,6 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange })
       console.error('Error adding new folder:', error.response ? error.response.data : error.message);
     }
   };
-
 
   const handleTagChange = (event) => {
     const selectedTags = Array.from(event.target.selectedOptions, option => option.value);

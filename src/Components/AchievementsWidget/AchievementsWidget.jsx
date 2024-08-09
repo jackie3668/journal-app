@@ -27,17 +27,16 @@ const AchievementsWidget = ({ setLoading }) => {
     specificTagUsage: tag,
     entriesInFolder: folder,
     timeSpentWriting: time,
+    promptUsage: entry,
   };
 
   useEffect(() => {
     if (user && user.sub) {
-      console.log(user);
-  
       const fetchOrCreateAchievements = async () => {
         try {
-          const response = await fetchAchievements();
-  
-          if (!response) {
+          const response = await fetchAchievements(); 
+          
+          if (response?.status === 210) {  
             const initialAchievements = {
               userId: user.sub,
               totalWordCount: 0,
@@ -47,9 +46,11 @@ const AchievementsWidget = ({ setLoading }) => {
               promptUsage: 0,
               timeSpentWriting: 0,
             };
-  
+
             await axios.post('http://localhost:5000/api/achievements', initialAchievements);
             setAchievements(initialAchievements);
+          } else if (response?.status === 200) {
+            setAchievements(response.data);
           }
         } catch (err) {
           setError('Error fetching or creating achievements: ' + err.message);
@@ -57,17 +58,15 @@ const AchievementsWidget = ({ setLoading }) => {
           setLoading(false);
         }
       };
-  
+
       fetchOrCreateAchievements();
     } else {
       setLoading(false);
     }
   }, [user]);
-  
 
   useEffect(() => {
     const fetchClosestAchievements = async () => {
-      console.log(user);
       if (!user) {
         return
       }
