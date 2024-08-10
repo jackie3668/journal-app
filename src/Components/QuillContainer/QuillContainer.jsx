@@ -59,11 +59,12 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       setInitialWordCount(calculateWordCount(extractPlainText(selectedEntry.entryText || '')));
     } else {
       setEntryTitle('');
-      setEntryText(selectedPrompt ? selectedPrompt.replace(/['"]+/g, '') : '');
+      setEntryText('');
       setTags([]);
-      setSelectedFolder('Default');
+      setSelectedFolder('Default'); 
     }
-  }, [selectedEntry, selectedPrompt]);  
+  }, [selectedEntry, selectedPrompt]);
+  
 
   useEffect(() => {
     if (isTyping) {
@@ -185,7 +186,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   
 
   return (
-    <div className='quill-container'>
+    <div className='quill-container glass'>
       <div>
         <Export entryTitle={entryTitle} entryText={entryText} />
       </div>

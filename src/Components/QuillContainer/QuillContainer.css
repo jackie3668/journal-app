@@ -3,7 +3,6 @@
   flex-direction: column;
   width: 100%;
   height: 65vh;
-  border: 2px solid red;
 }
 
 .quill-container .tag-wrapper {

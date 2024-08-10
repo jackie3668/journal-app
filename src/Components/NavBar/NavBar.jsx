@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../Context/AuthContext';
 import './NavBar.css';
+import page from '../../Assets/Sounds/turnpage-99756.mp3'
 
 const NavBar = () => {
   const { authState, login, logout } = useAuth();
@@ -43,6 +44,11 @@ const NavBar = () => {
     return location.pathname === path ? 'active' : '';
   };
 
+  const handleClick = () => {
+    const audio = new Audio(page);
+    audio.play();
+  }
+
   return (
     <nav>
       <div className="clock">
@@ -58,7 +64,7 @@ const NavBar = () => {
           <Link to="/" className={isActive('/')}>Home</Link>
         </li>
         <li className={isActive('/journal')}>
-          <Link to="/journal" className={isActive('/journal')}>Journal</Link>
+          <Link to="/journal" onClick={handleClick} className={isActive('/journal')}>Journal</Link>
         </li>
         <li className={isActive('/account')}>
           <Link to="/account" className={isActive('/account')}>Account</Link>

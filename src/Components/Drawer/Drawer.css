@@ -1,68 +1,373 @@
 .drawer {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
   position: fixed;
   top: 0;
-  right: -300px;
-  width: 300px;
+  right: -20rem;
+  width: 20rem;
   height: 100%;
-  color: white;
   overflow: hidden;
-  transition: 0.3s;
+  transition: all 0.3s ease-in-out;
   z-index: 2;
-  padding: 20px;
+  padding: 2rem;
 }
 
 .drawer.open {
   right: 0px;
 }
 
-.drawer-content h2 {
-  margin-top: 0;
+.drawer .drawer-top {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.close-button {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  position: absolute;
-  top: 10px;
-  right: 10px;
+.drawer .drawer-top img {
+  width: 2rem;
+  padding: 0.25rem;
+  transform: rotate(180deg);
 }
 
-.drawer-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 998;
+.drawer .drawer-top img:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
 }
 
-.drawer ul {
-  overflow-y:visible;
-}
-
-.folder-header {
+.drawer .search-and-filter {
   width: 100%;
   display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+  position: relative;
 }
 
-.search-bar {
+.drawer .filter-icon {
+  padding: 0.25rem;
+  width: 1.75rem;
+  opacity: 0.5;
+}
+
+.drawer .filter-icon:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.drawer .filter-icon.active {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.drawer .filter-dropdown {
+  margin-top: -0.25rem;
+  width: 65%;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+  padding: 1rem;
+}
+
+.drawer .clear-filters-button {
+  border: none;
+  outline: none;
+  padding-top: 0.25rem;
+}
+
+.drawer .filter-dropdown ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.drawer .filter-dropdown li {
+  font-size: 0.875rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.drawer .filter-dropdown input[type="checkbox"] {
+  appearance: none;
+  width: 0.9rem;
+  height: 0.9rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+}
+
+.drawer .filter-dropdown input[type="checkbox"]:checked {
+  background-color: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 3px;
+}
+
+.drawer .filter-dropdown input[type="checkbox"]:checked::after {
+  content: '✔';
+  color: white;
+  font-size: 12px;
+  position: absolute;
+  font-weight: 400;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.drawer .clear-filters-button {
+  padding: 0.25rem 0.5rem;
+  margin-top: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 3px;
+}
+
+.drawer .search-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  border-radius: 2rem;
+  padding: 0.25rem 1.25rem;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.drawer .search-bar img {
+  width: 1rem;
+  opacity: 0.3;
+}
+
+.drawer .search-bar {
   display: flex;
   align-items: center;
   border-radius: 5px;
   padding: 5px 10px;
 }
 
-.search-icon {
-  width: 20px; /* Adjust size as needed */
-  height: 20px;
-  margin-right: 10px; /* Space between icon and input */
-}
-
-.search-input {
+.drawer .search-input {
   border: none;
   background: none;
   outline: none;
   flex: 1;
+  padding: 0.25rem 0.5rem;
+}
+
+.drawer .search-input::placeholder {
+  font-size: 0.75rem; 
+}
+
+.drawer .add-folder {
+  transition: all 0.3s ease-in-out;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.drawer .add-folder-button:hover {
+  border-radius: 5px;
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.drawer .add-folder-button:hover img,
+.drawer .add-folder-button:hover p {
+  opacity: 1;
+}
+
+.drawer .add-folder.active .add-folder-button{
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.drawer .add-entry-button p,
+.drawer .add-entry-button img {
+  opacity: 0.5;
+}
+
+.drawer .add-entry-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.drawer .add-entry-button:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+
+.drawer .add-entry-button:hover p,
+.drawer .add-entry-button:hover img {
+  opacity: 1;
+}
+
+.drawer .add-folder.active img,
+.drawer .add-folder.active p {
+  opacity: 1;
+}
+
+.drawer .add-folder-input {
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(50px);
+  font-size: 1rem;
+}
+
+.drawer .add-folder-input input {
+  padding: 0.25rem 0.5rem;
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-size: 1rem;
+  width: 75%;
+}
+
+.drawer .add-folder-input button {
+  outline: none;
+  border: none;
+  font-size: 1rem;
+  background-color: transparent;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+}
+
+.drawer .add-folder-input button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.drawer .folder-header:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.drawer .add-folder-button,
+.drawer .add-entry-button,
+.drawer .folder-header,
+.drawer .add-folder-input {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
+  gap: 0.75rem;
+  transition: all 0.3s ease-in-out;
+}
+
+.drawer .divider {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+.drawer .folder-header p,
+.drawer .add-folder p {
+  flex: 1;
+}
+
+.drawer .add-folder p {
+  opacity: 0.5;
+}
+
+.drawer .folder-header img,
+.drawer .add-folder img,
+.drawer .add-entry-button img {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0.25rem;
+  opacity: 0.5;
+  border-radius: 3px;
+}
+
+.drawer .folder-header:hover img.folder-icon {
+  transform: rotate(-90deg);
+  opacity: 1;
+}
+
+.drawer .folder-header.active img.folder-icon {
+  transform: rotate(0deg);
+  opacity: 1;
+}
+
+.drawer .folder-header img:hover{
+  opacity: 1;
+}
+
+.drawer .drawer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.drawer .folder-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.drawer .folder-list {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y:visible;
+  gap: 0.5rem;
+  height: 50vh;
+}
+
+.drawer ul .entry-item {
+  padding: 0.5rem;
+}
+
+.drawer .entries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.drawer .entry-item {
+  display: flex;
+  align-items: flex-start;
+  background-color: rgba(255, 255, 255, 0.05); 
+  gap: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+.drawer .entry-item .entry-icon img {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.drawer .entry-item:hover {
+  background-color: rgba(255, 255, 255, 0.1); 
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.drawer .entry-content {
+  padding: 0.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.drawer .entry-title {
+  font-size: 1rem
+}
+
+.drawer .entry-date {
+  opacity: 0.5;
+  font-size: 0.75rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.drawer .entry-preview {
+  font-size: 0.875rem;
+  opacity: 0.9;
+}
+
+.entry-edit img {
+  width: 24px; 
+  height: 24px;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.entry-edit img:hover {
+  opacity: 1;
 }

@@ -9,6 +9,7 @@ import image2 from '../../Assets/Images/prompt (2).jpg'
 import image3 from '../../Assets/Images/prompt (3).jpg'
 import image4 from '../../Assets/Images/prompt (4).jpg'
 import image5 from '../../Assets/Images/prompt (5).jpg'
+import page from '../../Assets/Sounds/turnpage-99756.mp3'
 
 const PromptWidget = () => {
   const { setSelectedPrompt } = useTheme();
@@ -41,6 +42,8 @@ const PromptWidget = () => {
 
   const handleSelect = (prompt) => {
     setSelectedPrompt(prompt.text);
+    const audio = new Audio(page);
+    audio.play();
   };
 
   const images = [image1, image2, image3, image4, image5];

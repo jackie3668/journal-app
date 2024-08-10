@@ -3,16 +3,17 @@ import drawerIcon from '../../Assets/UI/Journal/radix-icons_pin-left.png';
 import backgroundIcon from '../../Assets/UI/Journal/image.png';
 import typingSoundIcon from '../../Assets/UI/Journal/keyboard.png';
 import ambienceIcon from '../../Assets/UI/Journal/sound-waves.png';
+import presetIcon from '../../Assets/UI/Journal/desert.png';
 import './JournalSideMenu.css'
 
 const JournalSideMenu = ({ onSelect, selectedMenu }) => {
   return (
     <div className='side-menu'>
       <img 
-        src={drawerIcon} 
-        alt="Drawer" 
-        onClick={() => onSelect('drawer')}
-        className={`menu-icon clickable ${selectedMenu === 'drawer' ? 'active' : ''}`}
+        src={presetIcon} 
+        alt="Preset Selector" 
+        onClick={() => onSelect('preset')}
+        className={`menu-icon clickable ${selectedMenu === 'preset' ? 'active' : ''}`}
       />
       <img 
         src={backgroundIcon} 
@@ -31,6 +32,12 @@ const JournalSideMenu = ({ onSelect, selectedMenu }) => {
         alt="Typing Sound" 
         onClick={() => onSelect('typingSound')}
         className={`menu-icon clickable ${selectedMenu === 'typingSound' ? 'active' : ''}`}
+      />
+      <img 
+        src={drawerIcon} 
+        alt="Drawer" 
+        onClick={() => onSelect('drawer')}
+        className={`menu-icon clickable ${selectedMenu === 'drawer' ? 'active' : ''}`}
       />
     </div>
   );
