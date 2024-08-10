@@ -25,6 +25,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
   const [expandedFolders, setExpandedFolders] = useState({}); 
   const [hoveredFolder, setHoveredFolder] = useState(null);  
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [isFolderListVisible, setIsFolderListVisible] = useState(false);
   const addFolderRef = useRef(null);
 
   useEffect(() => {
@@ -207,7 +208,6 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
     }
   };
 
-  
   const handleFolderHover = (folderName) => {
     setHoveredFolder(folderName);
   };

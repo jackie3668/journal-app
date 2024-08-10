@@ -60,7 +60,6 @@ const Export = ({ entryTitle, entryText }) => {
   };
 
   const handleExportDocx = async () => {
-    // Convert HTML to docx format
     const doc = new Document({
       sections: [
         {
@@ -81,7 +80,7 @@ const Export = ({ entryTitle, entryText }) => {
   };
 
   return (
-    <div>
+    <div className='export-menu'>
       <button onClick={handleExportTxt}>Export as TXT</button>
       <button onClick={handleExportPdf}>Export as PDF</button>
       <button onClick={handleExportCsv}>Export as CSV</button>

@@ -7,11 +7,18 @@ import { useTheme } from '../../Context/ThemeContext';
 import { fetchFolders, saveEntry, addNewFolder, extractPlainText, calculateWordCount } from '../../Utils/utils';
 import { useAchievements } from '../../Context/AchievementContext';
 import './QuillContainer.css';
+import exportIcon from  '../../Assets/UI/Journal/export.png'
+import remove from '../../Assets/UI/Journal/cancel.png'
+import tagIcon from '../../Assets/UI/Journal/tag (1).png'
+import date from '../../Assets/UI/Journal/calendar.png'
+import folder from '../../Assets/UI/Journal/folder (1).png'
+import check from '../../Assets/UI/Journal/tick.png'
 
+import { Scrollbar } from 'react-scrollbars-custom';
 const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry, selectedEntryId, setSelectedEntryId }) => {
-  const { authState, login, userData } = useAuth();
+  const { authState, login } = useAuth();
   const { selectedPrompt } = useTheme();
-  const { achievements, updateAchievements } = useAchievements();
+  const { updateAchievements } = useAchievements();
   const [entryTitle, setEntryTitle] = useState('');
   const [entryText, setEntryText] = useState(selectedPrompt ? selectedPrompt.replace(/['"]+/g, '') : '');
   const [tags, setTags] = useState([]);
@@ -20,15 +27,21 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   const [folders, setFolders] = useState([]);
   const [newFolderName, setNewFolderName] = useState('');
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
-  const [startTime, setStartTime] = useState(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [wordCount, setWordCount] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [initialWordCount, setInitialWordCount] = useState(0);
+  const [isToolbarVisible, setIsToolbarVisible] = useState(true);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [isFolderListVisible, setIsFolderListVisible] = useState(false); 
+  const [isTagInputVisible, setIsTagInputVisible] = useState(false);
+  const [activeSetting, setActiveSetting] = useState(null); // null, 'tags', or 'folder'
+
   const lastSaveTime = useRef(0);
   const quillRef = useRef(null);
   const loggedTagsRef = useRef([]);
-
+  const folderSettingRef = useRef(null);
+  const settingsRef = useRef(null);
  
   useEffect(() => {
     if (authState.isAuthenticated) {
@@ -64,7 +77,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       setSelectedFolder('Default'); 
     }
   }, [selectedEntry, selectedPrompt]);
-  
 
   useEffect(() => {
     if (isTyping) {
@@ -149,21 +161,36 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     setWordCount(newWordCount);
 
     if (!isTyping) {
-      setStartTime(Date.now());
       setIsTyping(true);
     }
+    setIsToolbarVisible(false);
   };
 
+  const handleMouseMove = () => {
+    setIsToolbarVisible(true);
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
   const handleTitleChange = (e) => {
     setEntryTitle(e.target.value);
   };
 
   const handleAddTag = () => {
-    if (newTag.trim() && !tags.includes(newTag.trim())) {
-      setTags([...tags, newTag.trim()]);
-      setNewTag('');
+    const tagList = newTag.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
+  
+    const newTagsToAdd = tagList.filter(tag => !tags.includes(tag));
+  
+    if (newTagsToAdd.length > 0) {
+      setTags([...tags, ...newTagsToAdd]);
+      setNewTag(''); 
     }
   };
+  
 
   const handleRemoveTag = (tagToRemove) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
@@ -183,88 +210,209 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       console.error('Error adding new folder:', error);
     }
   };
-  
 
+  function formatDate() {
+    const options = { year: 'numeric', month: 'long', day: '2-digit' };
+    const today = new Date();
+    return today.toLocaleDateString('en-US', options);
+  }
+  const handleMouseEnter = () => {
+    setIsDropdownVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDropdownVisible(false);
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (folderSettingRef.current && !folderSettingRef.current.contains(event.target)) {
+        setIsFolderListVisible(false);
+      }
+    }
+  
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (settingsRef.current && !settingsRef.current.contains(event.target)) {
+        setActiveSetting(null); // Close active setting if clicked outside
+      }
+    }
+  
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // For the tags section
+  const handleTagClick = () => {
+    if (activeSetting === 'tags') {
+      setActiveSetting(null); // Close if it's already open
+    } else {
+      setActiveSetting('tags'); // Open tags section and close others
+    }
+  };
+
+
+  const handleFolderClick = () => {
+    if (activeSetting === 'folder') {
+      setActiveSetting(null); // Close if it's already open
+    } else {
+      setActiveSetting('folder'); // Open folder section and close others
+    }
+  };
   return (
     <div className='quill-container glass'>
-      <div>
-        <Export entryTitle={entryTitle} entryText={entryText} />
-      </div>
-      <div>
-        <label htmlFor="folder-select">Select Folder:</label>
-        <select
-          id="folder-select"
-          value={selectedFolder}
-          onChange={(e) => setSelectedFolder(e.target.value)}
-        >
-          {folders.length ? (
-            folders.map((folder) => (
-              <option key={folder._id} value={folder.name}>
-                {folder.name}
-              </option>
-            ))
-          ) : (
-            <option value="Default">Default</option>
-          )}
-        </select>
-      </div>
-      <div>
-        {showNewFolderInput ? (
-          <div>
-            <input
-              type="text"
-              value={newFolderName}
-              onChange={(e) => setNewFolderName(e.target.value)}
-              placeholder="New Folder Name"
-            />
-            <button onClick={handleAddNewFolder}>Add Folder</button>
-            <button onClick={() => setShowNewFolderInput(false)}>Cancel</button>
+
+      <div className="editor-top">
+        <div className="entry-setting-wrapper">
+
+          <div className={!isToolbarVisible ? 'editing settings' : 'settings'}>
+            <div className="date">
+              <img src={date} alt="" />
+              {formatDate()}
+            </div>
+
+            <div className="tags-setting">
+              <p onClick={handleTagClick}>
+                <img src={tagIcon} alt="" />Add Tag
+              </p>
+              
+              {activeSetting === 'tags' && (
+                <div className='add-tag-wrapper'>
+                  <div className='tag-wrapper'>
+                    <input
+                      type="text"
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault(); 
+                          handleAddTag();
+                        }
+                      }}
+                      placeholder="Add tags here. Use comma to separate."
+                    />
+                  </div>
+                  
+                  <div className='tags-display'>
+                    {tags.length > 0 && (
+                      <ul>
+                        {tags.map((tag, index) => (
+                          <li onClick={() => handleRemoveTag(tag)} key={index}>
+                            <img src={tagIcon} alt="" />
+                            <p>{tag}</p>
+                            <img src={remove} alt="" />
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="folder-setting" ref={folderSettingRef}>
+              <p onClick={handleFolderClick}><img src={folder} alt="" />Add to folder</p>
+              {activeSetting === 'folder' && (
+                <ul>
+                  {folders.length ? (
+                    folders.map((folder) => (
+                      <li 
+                        key={folder._id} 
+                        onClick={() => {
+                          setSelectedFolder(folder.name);
+                          setIsFolderListVisible(false);
+                          setActiveSetting(null);
+                        }} 
+                        className={selectedFolder === folder.name ? 'selected' : ''}
+                      >
+                        {folder.name}
+                        {selectedFolder === folder.name && <img src={check} alt="Selected" className="check-icon" />}
+                      </li>
+                    ))
+                  ) : (
+                    <li 
+                      onClick={() => {
+                        setSelectedFolder("Default");
+                        setIsFolderListVisible(false);
+                        setActiveSetting(null);
+                      }} 
+                      className={selectedFolder === "Default" ? 'selected' : ''}
+                    >
+                      Default
+                      {selectedFolder === "Default" && <img src={check} alt="Selected" className="check-icon" />}
+                    </li>
+                  )}
+                  <li onClick={() => setShowNewFolderInput(true)} className="add-folder">
+                    + Add Folder
+                  </li>
+                  {showNewFolderInput && (
+                    <div>
+                      <input
+                        type="text"
+                        value={newFolderName}
+                        onChange={(e) => setNewFolderName(e.target.value)}
+                        placeholder="New Folder Name"
+                      />
+                      <button onClick={handleAddNewFolder}>Add</button>
+                      <button onClick={() => setShowNewFolderInput(false)}>Cancel</button>
+                    </div>
+                  )}
+                </ul>
+              )}
+            </div>
+
+
           </div>
-        ) : (
-          <button onClick={() => setShowNewFolderInput(true)}>Add New Folder</button>
-        )}
+
+          <input 
+            type="text" 
+            placeholder="Enter title here" 
+            value={entryTitle} 
+            onChange={handleTitleChange}
+            onKeyDown={handleKeyDown}
+            className='title-input'
+          />
+          
+        </div>
+
+        <div 
+          className={!isToolbarVisible ? 'editing export-container' : 'export-container'}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >          
+          {isDropdownVisible && (
+            <Export entryTitle={entryTitle} entryText={entryText} />
+          )}
+          <button className="export-button">
+            <img src={exportIcon} alt="Export" />
+          </button>
+        </div>
       </div>
-      <input 
-        type="text" 
-        placeholder="Title" 
-        value={entryTitle} 
-        onChange={handleTitleChange}
-        onKeyDown={handleKeyDown}
-        className='title-input'
-      />
-      <ReactQuill
-        theme="snow"
-        value={entryText}
-        onChange={handleTextChange}
-        onKeyDown={handleKeyDown}
-        modules={modules}
-        placeholder={selectedPrompt ? selectedPrompt.text : "Start writing here..."} 
-        ref={quillRef}
-      />
-      <div className='tag-wrapper'>
-        <input
-          type="text"
-          value={newTag}
-          onChange={(e) => setNewTag(e.target.value)}
-          placeholder="Add a tag"
+      
+
+      <Scrollbar>
+        <ReactQuill
+          className={!isToolbarVisible ? 'editing ql clickable' : 'ql clickable'}
+          theme="snow"
+          value={entryText}
+          onChange={handleTextChange}
+          onKeyDown={handleKeyDown}
+          modules={modules}
+          placeholder={selectedPrompt ? selectedPrompt.text : ""} 
+          ref={quillRef}
         />
-        <button onClick={handleAddTag}>Add Tag</button>
-      </div>
-      <div>
-        {tags.length > 0 && (
-          <ul>
-            {tags.map((tag, index) => (
-              <li key={index} style={{ display: 'inline', marginRight: '5px' }}>
-                <span>{tag}</span>
-                <button onClick={() => handleRemoveTag(tag)} style={{ marginLeft: '5px' }}>Remove</button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-      <div>
-        <p>Word Count: {wordCount}</p>
-        <p>Time Spent: {Math.floor(elapsedTime / 60000)}m {Math.floor((elapsedTime % 60000) / 1000)}s</p>
+      </Scrollbar>
+      <div className='count-time'>
+        <p>{wordCount} Words</p>
+        <p>{Math.floor(elapsedTime / 60000)}m {Math.floor((elapsedTime % 60000) / 1000)}s</p>
       </div>
     </div>
   );

@@ -3,8 +3,319 @@
   flex-direction: column;
   width: 100%;
   height: 65vh;
+  padding-bottom: 3rem;
+  border-radius: 1rem;
+  gap:0.25rem;
 }
 
-.quill-container .tag-wrapper {
-  margin-top: 4rem;
+.quill-container .editor-top {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1.5rem 1.5rem;
+  padding-bottom: 0.25rem;
+}
+
+.quill-container .editor-top .entry-setting-wrapper {
+  width: 100%;
+}
+
+.quill-container .editor-top .export-container.editing {
+  opacity: 0;
+}
+
+.quill-container .editor-top .export-button {
+  background-color: transparent;
+  height: 2rem;
+}
+
+.quill-container .editor-top .export-container {
+  display: flex;
+}
+
+.quill-container .editor-top .export-button img {
+  width: 1.25rem;
+  opacity: 0.7;
+}
+
+.quill-container .editor-top .export-menu {
+  display: flex;
+}
+
+.quill-container .title-date {
+  display: flex;
+}
+
+.quill-container .title-input {
+  font-size: 1.5rem;
+  background-color: transparent;
+  padding-top: 0.5rem;
+}
+
+.quill-container .settings {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  gap: 1rem;
+  padding: 0;
+  position: relative;
+}
+
+.quill-container .settings.editing {
+  opacity: 0;
+}
+
+.quill-container .date {
+  text-align: left;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.quill-container .date img {
+  width: 0.875rem;
+  margin-right: 5px;
+  margin-bottom: -2px;
+}
+
+.quill-container .folder-setting img {
+  width: 0.875rem;
+  margin-right: 3px;
+  margin-bottom: -2px;
+}
+
+.quill-container .settings .tags-setting {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  border-radius: 5px;
+  font-size: 0.75rem;
+}
+
+.quill-container .settings .tags-setting img {
+  width: 0.75rem;
+  margin-bottom: -2px;
+  margin-right: 5px;
+}
+
+.quill-container .settings .add-tag-wrapper {
+  top: 135%;
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 0.5);
+  background-color: white;
+  position: absolute;
+  color: black;
+  padding: 0.5rem 1rem;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  width: 20rem;
+}
+
+.quill-container .settings .tag-wrapper input {
+  width: 15rem;
+  color: black;
+  background-color: transparent;
+}
+
+.quill-container .settings .tag-wrapper input::placeholder {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.quill-container .settings .tags-display ul {
+  margin-top: 0.3rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.quill-container .settings .tags-display ul li {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  border-radius: 5px;
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  gap: 0.25rem;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.quill-container .settings li.selected img {
+  filter: invert(1);
+  opacity: 0.7;
+  margin-left: 0.5rem;
+}
+
+.quill-container .settings li.selected:hover img {
+  filter: invert(0);
+}
+
+.quill-container .settings .tags-display ul li:hover {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.quill-container .settings .tags-display ul li p {
+  margin-bottom: 0.2rem;
+  margin-right: 0.2rem;
+}
+
+.quill-container .settings .tags-display img:first-child {
+  width: 0.7rem;
+}
+
+.quill-container .settings .tags-display img:last-child {
+  width: 0.5rem;
+}
+
+.quill-container .settings .folder-setting {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  position: relative;
+}
+
+.quill-container .settings .folder-setting ul {
+  position: absolute;
+  background-color: white;
+  border-radius: 10px;
+  top: 100%;
+  left: 0;
+  z-index: 12;
+  color: black;
+  width: 10rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 2px 2px 10px 2px rgba(0, 0, 0, 0.5);
+}
+
+.quill-container .settings .folder-setting ul li {
+  color: black;
+  padding: 0.5rem 1rem;
+}
+
+.quill-container .settings .folder-setting ul li:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+}
+
+.ql {
+  flex: 1;
+}
+
+.quill-container .ql-container.ql-snow {
+  border: none;
+  position: relative;
+}
+
+.quill-container .ql.editing .ql-toolbar {
+ opacity: 0;
+}
+
+.quill-container .ql .ql-toolbar {
+  border: none;
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
+  padding: 0;
+  font-family: "Quicksand", sans-serif;
+  padding: 0 1.5rem;
+}
+
+.quill-container .ql-toolbar {
+  position: sticky;
+  top: 0; 
+  width: 100%; 
+  z-index: 10; 
+  color: black;
+}
+
+.quill-container .ql-container {
+  padding: 0;
+}
+
+.quill-container .ql-editor {
+  padding: 1.5rem;
+}
+.quill-container .ql-editor.ql-blank::before {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.quill-container .ql-picker-options span {
+  color: black;
+}
+
+.quill-container .count-time {
+  position: absolute;
+  display: flex;
+  gap: 1rem;
+  z-index: 12;
+  bottom: 1.25rem;
+  right: 1.5rem;
+  font-size: 0.75rem;
+}
+
+.quill .ql-toolbar .ql-stroke {
+  stroke: white;
+}
+
+.ql-picker-label::before {
+  color: white !important;
+
+}
+
+.ql-picker-label::before svg {
+  stroke: white !important;
+  fill: white !important; 
+}
+
+.ql-picker .ql-stroke {
+  color: white !important;
+  stroke: white !important; 
+  fill: white !important; 
+}
+
+.quill-container .ql-toolbar button {
+  color: white;
+}
+
+.quill .ql-toolbar svg,
+.ql-picker .ql-stroke {
+  fill: white;
+  stroke: white;
+}
+
+.quill .ql-toolbar button.ql-active svg,
+.quill .ql-toolbar button:hover svg,
+.quill .ql-toolbar .ql-active svg,
+.quill .ql-toolbar button.ql-active .ql-stroke,
+.quill .ql-toolbar button:hover .ql-stroke,
+.quill .ql-toolbar button.ql-active .ql-fill,
+.quill .ql-toolbar button:hover .ql-fill {
+  stroke: darkgrey;
+}
+
+.ql-toolbar .ql-picker-options .ql-picker-item.ql-selected {
+  color: black;
+}
+
+.ql-toolbar .ql-picker-label {
+  color: white;
+}
+
+.ql-toolbar .ql-picker-label:hover,
+.ql-toolbar .ql-picker-label.ql-active {
+  color: darkgrey;
+}
+
+.ql-picker-item:hover {
+  color: darkgrey !important;
+}
+
+.ql-picker-label::before,
+.ql-picker-label::before svg {
+  stroke: white !important;
+  fill: white !important;
 }
