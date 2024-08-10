@@ -19,6 +19,8 @@ const PresetWidget = () => {
           const img = new Image();
           img.src = preset.imageUrl;
         });
+        console.log(presets);
+        
       } catch (error) {
         console.error('Error fetching presets:', error);
       }

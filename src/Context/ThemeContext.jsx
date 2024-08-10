@@ -29,20 +29,24 @@ export const ThemeProvider = ({ children }) => {
       const backgroundAsset = assets.find(asset => asset._id === preset.videoId);
       const typingSoundAsset = assets.find(asset => asset.name === preset.assets[0]);
       const otherSoundAssets = preset.assets.slice(1).map(name => assets.find(asset => asset.name === name));
-
+  
+      console.log('Preset:', preset);
       console.log('Background Asset:', backgroundAsset);
-
-
-      setBackgroundName(preset.assets[0]); 
-      setTypingSoundName(preset.assets[1]); 
+      console.log('Typing Sound Asset:', typingSoundAsset);
+      console.log('Other Sound Assets:', otherSoundAssets);
+  
+      setBackgroundName(preset.assets[0]);
+      setTypingSoundName(preset.assets[1]);
       setSounds(otherSoundAssets.map(asset => asset ? asset.name : 'Unknown'));
-
+  
       if (backgroundAsset) {
         setBackgroundUrl(backgroundAsset.url);
-        console.log('Background URL from preset:', backgroundAsset.url);
+        console.log('Background URL:', backgroundAsset.url);
       } else {
         setBackgroundUrl('');
+        console.log('No Background URL found');
       }
+  
     } else {
       setBackgroundName('');
       setTypingSoundName('');
@@ -50,6 +54,7 @@ export const ThemeProvider = ({ children }) => {
       setBackgroundUrl('');
     }
   };
+  
 
   return (
     <ThemeContext.Provider value={{
