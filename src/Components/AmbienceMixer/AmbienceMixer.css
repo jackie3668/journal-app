@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;  
-  height: 50%;
+  height: 45%;
   gap: 3rem;
 
 }
@@ -31,10 +31,6 @@
   width: 10vw;
 }
 
-.ambience-mixer .gallery .item img {
-  border-radius: 1rem;
-}
-
 .ambience-mixer .gallery .item-title {
   margin-top: 5px;
   font-weight: 600;
@@ -42,7 +38,104 @@
   font-size: 0.875rem;
 }
 
-.mixer-panel {
+.mixer-wrapper {
   display: flex;
-  height: 50%;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
+}
+
+.mixer-panel {
+  padding-top: 5vh;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  flex: 1;
+  width: 80%;
+  height: 100%;
+
+}
+
+.mixer-panel .sound-image {
+  width: 2rem;
+}
+
+.mixer-panel .sound-control {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.custom-slider {
+  position: relative;
+  width: 8px;
+  height: 150px;
+  background-color:green;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.custom-slider-thumb {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  top: 50%;
+  left: 50%; 
+  transition: left 0.1s ease-in-out;
+}
+
+.custom-slider-thumb:active {
+  background-color: white;
+}
+
+.sound-control .inactive {
+  cursor: not-allowed;
+}
+
+.custom-slider-thumb.inactive {
+  background-color: lightgrey;
+  cursor: not-allowed;
+}
+
+.custom-slider {
+  position: relative;
+  width: 10px;
+  height: 150px;
+  background-color: grey;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.custom-slider .active-track {
+  position: absolute;
+  width: 100%;
+  background-color: white;
+  bottom: 0;
+  height: 0;
+  border-radius: 8px 
+}
+
+.custom-slider-thumb {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  cursor: pointer;
+}
+
+.sound-control span {
+  font-size: 0.875rem;
+  text-align: center;
+  height: 3rem;
 }

@@ -38,10 +38,11 @@ const Player = () => {
     sounds.forEach((soundName) => {
       const soundAsset = soundAssets.find(asset => asset.name === soundName);
       if (soundAsset && soundAsset.url) {
+        console.log(`Playing sound: ${soundAsset.url}`);
         const audio = new Audio(soundAsset.url);
         audio.loop = true; 
         audio.volume = volumes.ambient[soundName] 
-        audio.play()
+        audio.play().catch(err => console.error('Error playing sound:', err));
         audioRefs.current.push(audio); 
       }
     });

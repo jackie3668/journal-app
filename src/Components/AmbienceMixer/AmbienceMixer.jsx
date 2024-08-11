@@ -13,7 +13,7 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
   const [activeCategory, setActiveCategory] = useState('All'); 
   const [imagesLoadedCount, setImagesLoadedCount] = useState(0);
   const [loading, setLoading] = useState(true); 
-
+  const [isDragging, setIsDragging] = useState(false);
   useEffect(() => {
     const fetchSounds = async () => {
       try {
@@ -82,6 +82,27 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
     });
   };
   
+  const handleSliderChange = (e, soundName) => {
+    const sliderHeight = e.target.clientHeight;
+    const newVolume = 1 - e.nativeEvent.offsetY / sliderHeight;
+    setVolumes((prevVolumes) => ({
+      ...prevVolumes,
+      [soundName]: Math.max(0, Math.min(1, newVolume)),
+    }));
+    updateVolume('ambient', soundName, newVolume);
+  };
+  
+  const handleSliderMove = (e, soundName) => {
+    if (!isDragging) return;
+    handleSliderChange(e, soundName);
+  };
+  
+  useEffect(() => {
+    const handleMouseUp = () => setIsDragging(false);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => window.removeEventListener('mouseup', handleMouseUp);
+  }, []);
+  
 
   return (
     <div className='ambience-mixer menu-container dark-glass'>
@@ -124,31 +145,59 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
         </Scrollbar>
       </div>
 
-      <div className="mixer-panel">
-        <h3>Selected Sounds</h3>
-        {sounds.map((soundName) => {
-          const sound = allSounds.find(s => s.name === soundName);
-          if (!sound) {
-            return null;
+
+      <div className="mixer-wrapper">
+        <div className="mixer-panel">
+          
+          {new Array(8).fill(null).map((_, index) => {
+              const soundName = sounds[index];
+              const sound = allSounds.find(s => s.name === soundName);
+              
+              if (!sound) {
+                return (
+                  <div key={index} className="sound-control inactive">
+                    <div
+                      className="custom-slider"
+                    >
+                      <div
+                        className="custom-slider-thumb inactive"
+                      ></div>
+                    </div>
+                    <span>None selected</span>
+                  </div>
+                );
+              }
+              
+              return (
+                <div key={sound._id} className="sound-control clickable">
+                  <div
+                    className="custom-slider"
+                    onMouseDown={(e) => handleSliderChange(e, sound.name)}
+                    onMouseMove={(e) => handleSliderMove(e, sound.name)}
+                    onMouseUp={() => setIsDragging(false)}
+                    onMouseLeave={() => setIsDragging(false)}
+                  >
+                    <div
+                      className="active-track"
+                      style={{ height: `${volumes[sound.name] * 100}%` }}
+                    ></div>
+                    <div
+                      className="custom-slider-thumb"
+                      style={{ top: `${(1 - volumes[sound.name]) * 100}%` }}
+                    ></div>
+                  </div>
+                  <img src={sound.imageUrl} alt={sound.name} className="sound-image" />
+                  <span>{sound.name}</span>
+                  <button onClick={() => handleRemoveSound(sound.name)}>Remove</button>
+
+                </div>
+              );
+            })
           }
-          return (
-            <div key={sound._id} className="sound-control">
-              <img src={sound.imageUrl} alt={sound.name} className="sound-image" />
-              <span>{sound.name}</span>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={volumes[sound.name]}
-                onChange={(e) => handleVolumeChange(sound.name, parseFloat(e.target.value))}
-                className="volume-slider"
-              />
-              <button onClick={() => handleRemoveSound(sound.name)}>Remove</button>
-            </div>
-          );
-        })}
+        </div>
       </div>
+
+
     </div>
   );
 };
