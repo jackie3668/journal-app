@@ -35,7 +35,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [isFolderListVisible, setIsFolderListVisible] = useState(false); 
   const [isTagInputVisible, setIsTagInputVisible] = useState(false);
-  const [activeSetting, setActiveSetting] = useState(null); // null, 'tags', or 'folder'
+  const [activeSetting, setActiveSetting] = useState(null); 
 
   const lastSaveTime = useRef(0);
   const quillRef = useRef(null);
@@ -190,7 +190,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       setNewTag(''); 
     }
   };
-  
 
   const handleRemoveTag = (tagToRemove) => {
     setTags(tags.filter(tag => tag !== tagToRemove));
@@ -226,21 +225,8 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (folderSettingRef.current && !folderSettingRef.current.contains(event.target)) {
-        setIsFolderListVisible(false);
-      }
-    }
-  
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-  
-  useEffect(() => {
-    function handleClickOutside(event) {
       if (settingsRef.current && !settingsRef.current.contains(event.target)) {
-        setActiveSetting(null); // Close active setting if clicked outside
+        setActiveSetting(null); 
       }
     }
   
@@ -250,29 +236,27 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     };
   }, []);
 
-  // For the tags section
   const handleTagClick = () => {
     if (activeSetting === 'tags') {
-      setActiveSetting(null); // Close if it's already open
+      setActiveSetting(null); 
     } else {
-      setActiveSetting('tags'); // Open tags section and close others
+      setActiveSetting('tags'); 
     }
   };
-
 
   const handleFolderClick = () => {
     if (activeSetting === 'folder') {
-      setActiveSetting(null); // Close if it's already open
+      setActiveSetting(null); 
     } else {
-      setActiveSetting('folder'); // Open folder section and close others
+      setActiveSetting('folder'); 
     }
   };
+
   return (
     <div className='quill-container glass'>
 
       <div className="editor-top">
         <div className="entry-setting-wrapper">
-
           <div className={!isToolbarVisible ? 'editing settings' : 'settings'}>
             <div className="date">
               <img src={date} alt="" />
@@ -368,8 +352,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
                 </ul>
               )}
             </div>
-
-
           </div>
 
           <input 
@@ -380,7 +362,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
             onKeyDown={handleKeyDown}
             className='title-input'
           />
-          
+
         </div>
 
         <div 

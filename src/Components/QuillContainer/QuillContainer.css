@@ -28,10 +28,16 @@
 .quill-container .editor-top .export-button {
   background-color: transparent;
   height: 2rem;
+  opacity: 0.5;
+}
+
+.quill-container .editor-top .export-button:hover {
+  opacity: 1;
 }
 
 .quill-container .editor-top .export-container {
   display: flex;
+  gap: 1rem;
 }
 
 .quill-container .editor-top .export-button img {
@@ -318,4 +324,32 @@
 .ql-picker-label::before svg {
   stroke: white !important;
   fill: white !important;
+}
+
+.ql-snow .ql-editor p {
+  font-size: 1rem;
+}
+
+.ql-snow .ql-editor h1 {
+  font-size: 2rem;
+}
+
+.ql-snow .ql-editor h2 {
+  font-size: 1.75rem;
+}
+
+.ql-snow .ql-editor h3 {
+  font-size: 1.5rem;
+}
+
+.ql-snow .ql-editor h4 {
+  font-size: 1.25rem;
+}
+
+.ql-snow .ql-editor h5 {
+  font-size: 1.125rem;
+}
+
+.ql-snow .ql-editor h6 {
+  font-size: 1rem;
 }
