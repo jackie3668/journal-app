@@ -1,18 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import './BackgroundSelector.css';
+import { Scrollbar } from 'react-scrollbars-custom';
 import axios from 'axios';
 import { useTheme } from '../../Context/ThemeContext';
+import LoadingScreen from '../LoadingScreen/LoadingScreen';
 
-const BackgroundSelector = () => {
-  const { setBackgroundName, setBackgroundUrl, backgroundUrl } = useTheme(); 
+const BackgroundSelector = ({ setSelectedMenu }) => {  
+  const { setBackgroundUrl } = useTheme(); 
   const [assets, setAssets] = useState([]);
-  const [selectedAsset, setSelectedAsset] = useState('');
+  const [categories, setCategories] = useState({});
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [imagesLoadedCount, setImagesLoadedCount] = useState(0);
+  const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     const fetchAssets = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/assets');
         const videoAssets = response.data.filter(asset => asset.type === 'video');
+        
+        const categorizedData = videoAssets.reduce((acc, asset) => {
+          const category = asset.category || 'All';
+          if (!acc[category]) acc[category] = [];
+          acc[category].push(asset);
+          return acc;
+        }, { All: videoAssets });
+
         setAssets(videoAssets);
+        setCategories(categorizedData);
       } catch (error) {
         console.error('Error fetching assets:', error);
       }
@@ -21,45 +36,57 @@ const BackgroundSelector = () => {
     fetchAssets();
   }, []);
 
-  useEffect(() => {
-    setSelectedAsset(backgroundUrl);
-  }, [backgroundUrl]);
+  const handleAssetClick = (asset) => {
+    setBackgroundUrl(asset.url); 
+    setSelectedMenu('')
+  };
 
-  const handleAssetChange = (event) => {
-    const selectedUrl = event.target.value;
-    setSelectedAsset(selectedUrl);
-
-    if (selectedUrl) {
-      const selectedAssetName = assets.find(asset => asset.url === selectedUrl)?.name || '';
-      if (selectedAssetName) {
-        setBackgroundName(selectedAssetName);
-        setBackgroundUrl(selectedUrl);
-        console.log('Selected asset name and URL set:', selectedAssetName, selectedUrl);
+  const handleImageLoad = () => {
+    setImagesLoadedCount(prevCount => {
+      const newCount = prevCount + 1;
+      if (newCount === 2) { 
+        console.log('finished');
+        setLoading(false); 
       }
-    } else {
-      setBackgroundName('');
-      setBackgroundUrl('');
-      console.log('No asset selected, background reset');
-    }
+      return newCount;
+    });
   };
 
   return (
-    <div className="background-selector">
-      <label htmlFor="background-select">Select Background:</label>
-      <select 
-        id="background-select" 
-        value={selectedAsset} 
-        onChange={handleAssetChange}
-      >
-        <option value="">None</option>
-        {assets.map((asset) => (
-          <option key={asset._id} value={asset.url}>
-            {asset.name}
-          </option>
+    <div className='background menu-container dark-glass'>
+      <button onClick={() => setSelectedMenu('')}>close</button>
+      {loading && (<LoadingScreen />)}
+      <div className="tab-nav-bar">
+        {Object.keys(categories).map((category) => (
+          <div
+            key={category}
+            className={`tab-nav-item ${category === activeCategory ? 'active' : ''}`}
+            onClick={() => setActiveCategory(category)}
+          >
+            {category}
+          </div>
         ))}
-      </select>
+      </div>
+      <Scrollbar>
+        <div className='gallery'>
+          {categories[activeCategory]?.map((asset, index) => (
+            <div 
+              key={index} 
+              className='item'
+              onClick={() => handleAssetClick(asset)} 
+            >
+              <img 
+                src={asset.imageUrl} 
+                alt={asset.name} 
+                onLoad={handleImageLoad} 
+              />
+              <div className='item-title'>{asset.name}</div> 
+            </div>
+          ))}
+        </div>
+      </Scrollbar>
     </div>
   );
-};
+}
 
 export default BackgroundSelector;

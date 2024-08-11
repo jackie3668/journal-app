@@ -1,16 +1,25 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
+import { log } from 'util';
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [backgroundName, setBackgroundName] = useState('');
   const [typingSoundName, setTypingSoundName] = useState('');
-  const [sounds, setSounds] = useState([]);
+  const [sounds, setSounds] = useState([]); // Include setSounds in the context
   const [backgroundUrl, setBackgroundUrl] = useState('https://cdn.pixabay.com/video/2023/10/26/186611-878455887_large.mp4'); 
   const [assets, setAssets] = useState([]);
+  const [volumes, setVolumes] = useState({
+    typing: {},
+    ambient: {},
+  }); 
   const [selectedPrompt, setSelectedPrompt] = useState(null); 
 
+  useEffect(() => {
+    console.log(sounds);
+    
+  },[sounds])
   useEffect(() => {
     const fetchAssets = async () => {
       try {
@@ -28,39 +37,60 @@ export const ThemeProvider = ({ children }) => {
     if (preset) {
       const backgroundAsset = assets.find(asset => asset._id === preset.videoId);
       const typingSoundAsset = assets.find(asset => asset.name === preset.assets[0]);
-      const otherSoundAssets = preset.assets.slice(1).map(name => assets.find(asset => asset.name === name));
-  
-      console.log('Preset:', preset);
-      console.log('Background Asset:', backgroundAsset);
-      console.log('Typing Sound Asset:', typingSoundAsset);
-      console.log('Other Sound Assets:', otherSoundAssets);
-  
+      const otherSoundAssets = preset.assets.slice(1).map(name => assets.find(asset => asset.name === name)).filter(Boolean);
+
       setBackgroundName(preset.assets[0]);
-      setTypingSoundName(preset.assets[1]);
-      setSounds(otherSoundAssets.map(asset => asset ? asset.name : 'Unknown'));
-  
+      setTypingSoundName(typingSoundAsset ? typingSoundAsset.name : '');
+      setSounds(otherSoundAssets.map(asset => asset.name));
+
       if (backgroundAsset) {
         setBackgroundUrl(backgroundAsset.url);
-        console.log('Background URL:', backgroundAsset.url);
       } else {
         setBackgroundUrl('');
         console.log('No Background URL found');
       }
-  
+
+      const newVolumes = {
+        typing: {},
+        ambient: {},
+      };
+
+      if (typingSoundAsset) {
+        newVolumes.typing[typingSoundAsset.name] = volumes.typing[typingSoundAsset.name] || 0.1;
+      }
+
+      otherSoundAssets.forEach(asset => {
+        if (asset) {
+          newVolumes.ambient[asset.name] = volumes.ambient[asset.name] || 0.1;
+        }
+      });
+
+      setVolumes(newVolumes);
+
     } else {
       setBackgroundName('');
       setTypingSoundName('');
       setSounds([]);
       setBackgroundUrl('');
+      setVolumes({ typing: {}, ambient: {} });
     }
   };
-  
+
+  const updateVolume = (soundType, soundName, volume) => {
+    setVolumes(prevVolumes => ({
+      ...prevVolumes,
+      [soundType]: {
+        ...prevVolumes[soundType],
+        [soundName]: volume,
+      },
+    }));
+  };
 
   return (
     <ThemeContext.Provider value={{
       backgroundName, setBackgroundName,
       typingSoundName, setTypingSoundName,
-      sounds, backgroundUrl, setBackgroundUrl,
+      sounds, setSounds, volumes, updateVolume, backgroundUrl, setBackgroundUrl,
       selectPreset, selectedPrompt, setSelectedPrompt
     }}>
       {children}

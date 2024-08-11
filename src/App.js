@@ -8,6 +8,8 @@ import Journal from './Pages/Journal/Journal';
 import NavBar from './Components/NavBar/NavBar';
 import LoadingScreen from './Components/LoadingScreen/LoadingScreen';
 import AnimatedCursor from "react-animated-cursor"
+import Player from './Components/Player/Player';
+import GlobalVolume from './Components/GlobalVolume/GlobalVolume';
 
 const App = () => {
   const location = useLocation();
@@ -18,6 +20,8 @@ const App = () => {
     <div className="container">
       {isLoading && <LoadingScreen />}
       <Background />
+      <Player />
+      <GlobalVolume />
       <AnimatedCursor
         innerSize={10}
         outerSize={12}

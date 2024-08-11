@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import './PresetMenu.css';
 import { Scrollbar } from 'react-scrollbars-custom';
 import axios from 'axios';
-import { useTheme } from '../Context/ThemeContext';
-import LoadingScreen from '../Components/LoadingScreen/LoadingScreen'
+import { useTheme } from '../../Context/ThemeContext'
+import LoadingScreen from '../LoadingScreen/LoadingScreen';
 
-const PresetMenu = ({ onClose }) => {  
+const PresetMenu = ({ onClose, setSelectedMenu }) => {  
   const { selectPreset } = useTheme();
   const [categories, setCategories] = useState({});
   const [activeCategory, setActiveCategory] = useState('All');
@@ -52,7 +52,7 @@ const PresetMenu = ({ onClose }) => {
   const handleImageLoad = () => {
     setImagesLoadedCount(prevCount => {
       const newCount = prevCount + 1;
-      if (newCount === 3) {
+      if (newCount === 5) {
         console.log('finished');
         setLoading(false); 
       }
@@ -64,6 +64,7 @@ const PresetMenu = ({ onClose }) => {
   return (
     <div className='preset menu-container dark-glass'>
       {loading && (<LoadingScreen />)}
+      <button onClick={() => setSelectedMenu('')}>close</button>
       <div className="tab-nav-bar">
         {Object.keys(categories).map((category) => (
           <div
