@@ -42,6 +42,11 @@ input::placeholder {
   backdrop-filter: blur(15px);
 }
 
+.dark-glass {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(50px);
+}
+
 .container {
   height: 90vh;
   display: flex;

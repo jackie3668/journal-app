@@ -6,7 +6,7 @@ import './Journal.css';
 import TypingSound from '../../Components/TypingSound/TypingSound';
 import QuillContainer from '../../Components/QuillContainer/QuillContainer';
 import AmbienceMixer from '../../Components/AmbienceMixer/AmbienceMixer';
-import PresetWidget from '../../Components/PresetWidget/PresetWidget'
+import PresetMenu from '../../Components/PresetMenu';
 import Drawer from '../../Components/Drawer/Drawer';
 import BackgroundSelector from '../../Components/BackgroundSelector/BackgroundSelector';
 import JournalSideMenu from '../../Components/JournalSideMenu/JournalSideMenu'
@@ -94,6 +94,10 @@ const Journal = () => {
     }
   };
 
+  const handleClosePresetMenu = () => {
+    setSelectedMenu(''); 
+  };
+
   return (
     <Scrollbar>
       <div className='journal-container'>
@@ -125,7 +129,9 @@ const Journal = () => {
         {selectedMenu === 'background' && <BackgroundSelector />}
         {selectedMenu === 'ambience' && <AmbienceMixer />}
         {selectedMenu === 'typingSound' && <TypingSound onSoundChange={setTypingSound} />}
-        {selectedMenu === 'preset' && <PresetWidget />}
+        {selectedMenu === 'preset' && (
+          <PresetMenu selectedMenu={selectedMenu} onClose={handleClosePresetMenu} /> 
+        )}
       </div>
     </Scrollbar>
   );
