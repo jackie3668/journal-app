@@ -21,7 +21,7 @@ const App = () => {
       {isLoading && <LoadingScreen />}
       <Background />
       <Player />
-      <GlobalVolume />
+      {/* <GlobalVolume /> */}
       <AnimatedCursor
         innerSize={10}
         outerSize={12}

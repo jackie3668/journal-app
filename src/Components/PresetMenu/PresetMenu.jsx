@@ -64,7 +64,7 @@ const PresetMenu = ({ onClose, setSelectedMenu }) => {
   return (
     <div className='preset menu-container dark-glass'>
       {loading && (<LoadingScreen />)}
-      <button onClick={() => setSelectedMenu('')}>close</button>
+      <button className='close-gallery' onClick={() => setSelectedMenu('')}>close</button>
       <div className="tab-nav-bar">
         {Object.keys(categories).map((category) => (
           <div

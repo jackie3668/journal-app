@@ -3,7 +3,7 @@ import { useTheme } from '../../Context/ThemeContext';
 import axios from 'axios';
 
 const Player = () => {
-  const { sounds, volumes } = useTheme();  // Get sounds and volumes from ThemeContext
+  const { sounds, volumes } = useTheme();
   const [soundAssets, setSoundAssets] = useState([]);
   const audioRefs = useRef([]);
 
@@ -23,7 +23,7 @@ const Player = () => {
   useEffect(() => {
     console.log(sounds);
     
-    // Stop and reset previous sounds
+
     audioRefs.current.forEach(audio => {
       if (audio) {
         audio.pause();
@@ -31,23 +31,21 @@ const Player = () => {
       }
     });
 
-    // Clear the ref array
+
     audioRefs.current = [];
 
-    // Play new sounds with the corresponding volume from the context
+
     sounds.forEach((soundName) => {
       const soundAsset = soundAssets.find(asset => asset.name === soundName);
       if (soundAsset && soundAsset.url) {
-        console.log(`Playing sound: ${soundAsset.url}`); // Log the sound URL
         const audio = new Audio(soundAsset.url);
         audio.loop = true; 
         audio.volume = volumes.ambient[soundName] 
-        audio.play().catch(err => console.error('Error playing sound:', err));
-        audioRefs.current.push(audio); // Add audio object to refs
+        audio.play()
+        audioRefs.current.push(audio); 
       }
     });
 
-    // Cleanup when the component is unmounted or sounds change
     return () => {
       audioRefs.current.forEach(audio => {
         if (audio) {
@@ -55,7 +53,7 @@ const Player = () => {
         }
       });
     };
-  }, [sounds, soundAssets, volumes]); // Dependency on sounds, soundAssets, and volumes
+  }, [sounds, soundAssets, volumes]); 
 
   return null; 
 };

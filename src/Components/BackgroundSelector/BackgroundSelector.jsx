@@ -10,8 +10,8 @@ const BackgroundSelector = ({ setSelectedMenu }) => {
   const [assets, setAssets] = useState([]);
   const [categories, setCategories] = useState({});
   const [activeCategory, setActiveCategory] = useState('All');
-  const [imagesLoadedCount, setImagesLoadedCount] = useState(0);
   const [loading, setLoading] = useState(true); 
+  const [imagesLoadedCount, setImagesLoadedCount] = useState(0);
 
   useEffect(() => {
     const fetchAssets = async () => {
@@ -54,7 +54,7 @@ const BackgroundSelector = ({ setSelectedMenu }) => {
 
   return (
     <div className='background menu-container dark-glass'>
-      <button onClick={() => setSelectedMenu('')}>close</button>
+      <button className='close-gallery' onClick={() => setSelectedMenu('')}>close</button>
       {loading && (<LoadingScreen />)}
       <div className="tab-nav-bar">
         {Object.keys(categories).map((category) => (

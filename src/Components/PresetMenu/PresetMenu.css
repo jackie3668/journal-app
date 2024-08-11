@@ -80,3 +80,9 @@
 .gallery .item-description {
   opacity: 0.5;
 }
+
+.close-gallery {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+}
