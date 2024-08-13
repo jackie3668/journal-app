@@ -1,4 +1,3 @@
-// src/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import axios from 'axios';
@@ -6,7 +5,7 @@ import axios from 'axios';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const { user, isAuthenticated, isLoading, loginWithRedirect, logout } = useAuth0();
+  const { user, isAuthenticated, isLoading, loginWithRedirect, logout, getAccessTokenSilently } = useAuth0();
   const [authState, setAuthState] = useState({
     user: null,
     isAuthenticated: false,
@@ -44,11 +43,29 @@ export const AuthProvider = ({ children }) => {
     fetchUserData();
   }, [authState]);
 
+  const resetPassword = async () => {
+    const domain = "your-auth0-domain";
+    const clientId = "your-auth0-client-id";
+
+    try {
+      await axios.post(`https://${domain}/dbconnections/change_password`, {
+        client_id: clientId,
+        email: authState.user.email,
+        connection: 'Username-Password-Authentication',
+      });
+      alert('Password reset email sent!');
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
+      alert('Failed to send password reset email.');
+    }
+  };
+
   const contextValue = {
     authState,
     userData, 
     login: loginWithRedirect,
     logout: logout,
+    resetPassword, 
   };
 
   return <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>;

@@ -75,7 +75,16 @@ export const getAchievements = async (userAchievements, userId) => {
       default:
         userProgress = 0;
     }
-    const progressPercentage = Math.min((userProgress / achievement.target) * 100, 100);
+
+    let progressPercentage = Math.min((userProgress / achievement.target) * 100, 100);
+    
+    if (progressPercentage >= 99 && progressPercentage < 100) {
+      progressPercentage = 99;
+    }
+
+    if (progressPercentage >= 100) {
+      return null;
+    }
 
     return { 
       ...achievement, 
@@ -84,7 +93,7 @@ export const getAchievements = async (userAchievements, userId) => {
       additionalInfo,
       unit
     };
-  });
+  }).filter(Boolean); 
 
   allAchievements.forEach(achievement => {
     if (!categoryProgress[achievement.category]) {
@@ -94,10 +103,13 @@ export const getAchievements = async (userAchievements, userId) => {
     categoryProgress[achievement.category].push(achievement);
   });
 
-  const closestAchievements = allAchievements
-    .filter(a => a.progressPercentage < 100)
-    .sort((a, b) => b.progressPercentage - a.progressPercentage)
-    .slice(0, 3);
+  const closestAchievements = Object.values(categoryProgress)
+    .map(achievements => 
+      achievements.sort((a, b) => b.progressPercentage - a.progressPercentage)[0]
+    )
+    .filter(Boolean) 
+    .sort((a, b) => b.progressPercentage - a.progressPercentage) 
+    .slice(0, 3); 
     
   return {
     allAchievements,

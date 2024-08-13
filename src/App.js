@@ -10,6 +10,7 @@ import LoadingScreen from './Components/LoadingScreen/LoadingScreen';
 import AnimatedCursor from "react-animated-cursor"
 import Player from './Components/Player/Player';
 import GlobalVolume from './Components/GlobalVolume/GlobalVolume';
+import Account from './Pages/Account/Account';
 
 const App = () => {
   const location = useLocation();
@@ -21,7 +22,6 @@ const App = () => {
       {isLoading && <LoadingScreen />}
       <Background />
       <Player />
-      {/* <GlobalVolume /> */}
       <AnimatedCursor
         innerSize={10}
         outerSize={12}
@@ -51,7 +51,7 @@ const App = () => {
         <NavBar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/account" element={<Home />} />
+          <Route path="/account" element={<Account/>} />
           <Route path="/journal" element={<Journal />} />
         </Routes>
       </div>

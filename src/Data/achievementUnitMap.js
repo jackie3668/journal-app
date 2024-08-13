@@ -3,8 +3,8 @@ const achievementUnitMap = {
   entryCount: 'entries saved',
   folderCount: 'folders created',
   tagUsage: 'tags created',
-  specificTagUsage: 'uses of one tag',
-  entriesInFolder: 'entries saved in one folder',
+  specificTagUsage: 'uses of 1 tag',
+  entriesInFolder: 'saved in 1 folder',
   timeSpentWriting: 'minutes',
 };
 

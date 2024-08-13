@@ -60,15 +60,19 @@ const NavBar = () => {
       </div>
       <ul className="toggle-nav glass">
         <div className="slider" style={{ transform: `translateX(${activeIndex * 100}%)` }} />
-        <li className={isActive('/')}>
-          <Link to="/" className={isActive('/')}>Home</Link>
-        </li>
-        <li className={isActive('/journal')}>
-          <Link to="/journal" onClick={handleClick} className={isActive('/journal')}>Journal</Link>
-        </li>
-        <li className={isActive('/account')}>
-          <Link to="/account" className={isActive('/account')}>Account</Link>
-        </li>
+  
+        <Link to="/" className={isActive('/')}>
+          <li className={isActive('/')}>Home</li>
+        </Link>
+    
+        <Link to="/journal" onClick={handleClick} className={isActive('/journal')}>
+          <li className={isActive('/journal')}>Journal</li>
+        </Link>
+ 
+        <Link to="/account" className={isActive('/account')}>       
+          <li className={isActive('/account')}>Account</li>
+        </Link>
+      
       </ul>
       <div className="auth clickable">
         {isAuthenticated ? (

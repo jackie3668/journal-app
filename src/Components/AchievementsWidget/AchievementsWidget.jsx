@@ -105,7 +105,7 @@ const AchievementsWidget = ({ setLoading }) => {
                   {achievement.name}
                 </p>
                 <p className="achievement-progress">
-                  {achievement.userProgress} / {achievement.target} {achievementUnitMap[achievement.category]}
+                  {achievement.userProgress}/{achievement.target} {achievementUnitMap[achievement.category]}
                   {/* {achievement.additionalInfo && `${achievement.additionalInfo}`} */}
                 </p>
               </div>

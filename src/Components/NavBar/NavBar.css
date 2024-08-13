@@ -49,7 +49,6 @@ nav .toggle-nav li {
 
 nav .toggle-nav li.active {
   color: black;
-  font-weight: 600;
 }
 
 nav .toggle-nav .slider {
