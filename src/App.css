@@ -81,18 +81,15 @@ input::placeholder {
   cursor: pointer;
 }
 
+
 /* Mobile (up to 480px) */
 @media (max-width: 480px) {
-  .container-border {
-    width: 100%;
-  }
+
 }
 
 /* Tablet (481px to 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
-  .container-border {
-    width: 100%;
-  }
+
 }
 
 /* Laptop (769px to 1024px) */
@@ -146,12 +143,19 @@ input::placeholder {
   html {
     font-size: 13px;
   }
+
+  .container-border {
+    width: 100%;
+  }
 }
 
 /* Tablet (481px to 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
   html {
     font-size: 14px;
+  }
+  .container-border {
+    width: 100%;
   }
 }
 
@@ -166,6 +170,11 @@ input::placeholder {
 @media (min-width: 1025px) and (max-width: 1200px) {
   html {
     font-size: 16px;
+  }
+  .container-border {
+    padding: 1rem;
+    gap: 2rem;
+    margin: 0;
   }
 }
 
