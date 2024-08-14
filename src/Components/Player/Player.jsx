@@ -21,9 +21,6 @@ const Player = () => {
   }, []);
 
   useEffect(() => {
-    console.log(sounds);
-    
-
     audioRefs.current.forEach(audio => {
       if (audio) {
         audio.pause();
@@ -38,7 +35,6 @@ const Player = () => {
     sounds.forEach((soundName) => {
       const soundAsset = soundAssets.find(asset => asset.name === soundName);
       if (soundAsset && soundAsset.url) {
-        console.log(`Playing sound: ${soundAsset.url}`);
         const audio = new Audio(soundAsset.url);
         audio.loop = true; 
         audio.volume = volumes.ambient[soundName] 

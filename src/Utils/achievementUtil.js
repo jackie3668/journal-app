@@ -2,8 +2,39 @@ import { predefinedAchievements } from '../Data/predefinedAchievements';
 import axios from 'axios';
 import achievementUnitMap from '../Data/achievementUnitMap';
 
-export const getAchievements = async (userAchievements, userId) => {
+export const getAchievements = async (userId) => {
   const categoryProgress = {};
+
+  let userAchievements = {};
+  console.log(userId);
+  
+  try {
+    const response = await fetch(`http://localhost:5000/api/achievements/${userId}`);
+    if (response.status === 200) {
+      userAchievements = await response.json();
+      console.log('Fetched Achievements:', userAchievements); 
+
+    } else if (response.status === 210) {
+      console.log('Partial success or special case:', response.status);
+      userAchievements = await response.json();
+    } else {
+      console.error('Failed to fetch achievements, status:', response.status);
+      return {
+        allAchievements: [],
+        closestAchievements: [],
+        mostUsedTag: '',
+        mostUsedFolder: ''
+      };
+    }
+  } catch (err) {
+    console.error('Error fetching achievements:', err.message);
+    return {
+      allAchievements: [],
+      closestAchievements: [],
+      mostUsedTag: '',
+      mostUsedFolder: ''
+    };
+  }
 
   let allEntries = [];
   try {
@@ -59,7 +90,7 @@ export const getAchievements = async (userAchievements, userId) => {
         userProgress = folderCount;
         break;
       case 'tagUsage':
-        userProgress = Object.keys(userAchievements.tagUsage).length;
+        userProgress = Object.keys(userAchievements.tagUsage || {}).length;
         break;
       case 'specificTagUsage':
         userProgress = highestTagUsage;
@@ -70,7 +101,8 @@ export const getAchievements = async (userAchievements, userId) => {
         additionalInfo = mostUsedFolder;
         break;
       case 'timeSpentWriting':
-        userProgress = userAchievements.timeSpentWriting;
+        userProgress = Math.floor(userAchievements.timeSpentWriting / 60); 
+        unit = 'minutes';
         break;
       default:
         userProgress = 0;
@@ -93,7 +125,7 @@ export const getAchievements = async (userAchievements, userId) => {
       additionalInfo,
       unit
     };
-  }).filter(Boolean); 
+  }).filter(Boolean);
 
   allAchievements.forEach(achievement => {
     if (!categoryProgress[achievement.category]) {

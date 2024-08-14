@@ -20,20 +20,21 @@ export const AchievementProvider = ({ children }) => {
   const fetchAchievements = async () => {
     if (!user || !user.sub) {
       console.error('User information is missing.');
-      return;
+      return null;  
     }
   
     try {
       const response = await fetch(`http://localhost:5000/api/achievements/${user.sub}`);
-      if (response.ok || response.status === 210) {  
-        return response;
+      if (response.ok || response.status === 210) {
+        const data = await response.json(); 
+        return data;  
       } else {
         console.error('Failed to fetch achievements, status:', response.status);
-        return response;
+        return null; 
       }
     } catch (error) {
       console.error('Error fetching achievements:', error.message);
-      throw error;  
+      throw error; 
     }
   };
   
@@ -59,7 +60,9 @@ export const AchievementProvider = ({ children }) => {
             updatedAchievements.totalWordCount += payload;
             break;
           case 'incrementEntryCount':
+            console.log(`Fentry updated to ${updatedAchievements.entryCount}`);
             updatedAchievements.entryCount += 1;
+            console.log(`Fentry updated to ${updatedAchievements.entryCount}`); 
             break;
           case 'updateTagUsage':
             payload.forEach(tag => {
@@ -67,7 +70,9 @@ export const AchievementProvider = ({ children }) => {
             });
             break;
           case 'incrementFolderCount':
+            console.log(`Folder count updated to ${updatedAchievements.folderCount}`); 
             updatedAchievements.folderCount += 1;
+            console.log(`Folder count updated to ${updatedAchievements.folderCount}`);
             break;
           case 'incrementPromptUsage':
             updatedAchievements.promptUsage += 1;

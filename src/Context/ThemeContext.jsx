@@ -7,7 +7,7 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
   const [backgroundName, setBackgroundName] = useState('');
   const [typingSoundName, setTypingSoundName] = useState('');
-  const [sounds, setSounds] = useState([]); // Include setSounds in the context
+  const [sounds, setSounds] = useState([]); 
   const [backgroundUrl, setBackgroundUrl] = useState('https://cdn.pixabay.com/video/2023/10/26/186611-878455887_large.mp4'); 
   const [assets, setAssets] = useState([]);
   const [volumes, setVolumes] = useState({
@@ -17,7 +17,6 @@ export const ThemeProvider = ({ children }) => {
   const [selectedPrompt, setSelectedPrompt] = useState(null); 
 
   useEffect(() => {
-    console.log(sounds);
     
   },[sounds])
   useEffect(() => {

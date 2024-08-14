@@ -75,7 +75,7 @@ const Achievements = () => {
         return;
       }
       if (achievements && user && user.sub) {
-        const { allAchievements } = await getAchievements(achievements, user.sub);
+        const { allAchievements } = await getAchievements(user.sub);
         
         const inProgress = allAchievements.filter(ach => ach.progressPercentage > 0 && ach.progressPercentage < 100);
         const completed = allAchievements.filter(ach => ach.progressPercentage === 100);

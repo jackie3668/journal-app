@@ -185,9 +185,9 @@
 
 .quill-container .settings .folder-setting ul {
   position: absolute;
+  top: 135%;
   background-color: white;
   border-radius: 10px;
-  top: 100%;
   left: 0;
   z-index: 12;
   color: black;
@@ -205,6 +205,25 @@
 
 .quill-container .settings .folder-setting ul li:hover {
   background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+}
+
+.quill-container .settings .add-folder-input{
+  background-color: rgba(0, 0, 0, 0.4);
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.25rem;
+}
+
+
+.quill-container .settings .add-folder-input button {
+  background-color: transparent;
+}
+
+.quill-container .settings .add-folder-input input {
+  background-color: transparent;
+  margin-right: -3rem;
   color: white;
 }
 

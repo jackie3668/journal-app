@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../../Context/AuthContext';
 import { extractPlainText } from '../../Utils/utils';
 import { Scrollbar } from 'react-scrollbars-custom';
+import { useAchievements } from '../../Context/AchievementContext';
 import './Drawer.css';
 import folderIcon from '../../Assets/UI/Journal/folder (1).png'
 import arrow from '../../Assets/UI/Journal/down-arrow (3).png'
@@ -14,6 +15,7 @@ import page from '../../Assets/Sounds/turnpage-99756.mp3'
 
 const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, isOpen, onClose }) => {
   const { authState } = useAuth();
+  const { updateAchievements } = useAchievements();
   const { user, isAuthenticated, isLoading } = authState;
   const [folders, setFolders] = useState([]);
   const [entries, setEntries] = useState({});
@@ -25,7 +27,6 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
   const [expandedFolders, setExpandedFolders] = useState({}); 
   const [hoveredFolder, setHoveredFolder] = useState(null);  
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-  const [isFolderListVisible, setIsFolderListVisible] = useState(false);
   const addFolderRef = useRef(null);
 
   useEffect(() => {
@@ -149,7 +150,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
       });
       setNewFolderName('');
       setShowNewFolderInput(false);
-
+      updateAchievements('incrementFolderCount', 1);
       const response = await axios.get('http://localhost:5000/api/folders', {
         params: { userId: user.sub }
       });

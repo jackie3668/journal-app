@@ -71,7 +71,7 @@ const AchievementsWidget = ({ setLoading }) => {
         return
       }
       if (achievements && user && user.sub) {
-        const { closestAchievements } = await getAchievements(achievements, user.sub);
+        const { closestAchievements } = await getAchievements(user.sub);
         setClosestAchievements(closestAchievements);
       }
     };

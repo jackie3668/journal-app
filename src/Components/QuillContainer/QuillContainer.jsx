@@ -33,8 +33,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   const [initialWordCount, setInitialWordCount] = useState(0);
   const [isToolbarVisible, setIsToolbarVisible] = useState(true);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const [isFolderListVisible, setIsFolderListVisible] = useState(false); 
-  const [isTagInputVisible, setIsTagInputVisible] = useState(false);
   const [activeSetting, setActiveSetting] = useState(null); 
 
   const lastSaveTime = useRef(0);
@@ -42,7 +40,8 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   const loggedTagsRef = useRef([]);
   const folderSettingRef = useRef(null);
   const settingsRef = useRef(null);
- 
+  const tagMenuRef = useRef(null);
+  
   useEffect(() => {
     if (authState.isAuthenticated) {
       localStorage.removeItem('pendingEntry');
@@ -205,6 +204,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       setNewFolderName('');
       setShowNewFolderInput(false);
       updateAchievements('incrementFolderCount', 1);
+      
     } catch (error) {
       console.error('Error adding new folder:', error);
     }
@@ -244,14 +244,45 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     }
   };
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        folderSettingRef.current && !folderSettingRef.current.contains(event.target) &&
+        tagMenuRef.current && !tagMenuRef.current.contains(event.target)
+      ) {
+        setActiveSetting(null); 
+        setShowNewFolderInput(false);  
+      }
+    }
+  
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (settingsRef.current && !settingsRef.current.contains(event.target)) {
+        setActiveSetting(null);
+        setShowNewFolderInput(false);  
+      }
+    }
+  
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+  
   const handleFolderClick = () => {
     if (activeSetting === 'folder') {
-      setActiveSetting(null); 
+      setActiveSetting(null);
+      setShowNewFolderInput(false);  
     } else {
-      setActiveSetting('folder'); 
+      setActiveSetting('folder');
     }
   };
-
   return (
     <div className='quill-container glass'>
 
@@ -263,7 +294,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
               {formatDate()}
             </div>
 
-            <div className="tags-setting">
+            <div className="tags-setting" ref={tagMenuRef}>
               <p onClick={handleTagClick}>
                 <img src={tagIcon} alt="" />Add Tag
               </p>
@@ -304,15 +335,16 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
             <div className="folder-setting" ref={folderSettingRef}>
               <p onClick={handleFolderClick}><img src={folder} alt="" />Add to folder</p>
+
               {activeSetting === 'folder' && (
                 <ul>
+                  <Scrollbar style={{height : '40vh'}}>
                   {folders.length ? (
                     folders.map((folder) => (
                       <li 
                         key={folder._id} 
                         onClick={() => {
                           setSelectedFolder(folder.name);
-                          setIsFolderListVisible(false);
                           setActiveSetting(null);
                         }} 
                         className={selectedFolder === folder.name ? 'selected' : ''}
@@ -324,8 +356,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
                   ) : (
                     <li 
                       onClick={() => {
-                        setSelectedFolder("Default");
-                        setIsFolderListVisible(false);
+                        setSelectedFolder("Default")
                         setActiveSetting(null);
                       }} 
                       className={selectedFolder === "Default" ? 'selected' : ''}
@@ -338,19 +369,20 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
                     + Add Folder
                   </li>
                   {showNewFolderInput && (
-                    <div>
+                    <li className='add-folder-input'>
                       <input
                         type="text"
                         value={newFolderName}
                         onChange={(e) => setNewFolderName(e.target.value)}
-                        placeholder="New Folder Name"
+                        placeholder="Folder Name"
                       />
                       <button onClick={handleAddNewFolder}>Add</button>
-                      <button onClick={() => setShowNewFolderInput(false)}>Cancel</button>
-                    </div>
+                    </li>
                   )}
+                  </Scrollbar>
                 </ul>
               )}
+
             </div>
           </div>
 
