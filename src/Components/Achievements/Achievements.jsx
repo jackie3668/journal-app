@@ -18,10 +18,6 @@ const Achievements = () => {
   const { user } = authState;
   const { achievements, fetchAchievements, setAchievements } = useAchievements();
   const [inProgressAchievements, setInProgressAchievements] = useState([]);
-  const [completedAchievements, setCompletedAchievements] = useState([]);
-  const [notStartedAchievements, setNotStartedAchievements] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false)
 
   const achievementIcons = {
     wordCount: word,
@@ -57,16 +53,12 @@ const Achievements = () => {
             setAchievements(response.data);
           }
         } catch (err) {
-          setError('Error fetching or creating achievements: ' + err.message);
-        } finally {
-          setLoading(false);
+          console.log('Error fetching or creating achievements: ' + err.message);
         }
       };
 
       fetchOrCreateAchievements();
-    } else {
-      setLoading(false);
-    }
+    } 
   }, [user]);
 
   useEffect(() => {
@@ -82,8 +74,6 @@ const Achievements = () => {
         const notStarted = allAchievements.filter(ach => ach.progressPercentage === 0);
 
         setInProgressAchievements(inProgress);
-        setCompletedAchievements(completed);
-        setNotStartedAchievements(notStarted);
       }
     };
 
@@ -145,29 +135,6 @@ const Achievements = () => {
                   ))}
               </ul>
             </div>
-
-{/* 
-            <div className="achievements-section">
-              <h4>Completed Achievements</h4>
-              <ul className="achievements-list">
-                {Array.isArray(completedAchievements) && completedAchievements.map((achievement, index) => (
-                  <li key={index} className="achievement-item">
-                    <div className="achievement-icon">
-                      <img src={achievementIcons[achievement.category]} alt={`${achievement.category} icon`} />
-                    </div>
-                    <div className="achievement-details">
-                      <p className="achievement-name">
-                        {achievement.name}
-                      </p>
-                      <p className="achievement-progress">
-                        {achievement.userProgress} / {achievement.target} {achievementUnitMap[achievement.category]}
-                      </p>
-                    </div>
-                    <p className="achievement-percentage">{Math.round(achievement.progressPercentage)}%</p>
-                  </li>
-                ))}
-              </ul>
-            </div> */}
           </Scrollbar>
  
         </>

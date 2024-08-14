@@ -39,8 +39,8 @@ const Settings = () => {
         <div className="profile-section">
           <div className="profile-pic-container">
             <img src={profilePic} alt="Profile" className="profile-pic" />
-            <label htmlFor="profile-pic-upload" className="edit-profile-pic">Edit</label>
-            <input id="profile-pic-upload" type="file" accept="image/*" onChange={handleProfilePicChange} />
+            {/* <label htmlFor="profile-pic-upload" className="edit-profile-pic">Edit</label>
+            <input id="profile-pic-upload" type="file" accept="image/*" onChange={handleProfilePicChange} /> */}
           </div>
         </div>
 
