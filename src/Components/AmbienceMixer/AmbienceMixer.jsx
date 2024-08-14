@@ -130,7 +130,7 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
 
   return (
     <div className='ambience-mixer menu-container dark-glass'>
-      <button className='close-gallery' onClick={() => setSelectedMenu('')}>close</button>
+      <button className='close-gallery' onClick={() => setSelectedMenu('')}>Close</button>
       {loading && (<LoadingScreen />)}
       <div className="top">
         <div className="tab-nav-bar">

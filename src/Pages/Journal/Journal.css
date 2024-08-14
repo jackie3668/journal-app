@@ -18,7 +18,6 @@
   height: 100%;
 }
 
-/* Mobile (up to 480px) */
 @media (max-width: 480px) {
   .journal-container {
     overflow-x: hidden;
@@ -37,7 +36,6 @@
   }
 }
 
-/* Tablet (481px to 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
   .journal-container {
     overflow-x: hidden;
@@ -56,7 +54,6 @@
   }
 }
 
-/* Laptop (769px to 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
   .journal-container {
     overflow-x: hidden;
@@ -75,7 +72,6 @@
   }
 }
 
-/* Desktop (1025px to 1200px) */
 @media (min-width: 1025px) and (max-width: 1200px) {
   .journal-container {
     overflow-x: hidden;
@@ -85,7 +81,6 @@
   }
 }
 
-/* Larger screens (1201px and above) */
 @media (max-height: 900px) {
   .journal-container {
     height: 70vh;

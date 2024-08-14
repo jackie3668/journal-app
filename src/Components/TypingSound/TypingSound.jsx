@@ -69,7 +69,7 @@ const TypingSound = ({ onSoundChange, setSelectedMenu }) => {
 
   return (
     <div className="typing-sound-menu glass">
-      <button className='close-gallery' onClick={() => setSelectedMenu('')}>close</button>
+      <button className='close-gallery' onClick={() => setSelectedMenu('')}>Close</button>
       <div className="setting-group volume">
         <label htmlFor="volume">Volume:</label>
         <input
