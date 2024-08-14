@@ -1,6 +1,6 @@
 .account-container {
   display: flex;
-  height: 100vh;
+  height: 70vh;
   border-radius: 1rem;
 }
 
@@ -19,6 +19,7 @@
   right: 0;
   background-color: rgba(255, 255, 255, 0.3);
 }
+
 .account-nav ul {
   padding: 0;
   display: flex;
@@ -52,4 +53,65 @@
 .account-main {
   flex: 1;
   padding: 20px;
+}
+
+/* Mobile (up to 480px) */
+@media (max-width: 480px) {
+  .account-container {
+    flex-direction: column;
+  }
+
+  .account-nav {
+    width: 100%;
+  }
+
+  .account-nav::after {
+    display: none;
+  }
+  
+  .account-nav ul {
+    width: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+}
+
+/* Tablet (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .account-container {
+    border-radius: 1rem;
+  }
+
+  .account-nav ul li button {
+    font-size: 1rem;
+    padding: 0.5rem;
+  }
+  
+  .account-nav {
+    padding: 1rem;
+  }
+
+  .account-main {
+    width: 1005;
+  }
+
+}
+
+/* Laptop (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+}
+
+/* Desktop (1025px to 1200px) */
+@media (min-width: 1025px) and (max-width: 1200px) {
+
+}
+
+/* Larger screens (1201px and above) */
+@media (min-width: 1201px) {
+
 }

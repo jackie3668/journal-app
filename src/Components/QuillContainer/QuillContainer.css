@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 65vh;
+  height: 100%;
   padding-bottom: 3rem;
   border-radius: 1rem;
   gap:0.25rem;
@@ -240,6 +240,11 @@
  opacity: 0;
 }
 
+.quill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 .quill-container .ql .ql-toolbar {
   border: none;
   border-top: 1px solid white;
@@ -247,25 +252,45 @@
   padding: 0;
   font-family: "Quicksand", sans-serif;
   padding: 0 1.5rem;
+  width: 93%; 
+  display: flex;
+  justify-content: center;
+  border-radius: 3px;
 }
+
 
 .quill-container .ql-toolbar {
   position: sticky;
   top: 0; 
-  width: 100%; 
+  width: 90%; 
   z-index: 10; 
   color: black;
+  background-color: white;
 }
 
 .quill-container .ql-container {
   padding: 0;
 }
 
+.quill-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  width: 100%; 
+}
+
+.quill-container .ql-container {
+  width: 100%;
+  padding: 0;
+}
+
 .quill-container .ql-editor {
-  padding: 1.5rem;
+  padding: 1rem 1.5rem;
   width: 100%;
   overflow-y: hidden;
+  align-self: start;
 }
+
 
 .quill-container .ql-editor.ql-blank::before {
   color: rgba(255, 255, 255, 0.5);
@@ -286,33 +311,33 @@
 }
 
 .quill .ql-toolbar .ql-stroke {
-  stroke: white;
+  stroke: rgb(63, 63, 63);
 }
 
 .ql-picker-label::before {
-  color: white !important;
+  color: rgb(63, 63, 63) !important;
 
 }
 
 .ql-picker-label::before svg {
-  stroke: white !important;
-  fill: white !important; 
+  stroke: rgb(63, 63, 63) !important;
+  fill: rgb(63, 63, 63) !important; 
 }
 
 .ql-picker .ql-stroke {
-  color: white !important;
-  stroke: white !important; 
-  fill: white !important; 
+  color: rgb(63, 63, 63) !important;
+  stroke: rgb(63, 63, 63) !important; 
+  fill: rgb(63, 63, 63) !important; 
 }
 
 .quill-container .ql-toolbar button {
-  color: white;
+  color: rgb(63, 63, 63);
 }
 
 .quill .ql-toolbar svg,
 .ql-picker .ql-stroke {
-  fill: white;
-  stroke: white;
+  fill: rgb(63, 63, 63);
+  stroke: rgb(63, 63, 63);
 }
 
 .quill .ql-toolbar button.ql-active svg,
@@ -322,7 +347,7 @@
 .quill .ql-toolbar button:hover .ql-stroke,
 .quill .ql-toolbar button.ql-active .ql-fill,
 .quill .ql-toolbar button:hover .ql-fill {
-  stroke: darkgrey;
+  stroke: #1c1c1c;
 }
 
 .ql-toolbar .ql-picker-options .ql-picker-item.ql-selected {
@@ -330,22 +355,22 @@
 }
 
 .ql-toolbar .ql-picker-label {
-  color: white;
+  color: rgb(63, 63, 63);
 }
 
 .ql-toolbar .ql-picker-label:hover,
 .ql-toolbar .ql-picker-label.ql-active {
-  color: darkgrey;
+  color: #1c1c1c;
 }
 
 .ql-picker-item:hover {
-  color: darkgrey !important;
+  color: #1c1c1c !important;
 }
 
 .ql-picker-label::before,
 .ql-picker-label::before svg {
-  stroke: white !important;
-  fill: white !important;
+  stroke: rgb(63, 63, 63) !important;
+  fill: rgb(63, 63, 63) !important;
 }
 
 .ql-snow .ql-editor p {

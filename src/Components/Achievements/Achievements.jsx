@@ -102,7 +102,7 @@ const Achievements = () => {
         </div>
       ) : (
         <>
-          <Scrollbar>
+          <Scrollbar style={{height: '60vh'}}>
             <div className="achievements-section">
               <h4>In Progress Achievements</h4>
               <ul className="achievements-list">

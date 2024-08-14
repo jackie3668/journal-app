@@ -89,3 +89,31 @@
   align-self: center;
   font-size: 0.875rem;
 }
+
+/* Mobile (up to 480px) */
+@media (max-width: 480px) {
+  .account-subcontainer {
+    padding: 1rem;
+    min-width: 70vw;
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 60vh;
+  }
+}
+
+/* Tablet (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .account-subcontainer {
+    padding: 1rem;
+    min-width: 70vw;
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 60vh;
+  }
+}

@@ -8,7 +8,7 @@ const Account = () => {
 
   return (
     <div className="account-container glass">
-      <nav className="account-nav">
+      <div className="account-nav">
         <ul>
           <li>
             <button onClick={() => setSelectedComponent('Settings')}>Settings</button>
@@ -17,7 +17,7 @@ const Account = () => {
             <button onClick={() => setSelectedComponent('Achievements')}>Achievements</button>
           </li>
         </ul>
-      </nav>
+      </div>
       <main className="account-main">
         {selectedComponent === 'Settings' && <Settings />}
         {selectedComponent === 'Achievements' && <Achievements />}
