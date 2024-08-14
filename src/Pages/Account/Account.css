@@ -59,6 +59,8 @@
 @media (max-width: 480px) {
   .account-container {
     flex-direction: column;
+    overflow-x: hidden;
+
   }
 
   .account-nav {
@@ -83,32 +85,51 @@
 /* Tablet (481px to 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
   .account-container {
-    border-radius: 1rem;
+    flex-direction: column;
+    overflow: hidden;
+    width: 80vw;
+    padding: 1rem 5rem;
   }
 
-  .account-nav ul li button {
-    font-size: 1rem;
-    padding: 0.5rem;
+  .account-nav {
+    width: 100%;
+    padding: 1rem 0 0 0;
+  }
+
+  .account-nav::after {
+    display: none;
   }
   
-  .account-nav {
-    padding: 1rem;
+  .account-nav ul {
+    width: 100%;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
   }
 
   .account-main {
-    width: 1005;
+    padding: 0;
   }
-
 }
 
 /* Laptop (769px to 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
-
+  .account-container {
+    overflow-x: hidden;
+  }
+  
+  .account-main {
+    min-width: 400px;
+  }
 }
 
 /* Desktop (1025px to 1200px) */
 @media (min-width: 1025px) and (max-width: 1200px) {
-
+  .account-main {
+    min-width: 500px;
+  }
 }
 
 /* Larger screens (1201px and above) */

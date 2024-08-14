@@ -74,3 +74,10 @@
 .achievement-percentage {
   font-size: 0.6rem;
 }
+
+@media (max-width: 768px) {
+  .account-subcontainer  {
+    padding: 0;
+  }
+  
+}

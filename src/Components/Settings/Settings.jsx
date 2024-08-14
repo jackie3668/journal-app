@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../Context/AuthContext'
 import LoadingScreen from '../../Components/LoadingScreen/LoadingScreen';
 import './Settings.css';
+import { Scrollbar } from 'react-scrollbars-custom';
 
 const Settings = () => {
   const { authState, resetPassword } = useAuth();
@@ -33,36 +34,39 @@ const Settings = () => {
   return (
     <div className="account-subcontainer">
       <h2>Settings</h2>
-      
-      <div className="profile-section">
-        <div className="profile-pic-container">
-          <img src={profilePic} alt="Profile" className="profile-pic" />
-          <label htmlFor="profile-pic-upload" className="edit-profile-pic">Edit</label>
-          <input id="profile-pic-upload" type="file" accept="image/*" onChange={handleProfilePicChange} />
+      <Scrollbar>
+        
+        <div className="profile-section">
+          <div className="profile-pic-container">
+            <img src={profilePic} alt="Profile" className="profile-pic" />
+            <label htmlFor="profile-pic-upload" className="edit-profile-pic">Edit</label>
+            <input id="profile-pic-upload" type="file" accept="image/*" onChange={handleProfilePicChange} />
+          </div>
         </div>
-      </div>
 
-      <form className="settings-form" onSubmit={handleSaveChanges}>
-        <div className="form-group">
-          <label>Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your name"
-          />
-        </div>
-        <div className="form-group">
-          <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
-          />
-        </div>
-        <button type="submit" className="white-button save-button">Save Changes</button>
-      </form>
+        <form className="settings-form" onSubmit={handleSaveChanges}>
+          <div className="form-group">
+            <label>Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+            />
+          </div>
+          <div className="form-group">
+            <label>Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
+            />
+          </div>
+          <button type="submit" className="white-button save-button">Save Changes</button>
+        </form>
+    
+      </Scrollbar>
     </div>
   );
 };

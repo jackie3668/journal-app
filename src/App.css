@@ -68,6 +68,7 @@ input::placeholder {
   padding: 3rem;
   gap: 2rem;
   overflow-y: hidden;
+  overflow-x: hidden;
 }
 
 .white-button {
@@ -132,7 +133,7 @@ input::placeholder {
   }
 
   .container {
-    margin: 1rem 0;
+    margin: 1rem;
     padding: 0.25rem;
   }
 }

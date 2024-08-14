@@ -104,7 +104,7 @@ const Achievements = () => {
         <>
           <Scrollbar style={{height: '60vh'}}>
             <div className="achievements-section">
-              <h4>In Progress Achievements</h4>
+              {/* <h4>In Progress Achievements</h4> */}
               <ul className="achievements-list">
                 {Array.isArray(inProgressAchievements) &&
                   Object.values(
@@ -146,7 +146,7 @@ const Achievements = () => {
               </ul>
             </div>
 
-
+{/* 
             <div className="achievements-section">
               <h4>Completed Achievements</h4>
               <ul className="achievements-list">
@@ -161,14 +161,13 @@ const Achievements = () => {
                       </p>
                       <p className="achievement-progress">
                         {achievement.userProgress} / {achievement.target} {achievementUnitMap[achievement.category]}
-                        {/* {achievement.additionalInfo && `${achievement.additionalInfo}`} */}
                       </p>
                     </div>
                     <p className="achievement-percentage">{Math.round(achievement.progressPercentage)}%</p>
                   </li>
                 ))}
               </ul>
-            </div>
+            </div> */}
           </Scrollbar>
  
         </>

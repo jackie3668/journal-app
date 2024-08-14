@@ -1,5 +1,5 @@
 .account-subcontainer {
-  padding: 2rem 4rem;
+  padding: 2rem;
   min-width: 25vw;
   max-width: 600px;
   margin: 0 auto;
@@ -7,7 +7,6 @@
   flex-direction: column;
   justify-content: center;
   height: 60vh;
-
 }
 
 .account-subcontainer h2 {
@@ -95,25 +94,33 @@
   .account-subcontainer {
     padding: 1rem;
     min-width: 70vw;
-    max-width: 600px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 60vh;
+    height: 50vh;
   }
 }
 
 /* Tablet (481px to 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
   .account-subcontainer {
-    padding: 1rem;
-    min-width: 70vw;
-    max-width: 600px;
+    min-width: 25vw;
+    max-width: 300px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
     height: 60vh;
   }
+
+
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    font-size: 0.875rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
 }
