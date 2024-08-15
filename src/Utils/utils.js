@@ -8,17 +8,17 @@ import { debounce } from 'lodash';
  */
 export const fetchFolders = async (userId) => {
   try {
-    const response = await axios.get('http://localhost:5000/api/folders', {
+    const response = await axios.get('http://localhost:5000/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
       params: { userId },
     });
 
     if (response.data.length === 0) {
-      await axios.post('http://localhost:5000/api/folders', { 
+      await axios.post('http://localhost:5000/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', { 
         name: 'Default',
         userId 
       });
 
-      const updatedResponse = await axios.get('http://localhost:5000/api/folders', {
+      const updatedResponse = await axios.get('http://localhost:5000/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
         params: { userId },
       });
 
@@ -65,12 +65,12 @@ export const debouncedSaveEntry = debounce(saveEntry, 3000);
  */
 export const addNewFolder = async (userId, newFolderName) => {
   try {
-    await axios.post('http://localhost:5000/api/folders', {
+    await axios.post('http://localhost:5000/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
       name: newFolderName,
       userId,
     });
     
-    const response = await axios.get('http://localhost:5000/api/folders', {
+    const response = await axios.get('http://localhost:5000/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
       params: { userId },
     });
     

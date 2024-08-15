@@ -22,10 +22,6 @@ const Settings = () => {
     return <LoadingScreen />;
   }
 
-  const handleProfilePicChange = (e) => {
-    setProfilePic(URL.createObjectURL(e.target.files[0]));
-  };
-
   const handleSaveChanges = (e) => {
     e.preventDefault();
     console.log({ name, email });

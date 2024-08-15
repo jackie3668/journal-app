@@ -14,7 +14,7 @@ const PromptUploader = () => {
   useEffect(() => {
     const fetchPrompts = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/prompts');
+        const response = await axios.get('http://localhost:5000/api/prompts' || 'https://journal-app-backend-8szt.onrender.com/api/prompts');
         setPrompts(response.data);
         const uniqueCategories = [...new Set(response.data.map(prompt => prompt.category))];
         setCategories(uniqueCategories);
@@ -47,12 +47,12 @@ const PromptUploader = () => {
     }
 
     try {
-      await axios.post('http://localhost:5000/api/prompts', {
+      await axios.post('http://localhost:5000/api/prompts' || 'https://journal-app-backend-8szt.onrender.com/api/prompts', {
         prompts: parsedPrompts
       });
       setSuccess('Prompts uploaded successfully!');
       setInputText('');
-      const response = await axios.get('http://localhost:5000/api/prompts');
+      const response = await axios.get('http://localhost:5000/api/prompts' || 'https://journal-app-backend-8szt.onrender.com/api/prompts');
       setPrompts(response.data);
     } catch (err) {
       setError('Error uploading prompts.');
@@ -63,9 +63,9 @@ const PromptUploader = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/prompts/${id}`);
+      await axios.delete(`http://localhost:5000/api/prompts/${id}` || `https://journal-app-backend-8szt.onrender.com/api/prompts/${id}`);
       setSuccess('Prompt deleted successfully!');
-      const response = await axios.get('http://localhost:5000/api/prompts');
+      const response = await axios.get('http://localhost:5000/api/prompts' || 'https://journal-app-backend-8szt.onrender.com/api/prompts');
       setPrompts(response.data);
     } catch (err) {
       setError('Error deleting prompt.');

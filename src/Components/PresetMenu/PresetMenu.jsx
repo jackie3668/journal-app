@@ -9,13 +9,12 @@ const PresetMenu = ({ onClose, setSelectedMenu }) => {
   const { selectPreset } = useTheme();
   const [categories, setCategories] = useState({});
   const [activeCategory, setActiveCategory] = useState('All');
-  const [imagesLoadedCount, setImagesLoadedCount] = useState(0);
   const [loading, setLoading] = useState(true); 
 
   useEffect(() => {
     const fetchPresets = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/presets');
+        const response = await axios.get('http://localhost:5000/api/presets' || 'https://journal-app-backend-8szt.onrender.com/api/presets');
         const fetchedData = response.data;
 
         const categorizedData = fetchedData.reduce((acc, preset) => {
@@ -49,16 +48,6 @@ const PresetMenu = ({ onClose, setSelectedMenu }) => {
     onClose();  
   };
 
-  const handleImageLoad = () => {
-    setImagesLoadedCount(prevCount => {
-      const newCount = prevCount + 1;
-      if (newCount === 5) {
-        console.log('finished');
-        setLoading(false); 
-      }
-      return newCount;
-    });
-  };
 
 
   return (
@@ -87,7 +76,6 @@ const PresetMenu = ({ onClose, setSelectedMenu }) => {
               <img 
                 src={preset.image} 
                 alt={preset.title} 
-                onLoad={handleImageLoad} 
               />
               <div className='item-title'>{preset.title}</div>
               <div className='item-description'>{preset.description}</div>

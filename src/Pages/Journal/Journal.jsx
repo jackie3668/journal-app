@@ -68,9 +68,9 @@ const Journal = () => {
 
   const fetchEntries = async (folderName, userId) => {
     try {
-      const response = await axios.get('http://localhost:5000/api/entries', {
+      const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/entries' || 'http://localhost:5000/api/entries', {
         params: { folderName, userId }
-      });
+      });      
       setEntries(response.data);
     } catch (error) {
       console.error('Error fetching entries:', error);

@@ -10,7 +10,7 @@ const Player = () => {
   useEffect(() => {
     const fetchSounds = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/assets');
+        const response = await axios.get('http://localhost:5000/api/assets' || 'https://journal-app-backend-8szt.onrender.com/api/assets');
         const soundAssets = response.data.filter(asset => asset.type === 'sound');
         setSoundAssets(soundAssets);
       } catch (error) {

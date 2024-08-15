@@ -13,7 +13,7 @@ const PresetWidget = () => {
   useEffect(() => {
     const fetchPresets = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/presets');
+        const response = await axios.get('http://localhost:5000/api/prompts' || 'https://journal-app-backend-8szt.onrender.com/api/prompts');
         setPresets(response.data);
         response.data.slice(0, 5).forEach(preset => {
           const img = new Image();

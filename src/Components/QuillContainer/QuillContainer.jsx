@@ -106,7 +106,10 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     }
   
     try {
-      const url = selectedEntryId ? `http://localhost:5000/api/entries/${selectedEntryId}` : 'http://localhost:5000/api/entries';
+      const url = selectedEntryId
+        ? (`https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}` || `http://localhost:5000/api/entries/${selectedEntryId}`)
+        : (`https://journal-app-backend-8szt.onrender.com/api/entries` || 'http://localhost:5000/api/entries');
+      
       const method = selectedEntryId ? 'PUT' : 'POST';
   
       const savedEntry = await saveEntry({
