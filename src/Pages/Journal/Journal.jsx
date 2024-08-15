@@ -68,7 +68,7 @@ const Journal = () => {
 
   const fetchEntries = async (folderName, userId) => {
     try {
-      const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/entries' || 'http://https://journal-app-backend-8szt.onrender.com/api/entries', {
+      const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/entries' || 'https://journal-app-backend-8szt.onrender.com/api/entries', {
         params: { folderName, userId }
       });      
       setEntries(response.data);

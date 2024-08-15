@@ -16,7 +16,7 @@ const BackgroundSelector = ({ setSelectedMenu }) => {
   useEffect(() => {
     const fetchAssets = async () => {
       try {
-        const response = await axios.get('http://https://journal-app-backend-8szt.onrender.com/api/assets' || 'https://journal-app-backend-8szt.onrender.com/api/assets');
+        const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/assets' || 'https://journal-app-backend-8szt.onrender.com/api/assets');
         const videoAssets = response.data.filter(asset => asset.type === 'video');
         
         const categorizedData = videoAssets.reduce((acc, asset) => {

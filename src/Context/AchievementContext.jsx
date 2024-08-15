@@ -24,7 +24,7 @@ export const AchievementProvider = ({ children }) => {
     }
   
     try {
-      const response = await fetch(`http://https://journal-app-backend-8szt.onrender.com/api/achievements/${user.sub}` || `https://journal-app-backend-8szt.onrender.com/api/achievements/${user.sub}`);
+      const response = await fetch(`https://journal-app-backend-8szt.onrender.com/api/achievements/${user.sub}` || `https://journal-app-backend-8szt.onrender.com/api/achievements/${user.sub}`);
       if (response.ok || response.status === 210) {
         const data = await response.json(); 
         return data;  
@@ -46,7 +46,7 @@ export const AchievementProvider = ({ children }) => {
     }
 
     try {
-      const response = await fetch(`http://https://journal-app-backend-8szt.onrender.com/api/achievements/${user.sub}`);
+      const response = await fetch(`https://journal-app-backend-8szt.onrender.com/api/achievements/${user.sub}`);
       let achievementsData = null;
 
       if (response.ok) {
@@ -88,8 +88,8 @@ export const AchievementProvider = ({ children }) => {
 
       const method = achievementsData ? 'PUT' : 'POST';
       const url = achievementsData
-      ? `http://https://journal-app-backend-8szt.onrender.com/api/achievements/${user.sub}` || `https://journal-app-backend-8szt.onrender.com/api/achievements/${user.sub}`
-      : 'http://https://journal-app-backend-8szt.onrender.com/api/achievements' || 'https://journal-app-backend-8szt.onrender.com/api/achievements';    
+      ? `https://journal-app-backend-8szt.onrender.com/api/achievements/${user.sub}` || `https://journal-app-backend-8szt.onrender.com/api/achievements/${user.sub}`
+      : 'https://journal-app-backend-8szt.onrender.com/api/achievements' || 'https://journal-app-backend-8szt.onrender.com/api/achievements';    
 
       await fetch(url, {
         method,

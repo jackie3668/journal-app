@@ -8,17 +8,17 @@ import { debounce } from 'lodash';
  */
 export const fetchFolders = async (userId) => {
   try {
-    const response = await axios.get('http://https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
+    const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
       params: { userId },
     });
 
     if (response.data.length === 0) {
-      await axios.post('http://https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', { 
+      await axios.post('https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', { 
         name: 'Default',
         userId 
       });
 
-      const updatedResponse = await axios.get('http://https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
+      const updatedResponse = await axios.get('https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
         params: { userId },
       });
 
@@ -65,12 +65,12 @@ export const debouncedSaveEntry = debounce(saveEntry, 3000);
  */
 export const addNewFolder = async (userId, newFolderName) => {
   try {
-    await axios.post('http://https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
+    await axios.post('https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
       name: newFolderName,
       userId,
     });
     
-    const response = await axios.get('http://https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
+    const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
       params: { userId },
     });
     
