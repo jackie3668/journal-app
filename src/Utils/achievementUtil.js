@@ -9,7 +9,7 @@ export const getAchievements = async (userId) => {
   console.log(userId);
   
   try {
-    const response = await fetch(`http://localhost:5000/api/achievements/${userId}` || `https://journal-app-backend-8szt.onrender.com/api/achievements/${userId}`);
+    const response = await fetch(`http://https://journal-app-backend-8szt.onrender.com/api/achievements/${userId}` || `https://journal-app-backend-8szt.onrender.com/api/achievements/${userId}`);
     if (response.status === 200) {
       userAchievements = await response.json();
       console.log('Fetched Achievements:', userAchievements); 
@@ -38,7 +38,7 @@ export const getAchievements = async (userId) => {
 
   let allEntries = [];
   try {
-    const response = await axios.get('http://localhost:5000/api/entries/all' || 'https://journal-app-backend-8szt.onrender.com/api/entries/all', {
+    const response = await axios.get('http://https://journal-app-backend-8szt.onrender.com/api/entries/all' || 'https://journal-app-backend-8szt.onrender.com/api/entries/all', {
       params: { userId: userId }
     });
     allEntries = response.data || [];

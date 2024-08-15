@@ -21,7 +21,7 @@ export const ThemeProvider = ({ children }) => {
   useEffect(() => {
     const fetchAssets = async () => {
       try {
-        const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/assets' || 'http://localhost:5000/api/assets');
+        const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/assets' || 'http://https://journal-app-backend-8szt.onrender.com/api/assets');
         setAssets(response.data);
       } catch (err) {
         console.error('Error fetching assets:', err);

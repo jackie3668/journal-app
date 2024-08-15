@@ -36,7 +36,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/folders' || 'https://journal-app-backend-8szt.onrender.com/api/folders', {
+        const response = await axios.get('http://https://journal-app-backend-8szt.onrender.com/api/folders' || 'https://journal-app-backend-8szt.onrender.com/api/folders', {
           params: { userId: user.sub }
         });        
         setFolders(response.data);
@@ -55,7 +55,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
       }
 
       try {
-        const response = await axios.get('http://localhost:5000/api/tags' || 'https://journal-app-backend-8szt.onrender.com/api/tags', {
+        const response = await axios.get('http://https://journal-app-backend-8szt.onrender.com/api/tags' || 'https://journal-app-backend-8szt.onrender.com/api/tags', {
           params: { userId: user.sub }
         });        
         const tags = response.data;
@@ -89,7 +89,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
     }
 
     try {
-      const response = await axios.get('http://localhost:5000/api/entries' || 'https://journal-app-backend-8szt.onrender.com/api/entries', {
+      const response = await axios.get('http://https://journal-app-backend-8szt.onrender.com/api/entries' || 'https://journal-app-backend-8szt.onrender.com/api/entries', {
         params: {
           folderName,
           userId: user.sub,
@@ -144,14 +144,14 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
       return;
     }
     try {
-      await axios.post('http://localhost:5000/api/folders' || 'https://journal-app-backend-8szt.onrender.com/api/folders', {
+      await axios.post('http://https://journal-app-backend-8szt.onrender.com/api/folders' || 'https://journal-app-backend-8szt.onrender.com/api/folders', {
         name: newFolderName,
         userId: user.sub
       });
       setNewFolderName('');
       setShowNewFolderInput(false);
       updateAchievements('incrementFolderCount', 1);
-      const response = await axios.get('http://localhost:5000/api/folders' || 'https://journal-app-backend-8szt.onrender.com/api/folders', {
+      const response = await axios.get('http://https://journal-app-backend-8szt.onrender.com/api/folders' || 'https://journal-app-backend-8szt.onrender.com/api/folders', {
         params: { userId: user.sub }
       });
       setFolders(response.data);

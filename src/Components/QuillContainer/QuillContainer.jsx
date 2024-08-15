@@ -107,8 +107,8 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   
     try {
       const url = selectedEntryId
-        ? (`https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}` || `http://localhost:5000/api/entries/${selectedEntryId}`)
-        : (`https://journal-app-backend-8szt.onrender.com/api/entries` || 'http://localhost:5000/api/entries');
+        ? (`https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}` || `http://https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`)
+        : (`https://journal-app-backend-8szt.onrender.com/api/entries` || 'http://https://journal-app-backend-8szt.onrender.com/api/entries');
       
       const method = selectedEntryId ? 'PUT' : 'POST';
   

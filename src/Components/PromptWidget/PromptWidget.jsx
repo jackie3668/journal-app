@@ -22,7 +22,7 @@ const PromptWidget = () => {
   const fetchPrompts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:5000/api/prompts' || 'https://journal-app-backend-8szt.onrender.com/api/prompts');
+      const response = await axios.get('http://https://journal-app-backend-8szt.onrender.com/api/prompts' || 'https://journal-app-backend-8szt.onrender.com/api/prompts');
       const randomPrompts = response.data.sort(() => 0.5 - Math.random()).slice(0, 5);
       setPrompts(randomPrompts);
     } catch (err) {

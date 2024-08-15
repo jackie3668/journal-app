@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
     const fetchUserData = async () => {
       if (authState.isAuthenticated && authState.user) {
         try {
-          const response = await axios.post('http://localhost:5000/api/user' || 'https://journal-app-backend-8szt.onrender.com/api/user', {
+          const response = await axios.post('http://https://journal-app-backend-8szt.onrender.com/api/user' || 'https://journal-app-backend-8szt.onrender.com/api/user', {
             userId: authState.user.sub,
             name: authState.user.name,
             email: authState.user.email,

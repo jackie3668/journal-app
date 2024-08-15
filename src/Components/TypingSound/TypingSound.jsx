@@ -15,7 +15,7 @@ const TypingSound = ({ onSoundChange, setSelectedMenu }) => {
   useEffect(() => {
     const fetchSounds = async () => {
       try {
-        const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/assets' || 'http://localhost:5000/api/assets');
+        const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/assets' || 'http://https://journal-app-backend-8szt.onrender.com/api/assets');
         const typingSounds = response.data.filter(asset => asset.type === 'typing');
         setSounds(typingSounds);
 

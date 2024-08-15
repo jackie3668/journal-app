@@ -47,7 +47,7 @@ const Achievements = () => {
               timeSpentWriting: 0,
             };
 
-            await axios.post('http://localhost:5000/api/achievements' || 'https://journal-app-backend-8szt.onrender.com/api/achievements', initialAchievements);
+            await axios.post('https://journal-app-backend-8szt.onrender.com/api/achievements' , initialAchievements);
             setAchievements(initialAchievements);
           } else if (response?.status === 200) {
             setAchievements(response.data);

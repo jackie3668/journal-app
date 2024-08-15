@@ -51,7 +51,7 @@ const AssetUploader = () => {
   useEffect(() => {
     const fetchAssets = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/assets' || 'https://journal-app-backend-8szt.onrender.com/api/assets');
+        const response = await axios.get('http://https://journal-app-backend-8szt.onrender.com/api/assets' || 'https://journal-app-backend-8szt.onrender.com/api/assets');
         setAssets(response.data);
       } catch (err) {
         console.error('Error fetching assets:', err);
@@ -60,7 +60,7 @@ const AssetUploader = () => {
 
     const fetchPresets = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/presets' || 'https://journal-app-backend-8szt.onrender.com/api/presets');
+        const response = await axios.get('http://https://journal-app-backend-8szt.onrender.com/api/presets' || 'https://journal-app-backend-8szt.onrender.com/api/presets');
         setPresets(response.data);
       } catch (err) {
         console.error('Error fetching presets:', err);
@@ -78,7 +78,7 @@ const AssetUploader = () => {
     setSuccess(null);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/assets' || 'https://journal-app-backend-8szt.onrender.com/api/assets', {
+      const response = await axios.post('http://https://journal-app-backend-8szt.onrender.com/api/assets' || 'https://journal-app-backend-8szt.onrender.com/api/assets', {
         type,
         name,
         url,
@@ -128,7 +128,7 @@ const AssetUploader = () => {
     const assetURLs = uniqueAssetIds.map(id => assets.find(asset => asset._id === id)?.name);
   
     try {
-      const response = await axios.post('http://localhost:5000/api/presets' || 'https://journal-app-backend-8szt.onrender.com/api/presets', {
+      const response = await axios.post('http://https://journal-app-backend-8szt.onrender.com/api/presets' || 'https://journal-app-backend-8szt.onrender.com/api/presets', {
         name: presetName,
         assets: assetURLs,
         videoId: selectedVideoId, 
@@ -175,7 +175,7 @@ const AssetUploader = () => {
   
   const handleUpdate = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/assets/${editingId}` || `https://journal-app-backend-8szt.onrender.com/api/assets/${editingId}`, editFields);
+      await axios.put(`http://https://journal-app-backend-8szt.onrender.com/api/assets/${editingId}` || `https://journal-app-backend-8szt.onrender.com/api/assets/${editingId}`, editFields);
       setAssets(assets.map(asset =>
         asset._id === editingId ? { ...asset, ...editFields } : asset
       ));
@@ -189,7 +189,7 @@ const AssetUploader = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/assets/${id}` || `https://journal-app-backend-8szt.onrender.com/api/assets/${id}`);
+      await axios.delete(`http://https://journal-app-backend-8szt.onrender.com/api/assets/${id}` || `https://journal-app-backend-8szt.onrender.com/api/assets/${id}`);
       setAssets(assets.filter(asset => asset._id !== id));
     } catch (err) {
       console.error('Error deleting asset:', err);
@@ -213,7 +213,7 @@ const AssetUploader = () => {
 
   const handlePresetDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/presets/${id}` || `https://journal-app-backend-8szt.onrender.com/api/presets/${id}`);
+      await axios.delete(`http://https://journal-app-backend-8szt.onrender.com/api/presets/${id}` || `https://journal-app-backend-8szt.onrender.com/api/presets/${id}`);
       setPresets(presets.filter(preset => preset._id !== id));
     } catch (err) {
       console.error('Error deleting preset:', err);
