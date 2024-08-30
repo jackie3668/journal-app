@@ -6,7 +6,7 @@ import page from '../../Assets/Sounds/turnpage-99756.mp3'
 
 const NavBar = () => {
   const { authState, login, logout } = useAuth();
-  const { isAuthenticated, user } = authState;
+  const { isAuthenticated } = authState;
   const location = useLocation();
   const [activeIndex, setActiveIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -70,7 +70,7 @@ const NavBar = () => {
         </Link>
  
         <Link to="/account" className={isActive('/account')}>       
-          <li onClick={login} className={isActive('/account')}>Account</li>
+          <li onClick={isAuthenticated ? null : login} className={isActive('/account')}>Account</li>
         </Link>
       
       </ul>
