@@ -18,6 +18,7 @@ const Achievements = () => {
   const { user } = authState;
   const { achievements, fetchAchievements, setAchievements } = useAchievements();
   const [inProgressAchievements, setInProgressAchievements] = useState([]);
+  const [allAchievementsList, setAllAchievementsList] = useState([]);
 
   const achievementIcons = {
     wordCount: word,
@@ -67,21 +68,23 @@ const Achievements = () => {
         return;
       }
       if (achievements && user && user.sub) {
-        const { allAchievements } = await getAchievements(user.sub);
+        const { closestAchievements, allAchievements } = await getAchievements(user.sub);
+  
+        const inProgress = closestAchievements;
+        const completed = allAchievements.filter(ach => ach.progressPercentage >= 99.9);
+        console.log(allAchievements);
+        console.log(completed);
         
-        const inProgress = allAchievements.filter(ach => ach.progressPercentage > 0 && ach.progressPercentage < 100);
-        const completed = allAchievements.filter(ach => ach.progressPercentage === 100);
-        const notStarted = allAchievements.filter(ach => ach.progressPercentage === 0);
-
         setInProgressAchievements(inProgress);
+        setAllAchievementsList(allAchievements); 
       }
     };
-
+  
     if (user && user.sub) {
       fetchAchievementsData();
     }
   }, [achievements, user]);
-
+  
   return (
     <div className="account-subcontainer">
       <h2 className="achievements-title">Achievements</h2>
@@ -91,10 +94,9 @@ const Achievements = () => {
           <p>Please log in</p>
         </div>
       ) : (
-        <>
-          <Scrollbar style={{height: '60vh'}}>
+      <Scrollbar style={{ height: '80vh' }}>
             <div className="achievements-section">
-              {/* <h4>In Progress Achievements</h4> */}
+              <h4>In Progress Achievements</h4>
               <ul className="achievements-list">
                 {Array.isArray(inProgressAchievements) &&
                   Object.values(
@@ -127,7 +129,6 @@ const Achievements = () => {
                         </p>
                         <p className="achievement-progress">
                           {achievement.userProgress} / {achievement.target} {achievementUnitMap[achievement.category]}
-                          {/* {achievement.additionalInfo && `${achievement.additionalInfo}`} */}
                         </p>
                       </div>
                       <p className="achievement-percentage">{Math.round(achievement.progressPercentage)}%</p>
@@ -135,9 +136,39 @@ const Achievements = () => {
                   ))}
               </ul>
             </div>
-          </Scrollbar>
- 
-        </>
+  
+            <div className="achievements-section">
+              <h4>All Achievements</h4>
+              <ul className="achievements-list">
+                {Array.isArray(allAchievementsList) &&
+                  allAchievementsList.map((achievement, index) => (
+                    <li key={index} className="achievement-item">
+                      <div
+                        className="achievement-progress-fill"
+                        style={{ width: `${achievement.progressPercentage}%` }}
+                      ></div>
+                      <div className="achievement-icon">
+                        <img
+                          src={achievementIcons[achievement.category]}
+                          alt={`${achievement.category} icon`}
+                        />
+                      </div>
+                     
+                      <div className="achievement-details">
+                        <p className="achievement-name">
+                          {achievement.name}
+                        </p>
+                        <p className="achievement-progress">
+                          {achievement.userProgress} / {achievement.target} {achievementUnitMap[achievement.category]}
+                        </p>
+                      </div>
+                      <p className="achievement-percentage">{Math.round(achievement.progressPercentage)}%</p>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+        </Scrollbar>
+
       )}
     </div>
   );
