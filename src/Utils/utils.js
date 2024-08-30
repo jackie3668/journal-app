@@ -8,17 +8,17 @@ import { debounce } from 'lodash';
  */
 export const fetchFolders = async (userId) => {
   try {
-    const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
+    const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/folders' || 'http://localhost:5000/api/folders', {
       params: { userId },
     });
 
     if (response.data.length === 0) {
-      await axios.post('https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', { 
+      await axios.post('https://journal-app-backend-8szt.onrender.com/api/folders' || 'http://localhost:5000/api/folders', { 
         name: 'Default',
         userId 
       });
 
-      const updatedResponse = await axios.get('https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
+      const updatedResponse = await axios.get('https://journal-app-backend-8szt.onrender.com/api/folders' || 'http://localhost:5000/api/folders', {
         params: { userId },
       });
 

@@ -98,7 +98,7 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
   const handleImageLoad = () => {
     setImagesLoadedCount(prevCount => {
       const newCount = prevCount + 1;
-      if (newCount === 25) { 
+      if (newCount === 14) { 
         console.log('finished');
         setLoading(false); 
       }

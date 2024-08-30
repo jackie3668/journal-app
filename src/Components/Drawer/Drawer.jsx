@@ -296,7 +296,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
 
         <div className="divider"></div>
 
-        <Scrollbar style={{ height: '75vh' }}>
+        <Scrollbar style={{ height: '60vh' }}>
           <ul className='folder-list'>
             {folders.map((folder) => (
               <li key={folder._id} className="folder-item">

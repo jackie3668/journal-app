@@ -1,10 +1,12 @@
-
+.ambience-mixer.menu-container {
+  padding: 5% 10% 2% 10%;
+}
 .ambience-mixer .top {
   display: flex;
   flex-direction: column;
   width: 100%;  
-  height: 45%;
-  gap: 3rem;
+  height: 100%;
+  gap: 2rem;
 
 }
 
@@ -96,7 +98,7 @@
   background-color: white;
 }
 
-.sound-control .inactive {
+.sound-control.inactive {
   cursor: not-allowed;
 }
 
@@ -105,10 +107,14 @@
   cursor: not-allowed;
 }
 
+.sound-control.inactive span {
+  height: 15vh;
+}
+
 .custom-slider {
   position: relative;
   width: 10px;
-  height: 150px;
+  height: 15vh;
   background-color: grey;
   border-radius: 8px;
   cursor: pointer;
