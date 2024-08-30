@@ -70,7 +70,7 @@ const NavBar = () => {
         </Link>
  
         <Link to="/account" className={isActive('/account')}>       
-          <li className={isActive('/account')}>Account</li>
+          <li onClick={login} className={isActive('/account')}>Account</li>
         </Link>
       
       </ul>

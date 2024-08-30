@@ -1,6 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
 import { useLoading } from './Context/LoadingContext';
+import { useAuth } from './Context/AuthContext';
 import './App.css';
 import Background from './Components/Background/Background';
 import Home from './Pages/Home/Home';
@@ -9,13 +10,14 @@ import NavBar from './Components/NavBar/NavBar';
 import LoadingScreen from './Components/LoadingScreen/LoadingScreen';
 import AnimatedCursor from "react-animated-cursor"
 import Player from './Components/Player/Player';
-import GlobalVolume from './Components/GlobalVolume/GlobalVolume';
 import Account from './Pages/Account/Account';
+import Upload from './Pages/Upload/Upload';
 
 const App = () => {
   const location = useLocation();
   const isJournalRoute = location.pathname === '/journal';
   const { isLoading } = useLoading();
+  const { authState, login } = useAuth();
 
   return (
     <div className="container">
@@ -51,8 +53,18 @@ const App = () => {
         <NavBar />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/account" element={<Account/>} />
           <Route path="/journal" element={<Journal />} />
+          <Route
+            path="/account"
+            element={
+              authState.isAuthenticated ? (
+                <Account />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
+          />
+          <Route path="/upload" element={<Upload />} />
         </Routes>
       </div>
     </div>
