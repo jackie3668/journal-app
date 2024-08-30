@@ -148,7 +148,7 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
         <Scrollbar>
           <ul className="gallery sound">
             {filteredSounds.flatMap((sound) => 
-              Array.from({ length: 5 }, (_, index) => (
+              Array.from({ length: 1 }, (_, index) => (
                 <li onClick={() => handleSelectSound(sound)} className='item' key={`${sound._id}-${index}`}>
                   <img src={sound.imageUrl} onLoad={handleImageLoad} alt={sound.name} className="sound-image" />
                   <p className='item-title'>{sound.name}</p>
