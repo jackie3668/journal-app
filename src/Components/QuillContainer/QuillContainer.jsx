@@ -23,7 +23,9 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
   const [entryTitle, setEntryTitle] = useState('');
   const [draftText, setDraftText] = useState('');
-  const [saveText, setSaveText] = useState('');
+  const [lastSavedTitle, setLastSavedTitle] = useState('');
+  const [lastSavedText, setLastSavedText] = useState('');
+
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState('');
   const [selectedFolder, setSelectedFolder] = useState('Default');
@@ -72,6 +74,8 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       setTags(selectedEntry.tags || []);
       setSelectedFolder(selectedEntry.folderName || 'Default');
       setInitialWordCount(calculateWordCount(extractPlainText(selectedEntry.entryText || '')));
+      setLastSavedTitle(selectedEntry.entryTitle || '');
+      setLastSavedText(selectedEntry.entryText || '');
     } else {
       setEntryTitle('');
       setDraftText('');
@@ -89,104 +93,95 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     }
   }, [isTyping]);
 
-const handleSave = async () => {
-  const now = Date.now();
-  
-  if (!selectedEntryId  && now - lastSaveTime.current < 3000) {
-    console.log(' not saving');
-    return;
-  }
-  if (selectedEntryId  && now - lastSaveTime.current < 3000) {
-    console.log(' not saving');
-    return;
-  }
+  const handleSave = async () => {
+    const now = Date.now();
 
-  if (saveText!== draftText && selectedEntryId  && now - lastSaveTime.current < 60000) {
-    setSaveText(draftText)
-    console.log(' not saving');
-    return;
-  }
+    if (now - lastSaveTime.current < 5000) {
+      console.log('Not saving due to throttle limit');
+      return;
+    }
 
-  lastSaveTime.current = now;
+    lastSaveTime.current = now;
 
-  if (!saveText && !entryTitle && tags.length === 0) {
-    console.log(' not saving');
-    return;
-  }
+    if (draftText === lastSavedText && entryTitle === lastSavedTitle) {
+      console.log('Not saving, content unchanged');
+      return;
+    }
 
-  if (!authState.isAuthenticated) {
-    localStorage.setItem('pendingEntry', saveText);
-    return;
-  }
+    if (!authState.isAuthenticated) {
+      localStorage.setItem('pendingEntry', draftText);
+      return;
+    }
 
-  console.log(' saving');
-  try {
-    const url = selectedEntryId
-      ? `https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`
-      : 'https://journal-app-backend-8szt.onrender.com/api/entries';
+    try {
+      console.log('Saving...');
+      const url = selectedEntryId
+        ? `https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`
+        : 'https://journal-app-backend-8szt.onrender.com/api/entries';
 
-    const method = selectedEntryId ? 'PUT' : 'POST';
+      const method = selectedEntryId ? 'PUT' : 'POST';
 
-    const savedEntry = await saveEntry({
-      userId: authState.user.sub,
-      entryTitle: entryTitle || '',
-      entryText: saveText,
-      folderName: selectedFolder,
-      tags,
-      createdAt: new Date(),
-    }, url, method);
+      const savedEntry = await saveEntry({
+        userId: authState.user.sub,
+        entryTitle: entryTitle || '',
+        entryText: draftText,
+        folderName: selectedFolder,
+        tags,
+        createdAt: new Date(),
+      }, url, method);
 
-    setSelectedEntry((prevEntry) => {
-      if (prevEntry && prevEntry._id === savedEntry._id) {
-        return savedEntry;
+      setLastSavedTitle(entryTitle);
+      setLastSavedText(draftText);
+
+      setSelectedEntry((prevEntry) => {
+        if (prevEntry && prevEntry._id === savedEntry._id) {
+          return savedEntry;
+        }
+        return prevEntry;
+      });
+
+      if (method === 'POST') {
+        setSelectedEntryId(savedEntry._id);
+        updateAchievements('incrementEntryCount', 1);
       }
-      return prevEntry;
-    });
 
-    if (method === 'POST') {
-      setSelectedEntryId(savedEntry._id);
-      updateAchievements('incrementEntryCount', 1);
+      const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
+      if (wordDelta > 0) {
+        updateAchievements('incrementWordCount', wordDelta);
+      }
+      updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
+
+      const newTags = tags.filter(tag => !loggedTagsRef.current.includes(tag));
+      const removedTags = loggedTagsRef.current.filter(tag => !tags.includes(tag));
+
+      if (newTags.length > 0) {
+        updateAchievements('updateTagUsage', newTags);
+        loggedTagsRef.current = [...loggedTagsRef.current, ...newTags].filter(tag => !removedTags.includes(tag));
+      }
+
+      setInitialWordCount(wordCount);
+      setIsTyping(false);
+      if (onEntrySaved) {
+        onEntrySaved();
+      }
+
+    } catch (error) {
+      console.error('Error saving journal entry:', error);
     }
+  };
 
-    const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
-    if (wordDelta > 0) {
-      updateAchievements('incrementWordCount', wordDelta);
-    }
-    updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
+  // const debouncedSave = useCallback(
+  //   debounce(() => {
+  //     handleSave();
+  //   }, 1000), // 
+  //   [draftText, entryTitle, selectedFolder, tags]
+  // );
 
-    const newTags = tags.filter(tag => !loggedTagsRef.current.includes(tag));
-    const removedTags = loggedTagsRef.current.filter(tag => !tags.includes(tag));
-
-    if (newTags.length > 0) {
-      updateAchievements('updateTagUsage', newTags);
-      loggedTagsRef.current = [...loggedTagsRef.current, ...newTags].filter(tag => !removedTags.includes(tag));
-    }
-
-    setInitialWordCount(wordCount);
-    setIsTyping(false);
-    if (onEntrySaved) {
-      onEntrySaved();
-    }
-
-  } catch (error) {
-    console.error('Error saving journal entry:', error);
-  }
-};
-
-
-  useEffect(() => {
-    handleSave();
-  }, [
-    draftText,
-    entryTitle, 
-    selectedFolder, 
-    tags
-  ]);
-
-
+  const stopTyping = () => {
+    setIsTyping(false); // User stopped typing
+    handleSave(); // Trigger save function
+  };
   const handleTextChange = (content) => {
-    // console.log(content);
-    
     setDraftText(content);
     const newWordCount = calculateWordCount(extractPlainText(content));
     setWordCount(newWordCount);
@@ -194,55 +189,48 @@ const handleSave = async () => {
     if (!isTyping) {
       setIsTyping(true);
     }
-    setIsToolbarVisible(false);  
+    setIsToolbarVisible(false);
+
+    stopTyping();
+  };
+
+  const handleTitleChange = (e) => {
+    setEntryTitle(e.target.value);
+
+    stopTyping();
   };
 
   const handleUnload = () => {
-    if (!authState.isAuthenticated || !draftText && !entryTitle && tags.length === 0) {
+    if (!authState.isAuthenticated || (!draftText && !entryTitle && tags.length === 0)) {
       return;
     }
 
-    const url = selectedEntryId
-      ? `https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`
-      : 'https://journal-app-backend-8szt.onrender.com/api/entries';
-
-    const data = JSON.stringify({
-      userId: authState.user.sub,
-      entryTitle: entryTitle || '',
-      entryText: draftText,
-      folderName: selectedFolder,
-      tags,
-      createdAt: new Date(),
-    });
-
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon(url, data);
-    } else {
-      fetch(url, {
-        method: selectedEntryId ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: data,
-        keepalive: true,
-      });
-    }
+    handleSave(); // Ensure save on unload
   };
 
   useEffect(() => {
     window.addEventListener('beforeunload', handleUnload);
-    // console.log('useeffect save');
-    
-    handleSave()
+
     return () => {
       window.removeEventListener('beforeunload', handleUnload);
     };
-  }, []);
+  }, [draftText, entryTitle, selectedFolder, tags]);
 
+  // Save on `Ctrl + S` or `Cmd + S`
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        handleSave();
+      }
+    };
 
-  const handleTitleChange = (e) => {
-    setEntryTitle(e.target.value);
-  };
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [draftText, entryTitle, selectedFolder, tags]);
 
   const handleAddTag = () => {
     const tagList = newTag.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
