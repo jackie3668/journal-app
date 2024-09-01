@@ -23,6 +23,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
   const [entryTitle, setEntryTitle] = useState('');
   const [draftText, setDraftText] = useState('');
+  const [saveText, setSaveText] = useState('');
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState('');
   const [selectedFolder, setSelectedFolder] = useState('Default');
@@ -88,95 +89,113 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     }
   }, [isTyping]);
 
-  const handleSave = useCallback(async () => {
-    console.log('saving');
-    
-    const now = Date.now();
-    // Use a consistent saving interval (e.g., 3000 milliseconds) for both new and existing entries
-    if (now - lastSaveTime.current < 3000) {
-      return;
-    }
+const handleSave = async () => {
+  const now = Date.now();
   
-    lastSaveTime.current = now;
-  
-    if (!draftText && !entryTitle && tags.length === 0) {
-      return;
-    }
-  
-    if (!authState.isAuthenticated) {
-      localStorage.setItem('pendingEntry', draftText);
-      return;
-    }
-  
-    try {
-      const url = selectedEntryId
-        ? `https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`
-        : 'https://journal-app-backend-8szt.onrender.com/api/entries';
-  
-      const method = selectedEntryId ? 'PUT' : 'POST';
-  
-      const savedEntry = await saveEntry({
-        userId: authState.user.sub,
-        entryTitle: entryTitle || '',
-        entryText: draftText,
-        folderName: selectedFolder,
-        tags,
-        createdAt: new Date(),
-      }, url, method);
-  
-      setSelectedEntry((prevEntry) => {
-        if (prevEntry && prevEntry._id === savedEntry._id) {
-          return savedEntry;
-        }
-        return prevEntry;
-      });
-  
-      if (method === 'POST') {
-        setSelectedEntryId(savedEntry._id);
-        updateAchievements('incrementEntryCount', 1);
+  if (!selectedEntryId  && now - lastSaveTime.current < 3000) {
+    console.log(' not saving');
+    return;
+  }
+  if (selectedEntryId  && now - lastSaveTime.current < 3000) {
+    console.log(' not saving');
+    return;
+  }
+
+  if (saveText!== draftText && selectedEntryId  && now - lastSaveTime.current < 60000) {
+    setSaveText(draftText)
+    console.log(' not saving');
+    return;
+  }
+
+  lastSaveTime.current = now;
+
+  if (!saveText && !entryTitle && tags.length === 0) {
+    console.log(' not saving');
+    return;
+  }
+
+  if (!authState.isAuthenticated) {
+    localStorage.setItem('pendingEntry', saveText);
+    return;
+  }
+
+  console.log(' saving');
+  try {
+    const url = selectedEntryId
+      ? `https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`
+      : 'https://journal-app-backend-8szt.onrender.com/api/entries';
+
+    const method = selectedEntryId ? 'PUT' : 'POST';
+
+    const savedEntry = await saveEntry({
+      userId: authState.user.sub,
+      entryTitle: entryTitle || '',
+      entryText: saveText,
+      folderName: selectedFolder,
+      tags,
+      createdAt: new Date(),
+    }, url, method);
+
+    setSelectedEntry((prevEntry) => {
+      if (prevEntry && prevEntry._id === savedEntry._id) {
+        return savedEntry;
       }
-  
-      const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
-      if (wordDelta > 0) {
-        updateAchievements('incrementWordCount', wordDelta);
-      }
-      updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
-  
-      const newTags = tags.filter(tag => !loggedTagsRef.current.includes(tag));
-      const removedTags = loggedTagsRef.current.filter(tag => !tags.includes(tag));
-  
-      if (newTags.length > 0) {
-        updateAchievements('updateTagUsage', newTags);
-        loggedTagsRef.current = [...loggedTagsRef.current, ...newTags].filter(tag => !removedTags.includes(tag));
-      }
-  
-      setInitialWordCount(wordCount);
-      setIsTyping(false);
-      if (onEntrySaved) {
-        onEntrySaved();
-      }
-  
-    } catch (error) {
-      console.error('Error saving journal entry:', error);
+      return prevEntry;
+    });
+
+    if (method === 'POST') {
+      setSelectedEntryId(savedEntry._id);
+      updateAchievements('incrementEntryCount', 1);
     }
-  }, [draftText, entryTitle, selectedFolder, tags, wordCount, initialWordCount, elapsedTime, selectedEntryId, authState.isAuthenticated, login, onEntrySaved, updateAchievements]);
-  
-  // Use debounce to ensure that the save function isn't called too frequently
-  const debounceSave = useCallback(
-    debounce(() => {
-      handleSave();
-    }, 10000), // Consistent debounce interval for both new and existing entries
-    [handleSave]
-  );
-  
+
+    const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
+    if (wordDelta > 0) {
+      updateAchievements('incrementWordCount', wordDelta);
+    }
+    updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
+
+    const newTags = tags.filter(tag => !loggedTagsRef.current.includes(tag));
+    const removedTags = loggedTagsRef.current.filter(tag => !tags.includes(tag));
+
+    if (newTags.length > 0) {
+      updateAchievements('updateTagUsage', newTags);
+      loggedTagsRef.current = [...loggedTagsRef.current, ...newTags].filter(tag => !removedTags.includes(tag));
+    }
+
+    setInitialWordCount(wordCount);
+    setIsTyping(false);
+    if (onEntrySaved) {
+      onEntrySaved();
+    }
+
+  } catch (error) {
+    console.error('Error saving journal entry:', error);
+  }
+};
+
+
   useEffect(() => {
-    const saveInterval = setInterval(() => {
-      debounceSave();
-    }, 10000); // Consistent interval for triggering saves
-  
-    return () => clearInterval(saveInterval);
-  }, [debounceSave]);
-  
+    handleSave();
+  }, [
+    draftText,
+    entryTitle, 
+    selectedFolder, 
+    tags
+  ]);
+
+
+  const handleTextChange = (content) => {
+    // console.log(content);
+    
+    setDraftText(content);
+    const newWordCount = calculateWordCount(extractPlainText(content));
+    setWordCount(newWordCount);
+
+    if (!isTyping) {
+      setIsTyping(true);
+    }
+    setIsToolbarVisible(false);  
+  };
 
   const handleUnload = () => {
     if (!authState.isAuthenticated || !draftText && !entryTitle && tags.length === 0) {
@@ -218,18 +237,8 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     return () => {
       window.removeEventListener('beforeunload', handleUnload);
     };
-  }, [draftText, entryTitle, tags, selectedFolder, authState.isAuthenticated]);
+  }, []);
 
-  const handleTextChange = (content) => {
-    setDraftText(content);
-    const newWordCount = calculateWordCount(extractPlainText(content));
-    setWordCount(newWordCount);
-
-    if (!isTyping) {
-      setIsTyping(true);
-    }
-    setIsToolbarVisible(false);  
-  };
 
   const handleTitleChange = (e) => {
     setEntryTitle(e.target.value);
