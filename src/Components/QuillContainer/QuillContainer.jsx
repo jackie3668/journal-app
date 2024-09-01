@@ -14,13 +14,12 @@ import date from '../../Assets/UI/Journal/calendar.png';
 import folder from '../../Assets/UI/Journal/folder (1).png';
 import check from '../../Assets/UI/Journal/tick.png';
 import { Scrollbar } from 'react-scrollbars-custom';
-import debounce from 'lodash/debounce';
 
 const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry, selectedEntryId, setSelectedEntryId }) => {
   const { authState, login } = useAuth();
   const { selectedPrompt } = useTheme();
   const { updateAchievements } = useAchievements();
-
+  const prevSelectedEntryId = useRef(null); 
   const [entryTitle, setEntryTitle] = useState('');
   const [draftText, setDraftText] = useState('');
   const [lastSavedTitle, setLastSavedTitle] = useState('');
@@ -41,6 +40,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   const [activeSetting, setActiveSetting] = useState(null);
 
   const lastSaveTime = useRef(0);
+  const typingTimeoutRef = useRef(null);
   const quillRef = useRef(null);
   const loggedTagsRef = useRef([]);
   const folderSettingRef = useRef(null);
@@ -68,21 +68,27 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   }, [authState.user]);
 
   useEffect(() => {
-    if (selectedEntry) {
-      setEntryTitle(selectedEntry.entryTitle || '');
-      setDraftText(selectedEntry.entryText || '');
-      setTags(selectedEntry.tags || []);
-      setSelectedFolder(selectedEntry.folderName || 'Default');
-      setInitialWordCount(calculateWordCount(extractPlainText(selectedEntry.entryText || '')));
-      setLastSavedTitle(selectedEntry.entryTitle || '');
-      setLastSavedText(selectedEntry.entryText || '');
-    } else {
-      setEntryTitle('');
-      setDraftText('');
-      setTags([]);
-      setSelectedFolder('Default');
+    if (prevSelectedEntryId.current !== selectedEntryId) {
+      prevSelectedEntryId.current = selectedEntryId;  
+
+      if (selectedEntry) {
+        console.log(selectedEntryId);
+        
+        setEntryTitle(selectedEntry.entryTitle || '');
+        setDraftText(selectedEntry.entryText || '');
+        setTags(selectedEntry.tags || []);
+        setSelectedFolder(selectedEntry.folderName || 'Default');
+        setInitialWordCount(calculateWordCount(extractPlainText(selectedEntry.entryText || '')));
+        setLastSavedTitle(selectedEntry.entryTitle || '');
+        setLastSavedText(selectedEntry.entryText || '');
+      } else {
+        setEntryTitle('');
+        setDraftText('');
+        setTags([]);
+        setSelectedFolder('Default');
+      }
     }
-  }, [selectedEntry, selectedPrompt]);
+  }, [selectedEntryId, selectedEntry]);
 
   useEffect(() => {
     if (isTyping) {
@@ -170,17 +176,11 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     }
   };
 
-  // const debouncedSave = useCallback(
-  //   debounce(() => {
-  //     handleSave();
-  //   }, 1000), // 
-  //   [draftText, entryTitle, selectedFolder, tags]
-  // );
-
   const stopTyping = () => {
     setIsTyping(false); // User stopped typing
     handleSave(); // Trigger save function
   };
+
   const handleTextChange = (content) => {
     setDraftText(content);
     const newWordCount = calculateWordCount(extractPlainText(content));
@@ -191,13 +191,23 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     }
     setIsToolbarVisible(false);
 
-    stopTyping();
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    typingTimeoutRef.current = setTimeout(stopTyping, 1000); // 1 second delay
   };
 
   const handleTitleChange = (e) => {
     setEntryTitle(e.target.value);
 
-    stopTyping();
+    if (!isTyping) {
+      setIsTyping(true);
+    }
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+    typingTimeoutRef.current = setTimeout(stopTyping, 1000); // 1 second delay
   };
 
   const handleUnload = () => {
@@ -216,7 +226,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     };
   }, [draftText, entryTitle, selectedFolder, tags]);
 
-  // Save on `Ctrl + S` or `Cmd + S`
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -476,6 +485,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       <div className='count-time'>
         <p>{wordCount} Words</p>
         <p>{Math.floor(elapsedTime / 60000)}m {Math.floor((elapsedTime % 60000) / 1000)}s</p>
+        <p>{isTyping ? 'yes' :'no'}</p>
       </div>
     </div>
   );
