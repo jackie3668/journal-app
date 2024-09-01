@@ -89,30 +89,32 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   }, [isTyping]);
 
   const handleSave = useCallback(async () => {
+    console.log('saving');
+    
     const now = Date.now();
-    if (!selectedEntryId && now - lastSaveTime.current < 5000) {
-      return;
-    } else if (selectedEntryId && now - lastSaveTime.current < 1000) {
+    // Use a consistent saving interval (e.g., 3000 milliseconds) for both new and existing entries
+    if (now - lastSaveTime.current < 3000) {
       return;
     }
-
+  
     lastSaveTime.current = now;
+  
     if (!draftText && !entryTitle && tags.length === 0) {
       return;
     }
-
+  
     if (!authState.isAuthenticated) {
       localStorage.setItem('pendingEntry', draftText);
       return;
     }
-
+  
     try {
       const url = selectedEntryId
         ? `https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`
         : 'https://journal-app-backend-8szt.onrender.com/api/entries';
-
+  
       const method = selectedEntryId ? 'PUT' : 'POST';
-
+  
       const savedEntry = await saveEntry({
         userId: authState.user.sub,
         entryTitle: entryTitle || '',
@@ -121,57 +123,60 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
         tags,
         createdAt: new Date(),
       }, url, method);
-
+  
       setSelectedEntry((prevEntry) => {
         if (prevEntry && prevEntry._id === savedEntry._id) {
           return savedEntry;
         }
         return prevEntry;
       });
-
+  
       if (method === 'POST') {
         setSelectedEntryId(savedEntry._id);
         updateAchievements('incrementEntryCount', 1);
       }
-
+  
       const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
       if (wordDelta > 0) {
         updateAchievements('incrementWordCount', wordDelta);
       }
       updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
-
+  
       const newTags = tags.filter(tag => !loggedTagsRef.current.includes(tag));
       const removedTags = loggedTagsRef.current.filter(tag => !tags.includes(tag));
-
+  
       if (newTags.length > 0) {
         updateAchievements('updateTagUsage', newTags);
         loggedTagsRef.current = [...loggedTagsRef.current, ...newTags].filter(tag => !removedTags.includes(tag));
       }
-
+  
       setInitialWordCount(wordCount);
       setIsTyping(false);
       if (onEntrySaved) {
         onEntrySaved();
       }
-
+  
     } catch (error) {
       console.error('Error saving journal entry:', error);
     }
   }, [draftText, entryTitle, selectedFolder, tags, wordCount, initialWordCount, elapsedTime, selectedEntryId, authState.isAuthenticated, login, onEntrySaved, updateAchievements]);
-
+  
+  // Use debounce to ensure that the save function isn't called too frequently
   const debounceSave = useCallback(
     debounce(() => {
       handleSave();
-    }, 3000), [handleSave]
+    }, 10000), // Consistent debounce interval for both new and existing entries
+    [handleSave]
   );
-
+  
   useEffect(() => {
     const saveInterval = setInterval(() => {
       debounceSave();
-    }, 3000);
-
+    }, 10000); // Consistent interval for triggering saves
+  
     return () => clearInterval(saveInterval);
   }, [debounceSave]);
+  
 
   const handleUnload = () => {
     if (!authState.isAuthenticated || !draftText && !entryTitle && tags.length === 0) {
@@ -207,7 +212,8 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
   useEffect(() => {
     window.addEventListener('beforeunload', handleUnload);
-
+    // console.log('useeffect save');
+    
     handleSave()
     return () => {
       window.removeEventListener('beforeunload', handleUnload);
@@ -222,7 +228,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     if (!isTyping) {
       setIsTyping(true);
     }
-    setIsToolbarVisible(false);
+    setIsToolbarVisible(false);  
   };
 
   const handleTitleChange = (e) => {
@@ -320,6 +326,17 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       setActiveSetting('folder');
     }
   };
+
+  const handleMouseMove = () => {
+    setIsToolbarVisible(true); 
+  };
+  
+  useEffect(() => {
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
 
   return (
     <div className='quill-container glass'>
