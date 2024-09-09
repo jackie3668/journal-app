@@ -82,7 +82,11 @@
 
 @media  (min-width:600px) and (max-height: 800px) {
   .prompt-widget .prompt-image {
-    width: 45%;
+    width: 75%;
+    height: 12vh;
+    border-radius: 5%;
+    background-size: cover;
+    cursor: pointer;
   }
 
   .prompt-widget .prompt-item h4 {

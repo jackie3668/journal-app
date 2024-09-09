@@ -175,8 +175,8 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   };
 
   const stopTyping = () => {
-    setIsTyping(false); // User stopped typing
-    handleSave(); // Trigger save function
+    setIsTyping(false); 
+    handleSave(); 
   };
 
   const handleTextChange = (content) => {
@@ -192,7 +192,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    typingTimeoutRef.current = setTimeout(stopTyping, 1000); // 1 second delay
+    typingTimeoutRef.current = setTimeout(stopTyping, 1000);
   };
 
   const handleTitleChange = (e) => {
@@ -205,7 +205,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    typingTimeoutRef.current = setTimeout(stopTyping, 1000); // 1 second delay
+    typingTimeoutRef.current = setTimeout(stopTyping, 1000); 
   };
 
   const handleUnload = () => {
@@ -213,7 +213,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       return;
     }
 
-    handleSave(); // Ensure save on unload
+    handleSave(); 
   };
 
   useEffect(() => {

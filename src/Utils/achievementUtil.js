@@ -12,10 +12,7 @@ export const getAchievements = async (userId) => {
     const response = await fetch(`https://journal-app-backend-8szt.onrender.com/api/achievements/${userId}` || `https://journal-app-backend-8szt.onrender.com/api/achievements/${userId}`);
     if (response.status === 200) {
       userAchievements = await response.json();
-      console.log('Fetched Achievements:', userAchievements); 
-
     } else if (response.status === 210) {
-      console.log('Partial success or special case:', response.status);
       userAchievements = await response.json();
     } else {
       console.error('Failed to fetch achievements, status:', response.status);
