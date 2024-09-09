@@ -272,7 +272,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
 
   const handleEntryDeleteClick = (entryId) => {
     setEntryToDelete(entryId);
-    setShowEntryModal(true);
+    setShowEntryModal(true); 
   };
 
   const confirmEntryDelete = async () => {
@@ -284,12 +284,17 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
   
         const updatedEntries = entries[selectedFolder].filter(entry => entry._id !== entryToDelete);
         setEntries({ ...entries, [selectedFolder]: updatedEntries });
+  
+        if (typeof onEntrySelect === 'function') {
+          onEntrySelect(null);
+        }
+  
       } catch (error) {
         console.error('Error deleting entry:', error.response ? error.response.data : error.message);
       }
     }
-    setEntryToDelete(null);
-    setShowEntryModal(false);
+    setEntryToDelete(null);  
+    setShowEntryModal(false);  
   };
   
   const closeEntryModal = () => {
