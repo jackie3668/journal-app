@@ -12,6 +12,7 @@ import add from '../../Assets/UI/Journal/more.png'
 import filter from '../../Assets/UI/Journal/filter.png'
 import search from '../../Assets/UI/Journal/search-interface-symbol (1).png'
 import page from '../../Assets/Sounds/turnpage-99756.mp3'
+import deleteIcon from '../../Assets/UI/Journal/delete.png';
 
 const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, isOpen, onClose }) => {
   const { authState } = useAuth();
@@ -27,7 +28,29 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
   const [expandedFolders, setExpandedFolders] = useState({}); 
   const [hoveredFolder, setHoveredFolder] = useState(null);  
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [folderToDelete, setFolderToDelete] = useState(null);
+  const [showEntryModal, setShowEntryModal] = useState(false);
+  const [entryToDelete, setEntryToDelete] = useState(null);
+
   const addFolderRef = useRef(null);
+
+  const Modal = ({ isOpen, onClose, onConfirm, title, message }) => {
+    if (!isOpen) return null;
+
+    return (
+      <div className="modal-overlay">
+        <div className="modal-content">
+          <h2>{title}</h2>
+          <p>{message}</p>
+          <div className="modal-actions">
+            <button onClick={onConfirm} className="confirm-button clickable">Yes</button>
+            <button onClick={onClose} className="cancel-button clickable">No</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   useEffect(() => {
     const fetchFolders = async () => {
@@ -39,7 +62,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
         const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/folders' || 'https://journal-app-backend-8szt.onrender.com/api/folders', {
           params: { userId: user.sub }
         });        
-        setFolders(response.data);
+        setFolders(response.data);       
       } catch (error) {
         console.error('Error fetching folders:', error);
       } 
@@ -67,7 +90,6 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
 
     fetchTags();
   }, [isAuthenticated, isLoading, user]);
-
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -217,6 +239,64 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
     setHoveredFolder(null);
   };
 
+  const handleFolderDeleteClick = (folderId) => {
+    setFolderToDelete(folderId);
+    setShowModal(true);
+  };
+
+  const deleteFolder = async (folderId) => {
+    try {
+      await axios.delete(`https://journal-app-backend-8szt.onrender.com/api/folders/${folderId}`, {
+        params: { userId: user.sub } 
+      });
+      const updatedFolders = folders.filter(folder => folder._id !== folderId);
+      setFolders(updatedFolders);
+      updateAchievements('decrementFolderCount', 1);
+    } catch (error) {
+      console.error('Error deleting folder:', error.response ? error.response.data : error.message);
+    }
+  };  
+  
+  const confirmDelete = () => {
+    if (folderToDelete) {
+      deleteFolder(folderToDelete);
+      setFolderToDelete(null);
+    }
+    setShowModal(false);
+  };
+
+  const closeModal = () => {
+    setFolderToDelete(null);
+    setShowModal(false);
+  };
+
+  const handleEntryDeleteClick = (entryId) => {
+    setEntryToDelete(entryId);
+    setShowEntryModal(true);
+  };
+
+  const confirmEntryDelete = async () => {
+    if (entryToDelete) {
+      try {
+        await axios.delete(`https://journal-app-backend-8szt.onrender.com/api/entries/${entryToDelete}`, {
+          params: { userId: user.sub } 
+        });
+  
+        const updatedEntries = entries[selectedFolder].filter(entry => entry._id !== entryToDelete);
+        setEntries({ ...entries, [selectedFolder]: updatedEntries });
+      } catch (error) {
+        console.error('Error deleting entry:', error.response ? error.response.data : error.message);
+      }
+    }
+    setEntryToDelete(null);
+    setShowEntryModal(false);
+  };
+  
+  const closeEntryModal = () => {
+    setShowEntryModal(false);
+    setEntryToDelete(null);
+  };
+  
   return (
     <div className={`drawer glass ${isOpen ? 'open' : ''}`}>
       <div className='drawer-top'>
@@ -301,10 +381,10 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
             {folders.map((folder) => (
               <li key={folder._id} className="folder-item">
                 <div
-                    onMouseEnter={() => handleFolderHover(folder.name)}
-                    onMouseLeave={() => handleFolderLeave(folder.name)}
-                    className={`folder-header clickable ${expandedFolders[folder.name] ? 'active' : ''}`}
-                  >
+                  onMouseEnter={() => handleFolderHover(folder.name)}
+                  onMouseLeave={() => handleFolderLeave(folder.name)}
+                  className={`folder-header clickable ${expandedFolders[folder.name] ? 'active' : ''}`}
+                >
                   <img 
                     src={(hoveredFolder === folder.name || expandedFolders[folder.name]) ? arrow : folderIcon}
                     className='folder-icon'
@@ -312,17 +392,37 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
                     onClick={() => handleFolderClick(folder)}
                   />
                   <p onClick={() => handleFolderClick(folder)}>{folder.name}</p>
+
+                  {folder.name !== 'Default' && (
+                    <img
+                      src={deleteIcon}
+                      className='del clickable'
+                      alt="Delete folder"
+                      onClick={() => handleFolderDeleteClick(folder._id)} 
+                    />
+                  )}
                 </div>
+
                 {expandedFolders[folder.name] && (
                   <ul className="entries-list">
                     {entries[folder.name] && entries[folder.name].length > 0 ? (
                       entries[folder.name].map((entry) => {
                         const plainText = extractPlainText(entry.entryText);
-                        const preview = plainText.length > 30 ? plainText.slice(0, 30) + '...' : plainText;
+                        const preview = plainText.length > 25 ? plainText.slice(0, 25) + '...' : plainText;
                         return (
                           <li key={entry._id} className="entry-item" onClick={() => handleEntryClick(entry)}>
                             <div className="entry-content">
-                              <h3 className="entry-title">{entry.entryTitle ? `${entry.entryTitle}` : 'No Title'}</h3>
+                              <img
+                                src={deleteIcon}
+                                className='del clickable'
+                                alt="Delete entry"
+                                onClick={() => handleEntryDeleteClick(entry._id)}
+                              />
+
+                              <h3 className="entry-title">
+                                {entry.entryTitle ? `${entry.entryTitle}` : 'No Title'}
+                              </h3>
+                              
                               <small className="entry-date">
                                 {new Date(entry.createdAt).toLocaleDateString('en-US', {
                                   year: 'numeric',
@@ -330,9 +430,11 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
                                   day: '2-digit'
                                 })}
                               </small>
+                              
                               <p className="entry-preview">{preview}</p>
                             </div>
                           </li>
+
                         );
                       })
                     ) : (
@@ -345,7 +447,22 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
           </ul>
         </Scrollbar>
       </div>
-   
+      <Modal
+        isOpen={showModal}
+        onClose={closeModal}
+        onConfirm={confirmDelete}
+        title="Delete Folder"
+        message="Are you sure you want to delete this folder? This action cannot be undone."
+      />
+
+      <Modal
+        isOpen={showEntryModal}
+        onClose={closeEntryModal}
+        onConfirm={confirmEntryDelete}
+        title="Delete Entry"
+        message="Are you sure you want to delete this entry? This action cannot be undone."
+      />
+
     </div>
   );
 };

@@ -295,6 +295,21 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  position: relative;
+}
+
+.drawer .folder-item .folder-header>.del  {
+  opacity: 0;
+  width: 1.5rem;
+  margin-right: -0.2rem;
+} 
+
+.drawer .folder-item .folder-header.active .del {
+  opacity: 0.5;
+}
+
+.drawer .folder-item .folder-header.active .del:hover {
+  opacity: 1;
 }
 
 .drawer .folder-list {
@@ -306,10 +321,6 @@
   height: 50vh;
 }
 
-.drawer ul .entry-item {
-  padding: 0.5rem;
-}
-
 .drawer .entries-list {
   display: flex;
   flex-direction: column;
@@ -317,6 +328,8 @@
 }
 
 .drawer .entry-item {
+  padding: 0.5rem;
+  position: relative;
   display: flex;
   align-items: flex-start;
   background-color: rgba(255, 255, 255, 0.05); 
@@ -330,6 +343,18 @@
 .drawer .entry-item .entry-icon img {
   width: 1.25rem;
   height: 1.25rem;
+}
+
+.drawer .entry-item img.del {
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+  width: 1rem;
+  opacity: 0.5;
+}
+
+.drawer .entry-item img.del:hover {
+  opacity: 1;
 }
 
 .drawer .entry-item:hover {
@@ -346,7 +371,8 @@
 }
 
 .drawer .entry-title {
-  font-size: 1rem
+  font-size: 1rem;
+  width: 85%;
 }
 
 .drawer .entry-date {
@@ -371,3 +397,64 @@
 .entry-edit img:hover {
   opacity: 1;
 }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: black;
+  padding: 20px;
+  border-radius: 0.5rem;
+  width: 90%;
+  text-align: center;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.confirm-button {
+  background-color: rgb(82, 82, 82);
+  color: white;
+  padding: 0.25rem 1rem;
+  border-radius: 0.15rem;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.confirm-button:hover {
+  background-color: #5c5c5c;
+  opacity: 0.9;
+}
+
+.cancel-button {
+  background-color: white;
+  color: black;
+  padding: 0.25rem 1rem;
+  border-radius: 0.15rem;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.cancel-button:hover {
+  background-color: #dfdfdf;
+  opacity: 0.95;
+}
+

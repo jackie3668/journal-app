@@ -70,9 +70,7 @@ export const AchievementProvider = ({ children }) => {
             });
             break;
           case 'incrementFolderCount':
-            console.log(`Folder count updated to ${updatedAchievements.folderCount}`); 
             updatedAchievements.folderCount += 1;
-            console.log(`Folder count updated to ${updatedAchievements.folderCount}`);
             break;
           case 'incrementPromptUsage':
             updatedAchievements.promptUsage += 1;

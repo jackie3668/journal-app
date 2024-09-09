@@ -16,7 +16,7 @@ import check from '../../Assets/UI/Journal/tick.png';
 import { Scrollbar } from 'react-scrollbars-custom';
 
 const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry, selectedEntryId, setSelectedEntryId }) => {
-  const { authState, login } = useAuth();
+  const { authState } = useAuth();
   const { selectedPrompt } = useTheme();
   const { updateAchievements } = useAchievements();
   const prevSelectedEntryId = useRef(null); 
@@ -72,8 +72,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       prevSelectedEntryId.current = selectedEntryId;  
 
       if (selectedEntry) {
-        console.log(selectedEntryId);
-        
         setEntryTitle(selectedEntry.entryTitle || '');
         setDraftText(selectedEntry.entryText || '');
         setTags(selectedEntry.tags || []);
