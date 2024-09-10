@@ -14,7 +14,7 @@ import search from '../../Assets/UI/Journal/search-interface-symbol (1).png'
 import page from '../../Assets/Sounds/turnpage-99756.mp3'
 import deleteIcon from '../../Assets/UI/Journal/delete.png';
 
-const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, isOpen, onClose }) => {
+const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, isOpen, onClose, onFoldersChange }) => {
   const { authState } = useAuth();
   const { updateAchievements } = useAchievements();
   const { user, isAuthenticated, isLoading } = authState;
@@ -173,6 +173,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
       setNewFolderName('');
       setShowNewFolderInput(false);
       updateAchievements('incrementFolderCount', 1);
+      onFoldersChange()
       const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/folders' || 'https://journal-app-backend-8szt.onrender.com/api/folders', {
         params: { userId: user.sub }
       });
@@ -242,6 +243,7 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
   const handleFolderDeleteClick = (folderId) => {
     setFolderToDelete(folderId);
     setShowModal(true);
+    onFoldersChange();
   };
 
   const deleteFolder = async (folderId) => {

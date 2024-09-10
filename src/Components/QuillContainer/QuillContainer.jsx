@@ -15,7 +15,7 @@ import folder from '../../Assets/UI/Journal/folder (1).png';
 import check from '../../Assets/UI/Journal/tick.png';
 import { Scrollbar } from 'react-scrollbars-custom';
 
-const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry, selectedEntryId, setSelectedEntryId }) => {
+const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry, selectedEntryId, setSelectedEntryId, folders, onFoldersChange }) => {
   const { authState } = useAuth();
   const { selectedPrompt } = useTheme();
   const { updateAchievements } = useAchievements();
@@ -24,11 +24,9 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   const [draftText, setDraftText] = useState('');
   const [lastSavedTitle, setLastSavedTitle] = useState('');
   const [lastSavedText, setLastSavedText] = useState('');
-
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState('');
   const [selectedFolder, setSelectedFolder] = useState('Default');
-  const [folders, setFolders] = useState([]);
   const [newFolderName, setNewFolderName] = useState('');
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -54,20 +52,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   }, [authState.isAuthenticated]);
 
   useEffect(() => {
-    const fetchAndSetFolders = async () => {
-      if (!authState.user) return;
-
-      try {
-        const folders = await fetchFolders(authState.user.sub);
-        setFolders(folders);
-      } catch (error) {
-        console.error('Error fetching folders:', error);
-      }
-    };
-    fetchAndSetFolders();
-  }, [authState.user]);
-
-  useEffect(() => {
     if (prevSelectedEntryId.current !== selectedEntryId) {
       prevSelectedEntryId.current = selectedEntryId;  
 
@@ -87,6 +71,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       }
     }
   }, [selectedEntryId, selectedEntry]);
+  
 
   useEffect(() => {
     if (isTyping) {
@@ -256,19 +241,25 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
   const handleAddNewFolder = async () => {
     if (!newFolderName.trim()) {
+      console.error('Folder name cannot be empty');
       return;
     }
+  
     try {
       const updatedFolders = await addNewFolder(authState.user.sub, newFolderName);
-      setFolders(updatedFolders);
-      setNewFolderName('');
-      setShowNewFolderInput(false);
-      updateAchievements('incrementFolderCount', 1);
+      
+      setNewFolderName(''); 
+      setShowNewFolderInput(false); 
+      updateAchievements('incrementFolderCount', 1)
 
+  
+      onFoldersChange();
     } catch (error) {
       console.error('Error adding new folder:', error);
     }
   };
+  
+  
 
   function formatDate() {
     const options = { year: 'numeric', month: 'long', day: '2-digit' };
@@ -423,9 +414,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
                         {selectedFolder === "Default" && <img src={check} alt="Selected" className="check-icon" />}
                       </li>
                     )}
-                    <li onClick={() => setShowNewFolderInput(true)} className="add-folder">
-                      + Add Folder
-                    </li>
                     {showNewFolderInput && (
                       <li className='add-folder-input'>
                         <input
@@ -437,6 +425,9 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
                         <button onClick={handleAddNewFolder}>Add</button>
                       </li>
                     )}
+                    <li onClick={() => setShowNewFolderInput(true)} className="add-folder">
+                      + Add Folder
+                    </li>
                   </Scrollbar>
                 </ul>
               )}
@@ -483,7 +474,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       <div className='count-time'>
         <p>{wordCount} Words</p>
         <p>{Math.floor(elapsedTime / 60000)}m {Math.floor((elapsedTime % 60000) / 1000)}s</p>
-        <p>{isTyping ? 'yes' :'no'}</p>
       </div>
     </div>
   );

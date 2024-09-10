@@ -54,23 +54,22 @@ export const saveEntry = async (data, url, method) => {
 };
 
 
-// Create a debounced version of saveEntry
 export const debouncedSaveEntry = debounce(saveEntry, 3000);
 
 /**
  * Add a new folder.
- * @param {string} userId - The ID of the user.
- * @param {string} newFolderName - The name of the new folder.
- * @returns {Promise<Array>} - A promise that resolves to the updated list of folders.
+ * @param {string} userId 
+ * @param {string} newFolderName 
+ * @returns {Promise<Array>} 
  */
 export const addNewFolder = async (userId, newFolderName) => {
   try {
-    await axios.post('https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
+    await axios.post('https://journal-app-backend-8szt.onrender.com/api/folders', {
       name: newFolderName,
       userId,
     });
     
-    const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/entries/folders' || 'https://journal-app-backend-8szt.onrender.com/api/entries/folders', {
+    const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/folders', {
       params: { userId },
     });
     
@@ -80,6 +79,7 @@ export const addNewFolder = async (userId, newFolderName) => {
     throw error;
   }
 };
+
 
 /**
  * Calculate the word count from text.

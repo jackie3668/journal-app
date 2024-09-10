@@ -18,6 +18,7 @@ const Journal = () => {
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [selectedEntryId, setSelectedEntryId] = useState(null);
   const [entries, setEntries] = useState([]);
+  const [folders, setFolders] = useState([]);
   const [refreshEntries, setRefreshEntries] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState('Default');
   const [typingSound, setTypingSound] = useState({ url: '', volume: 1 });
@@ -32,6 +33,13 @@ const Journal = () => {
       fetchEntries(selectedFolder, user.sub);
     }
   }, [refreshEntries, selectedFolder, user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchFolders(user.sub); 
+    }
+  }, [user]);
+  
 
   useEffect(() => {
     if (audio) {
@@ -98,17 +106,36 @@ const Journal = () => {
     setSelectedMenu(''); 
   };
 
+  const fetchFolders = async (userId) => {
+    try {
+      const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/folders', {
+        params: { userId }
+      });
+      setFolders(response.data); 
+      console.log(response.data);
+      
+    } catch (error) {
+      console.error('Error fetching folders:', error);
+    }
+  };
+  
+  const handleFolderAddedOrDeleted = () => {
+    fetchFolders(user.sub);
+  };
+
   return (
     <Scrollbar>
       <div className='journal-container'>
         <div className="editor">
           <QuillContainer 
-            handleKeyDown={handleKeyDown} 
-            setSelectedEntry={setSelectedEntry} 
-            selectedEntry={selectedEntry} 
-            onEntrySaved={handleEntrySaved} 
+            handleKeyDown={handleKeyDown}
+            setSelectedEntry={setSelectedEntry}
+            selectedEntry={selectedEntry}
+            onEntrySaved={handleEntrySaved}
             selectedEntryId={selectedEntryId}
             setSelectedEntryId={setSelectedEntryId}
+            folders={folders} 
+            onFoldersChange={handleFolderAddedOrDeleted} 
           />
         </div>
         <div className="menu">
@@ -116,13 +143,15 @@ const Journal = () => {
         </div>
         {selectedMenu === 'drawer' && (
           <div ref={drawerRef}>
-            <Drawer 
+            <Drawer
               isOpen={isDrawerOpen}
               onClose={() => setIsDrawerOpen(false)}
-              onEntrySelect={handleSelectEntry} 
-              onEntrySaved={handleEntrySaved} 
+              onEntrySelect={handleSelectEntry}
+              onEntrySaved={handleEntrySaved}
               selectedFolder={selectedFolder}
-              onFolderChange={handleFolderChange} 
+              onFolderChange={handleFolderChange}
+              folders={folders} 
+              onFoldersChange={handleFolderAddedOrDeleted} 
             />
           </div>
         )}
