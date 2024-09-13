@@ -73,7 +73,7 @@ const PromptWidget = () => {
               >
                 <div className="image-wrapper">
                   <img src={images[index]} alt={`Prompt ${index}`} className="prompt-image clickable" />
-                  <p className='clickable'>{prompt.category}</p>
+                  <p className='clickable shadow'>{prompt.category}</p>
                 </div>
               </Link>
             </div>

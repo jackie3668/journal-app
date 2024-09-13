@@ -176,18 +176,18 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
             return (
               <div key={sound._id} className="sound-control clickable">
                 <div
-                  className="custom-slider"
+                  className="custom-slider clickable"
                   onMouseDown={(e) => handleSliderChange(e, sound.name)}
                   onMouseMove={(e) => handleSliderMove(e, sound.name)}
                   onMouseUp={() => setIsDragging(false)}
                   onMouseLeave={() => setIsDragging(false)}
                 >
                   <div
-                    className="active-track"
+                    className="active-track clickable"
                     style={{ height: `${volumes[sound.name] * 100}%` }}
                   ></div>
                   <div
-                    className="custom-slider-thumb"
+                    className="custom-slider-thumb clickable"
                     style={{ top: `${(1 - volumes[sound.name]) * 100}%` }}
                   ></div>
                 </div>

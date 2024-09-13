@@ -335,7 +335,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
   return (
     <div className='quill-container glass'>
-      <div className="editor-top">
+      <div className="editor-top light-shadow">
         <div className="entry-setting-wrapper">
           <div className={!isToolbarVisible ? 'editing settings' : 'settings'}>
             <div className="date">
@@ -471,7 +471,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
           ref={quillRef}
         />
       </Scrollbar>
-      <div className='count-time'>
+      <div className='count-time shadow'>
         <p>{wordCount} Words</p>
         <p>{Math.floor(elapsedTime / 60000)}m {Math.floor((elapsedTime % 60000) / 1000)}s</p>
       </div>

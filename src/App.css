@@ -37,6 +37,14 @@ input::placeholder {
 }
 
 /* Reusable Class */
+.shadow {
+  text-shadow: 2px 2px 1px black;
+}
+
+.light-shadow {
+  text-shadow: 1px 1px 5px black;
+}
+
 .glass {
   background-color: rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(15px);

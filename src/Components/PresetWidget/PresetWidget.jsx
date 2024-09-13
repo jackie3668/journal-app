@@ -66,8 +66,8 @@ const PresetWidget = () => {
                 style={{ backgroundImage: `url(${preset.imageUrl})` }}
               />
               <span>Preset</span>
-              <h3 className="preset-name">{preset.name}</h3>
-              <p className='preset-description'>{preset.description}</p>
+              <h3 className="preset-name light-shadow">{preset.name}</h3>
+              <p className='preset-description light-shadow'>{preset.description}</p>
             </div>
           </Link>
         ))}

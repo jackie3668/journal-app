@@ -51,7 +51,7 @@ const NavBar = () => {
 
   return (
     <nav>
-      <div className="clock">
+      <div className="clock shadow">
         <div>{formatTime(currentTime)}</div>
         <div>
           <div>{formatDay(currentTime)}</div>
@@ -74,7 +74,7 @@ const NavBar = () => {
         </Link>
       
       </ul>
-      <div className="auth clickable">
+      <div className="auth clickable shadow">
         {isAuthenticated ? (
           <p onClick={() => logout({ returnTo: window.location.origin })}>Log out</p>
         ) : (
