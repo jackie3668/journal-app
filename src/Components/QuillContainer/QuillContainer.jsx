@@ -19,7 +19,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   const { authState } = useAuth();
   const { selectedPrompt, setSelectedPrompt } = useTheme();
   const { updateAchievements } = useAchievements();
-  const prevSelectedEntryId = useRef(null); 
   const [entryTitle, setEntryTitle] = useState('');
   const [draftText, setDraftText] = useState('');
   const [lastSavedTitle, setLastSavedTitle] = useState('');
@@ -36,7 +35,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   const [isToolbarVisible, setIsToolbarVisible] = useState(true);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [activeSetting, setActiveSetting] = useState(null);
-
   const lastSaveTime = useRef(0);
   const typingTimeoutRef = useRef(null);
   const quillRef = useRef(null);
@@ -85,19 +83,14 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
   const handleSave = async () => {
     const now = Date.now();
-    console.log('Saved Entry:', lastSavedText);
-    console.log('draft', draftText);
 
-        
     if (now - lastSaveTime.current < 5000) {
-      console.log('Not saving due to throttle limit');
       return;
     }
 
     lastSaveTime.current = now;
 
     if (draftText === lastSavedText && entryTitle === lastSavedTitle) {
-      console.log('Not saving, content unchanged');
       return;
     }
 
@@ -125,7 +118,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
       setLastSavedTitle(entryTitle);
       setLastSavedText(draftText);
-      console.log('Saved Entry:', lastSavedText, 'draft', draftText);
       setSelectedEntry((prevEntry) => {
         if (prevEntry && prevEntry._id === savedEntry._id) {
           return savedEntry;
