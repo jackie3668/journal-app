@@ -72,9 +72,7 @@ const Achievements = () => {
   
         const inProgress = closestAchievements;
         const completed = allAchievements.filter(ach => ach.progressPercentage >= 99.9);
-        console.log(allAchievements);
-        console.log(completed);
-        
+
         setInProgressAchievements(inProgress);
         setAllAchievementsList(allAchievements); 
       }

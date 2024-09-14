@@ -60,9 +60,7 @@ export const AchievementProvider = ({ children }) => {
             updatedAchievements.totalWordCount += payload;
             break;
           case 'incrementEntryCount':
-            console.log(`Fentry updated to ${updatedAchievements.entryCount}`);
             updatedAchievements.entryCount += 1;
-            console.log(`Fentry updated to ${updatedAchievements.entryCount}`); 
             break;
           case 'updateTagUsage':
             payload.forEach(tag => {

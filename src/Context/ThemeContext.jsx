@@ -9,15 +9,12 @@ export const ThemeProvider = ({ children }) => {
   const [sounds, setSounds] = useState([]); 
   const [backgroundUrl, setBackgroundUrl] = useState('https://cdn.pixabay.com/video/2023/10/26/186611-878455887_large.mp4'); 
   const [assets, setAssets] = useState([]);
+  const [selectedPrompt, setSelectedPrompt] = useState(null); 
   const [volumes, setVolumes] = useState({
     typing: {},
     ambient: {},
   }); 
-  const [selectedPrompt, setSelectedPrompt] = useState(null); 
 
-  useEffect(() => {
-    
-  },[sounds])
   useEffect(() => {
     const fetchAssets = async () => {
       try {
@@ -30,6 +27,11 @@ export const ThemeProvider = ({ children }) => {
 
     fetchAssets();
   }, []);
+
+  useEffect(() => {
+    console.log(selectedPrompt);
+    
+  },[selectedPrompt])
 
   const selectPreset = (preset) => {
     if (preset) {

@@ -6,7 +6,6 @@ export const getAchievements = async (userId) => {
   const categoryProgress = {};
 
   let userAchievements = {};
-  console.log(userId);
   
   try {
     const response = await fetch(`https://journal-app-backend-8szt.onrender.com/api/achievements/${userId}` || `https://journal-app-backend-8szt.onrender.com/api/achievements/${userId}`);
@@ -105,7 +104,7 @@ export const getAchievements = async (userId) => {
         userProgress = 0;
     }
 
-    let progressPercentage = Math.min((userProgress / achievement.target) * 100, 100);
+    let progressPercentage = Math.min((userProgress || 0 / achievement.target) * 100, 100);
     
     if (progressPercentage >= 99 && progressPercentage < 100) {
       progressPercentage = 99;

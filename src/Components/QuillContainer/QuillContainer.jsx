@@ -4,7 +4,7 @@ import 'react-quill/dist/quill.snow.css';
 import { useAuth } from '../../Context/AuthContext';
 import Export from '../Export/Export';
 import { useTheme } from '../../Context/ThemeContext';
-import { fetchFolders, saveEntry, addNewFolder, extractPlainText, calculateWordCount } from '../../Utils/utils';
+import { saveEntry, addNewFolder, extractPlainText, calculateWordCount } from '../../Utils/utils';
 import { useAchievements } from '../../Context/AchievementContext';
 import './QuillContainer.css';
 import exportIcon from '../../Assets/UI/Journal/export.png';
@@ -17,7 +17,7 @@ import { Scrollbar } from 'react-scrollbars-custom';
 
 const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry, selectedEntryId, setSelectedEntryId, folders, onFoldersChange }) => {
   const { authState } = useAuth();
-  const { selectedPrompt } = useTheme();
+  const { selectedPrompt, setSelectedPrompt } = useTheme();
   const { updateAchievements } = useAchievements();
   const prevSelectedEntryId = useRef(null); 
   const [entryTitle, setEntryTitle] = useState('');
@@ -52,25 +52,26 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
   }, [authState.isAuthenticated]);
 
   useEffect(() => {
-    if (prevSelectedEntryId.current !== selectedEntryId) {
-      prevSelectedEntryId.current = selectedEntryId;  
-
-      if (selectedEntry) {
-        setEntryTitle(selectedEntry.entryTitle || '');
-        setDraftText(selectedEntry.entryText || '');
-        setTags(selectedEntry.tags || []);
-        setSelectedFolder(selectedEntry.folderName || 'Default');
-        setInitialWordCount(calculateWordCount(extractPlainText(selectedEntry.entryText || '')));
-        setLastSavedTitle(selectedEntry.entryTitle || '');
-        setLastSavedText(selectedEntry.entryText || '');
-      } else {
-        setEntryTitle('');
-        setDraftText('');
-        setTags([]);
-        setSelectedFolder('Default');
-      }
+    if (selectedEntry) {
+      setEntryTitle(selectedEntry.entryTitle || '');
+      setDraftText(selectedEntry.entryText || '');
+      setTags(selectedEntry.tags || []);
+      setSelectedFolder(selectedEntry.folderName || 'Default');
+      setInitialWordCount(calculateWordCount(extractPlainText(selectedEntry.entryText || '')));
+      setLastSavedTitle(selectedEntry.entryTitle || '');
+      setLastSavedText(selectedEntry.entryText || '');
+    } else if (selectedPrompt) {
+      const strippedPrompt = selectedPrompt.replace(/^"(.*)"$/, '$1');
+      setDraftText(strippedPrompt);
+      setLastSavedText(strippedPrompt);
+      setSelectedPrompt(null); 
+    } else {
+      setEntryTitle('');
+      setDraftText('');
+      setTags([]);
+      setSelectedFolder('Default');
     }
-  }, [selectedEntryId, selectedEntry]);
+  }, [selectedEntry, selectedPrompt, setSelectedPrompt]);
   
 
   useEffect(() => {
@@ -84,7 +85,10 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
   const handleSave = async () => {
     const now = Date.now();
+    console.log('Saved Entry:', lastSavedText);
+    console.log('draft', draftText);
 
+        
     if (now - lastSaveTime.current < 5000) {
       console.log('Not saving due to throttle limit');
       return;
@@ -121,7 +125,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
       setLastSavedTitle(entryTitle);
       setLastSavedText(draftText);
-
+      console.log('Saved Entry:', lastSavedText, 'draft', draftText);
       setSelectedEntry((prevEntry) => {
         if (prevEntry && prevEntry._id === savedEntry._id) {
           return savedEntry;
@@ -226,9 +230,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
   const handleAddTag = () => {
     const tagList = newTag.split(',').map(tag => tag.trim()).filter(tag => tag !== '');
-
     const newTagsToAdd = tagList.filter(tag => !tags.includes(tag));
-
     if (newTagsToAdd.length > 0) {
       setTags([...tags, ...newTagsToAdd]);
       setNewTag('');
