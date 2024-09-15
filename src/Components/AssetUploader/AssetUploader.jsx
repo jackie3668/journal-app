@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './AssetUploader.css'
 import axios from 'axios';
 
 const SOUND_CATEGORIES = [
@@ -297,10 +298,6 @@ const AssetUploader = () => {
           <input id="presetName" type="text" required />
         </div>
         <div>
-          <label htmlFor="presetImageUrl">Preset Image URL:</label>
-          <input id="presetImageUrl" type="text" />
-        </div>
-        <div>
           <label htmlFor="presetCategory">Category:</label>
           <select id="presetCategory" value={presetCategory} onChange={(e) => setPresetCategory(e.target.value)}>
             {PRESET_CATEGORIES.map(cat => (
@@ -422,14 +419,13 @@ const AssetUploader = () => {
       )}
 
       <h2>Assets</h2>
-      <ul>
+      <ul className='asset-gallery'>
         {assets.map(asset => (
           <li key={asset._id}>
             {asset.name} ({asset.type}) - {asset.category}
             {asset.imageUrl && (
               <div>
-                <img src={asset.imageUrl} alt={asset.name} style={{ width: '150px', height: 'auto' }} />
-                <p>Thumbnail</p>
+                <img src={asset.imageUrl} alt={asset.name} style={{ width: '50px', height: 'auto' }} />
               </div>
             )}
             <button onClick={() => handleEdit(asset._id)}>Edit</button>
