@@ -77,16 +77,16 @@ export const getAchievements = async (userId) => {
 
     switch (achievement.category) {
       case 'wordCount':
-        userProgress = userAchievements.totalWordCount;
+        userProgress = userAchievements.totalWordCount || 0;
         break;
       case 'entryCount':
-        userProgress = userAchievements.entryCount;
+        userProgress = userAchievements.entryCount || 0;
         break;
       case 'folderCount':
         userProgress = folderCount;
         break;
       case 'tagUsage':
-        userProgress = Object.keys(userAchievements.tagUsage || {}).length;
+        userProgress = Object.keys(userAchievements.tagUsage || {}).length || 0;;
         break;
       case 'specificTagUsage':
         userProgress = highestTagUsage;
@@ -97,7 +97,7 @@ export const getAchievements = async (userId) => {
         additionalInfo = mostUsedFolder;
         break;
       case 'timeSpentWriting':
-        userProgress = Math.floor(userAchievements.timeSpentWriting / 60); 
+        userProgress = Math.floor(userAchievements.timeSpentWriting / 60) || 0;; 
         unit = 'minutes';
         break;
       default:

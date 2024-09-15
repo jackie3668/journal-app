@@ -261,13 +261,11 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     return today.toLocaleDateString('en-US', options);
   }
 
-  const handleMouseEnter = () => {
-    setIsDropdownVisible(true);
+  const handleMouseClick = () => {
+    setIsDropdownVisible(!isDropdownVisible);   
   };
 
-  const handleMouseLeave = () => {
-    setIsDropdownVisible(false);
-  };
+
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -329,7 +327,7 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
   return (
     <div className='quill-container glass'>
-      <div className="editor-top light-shadow">
+      <div className="editor-top">
         <div className="entry-setting-wrapper">
           <div className={!isToolbarVisible ? 'editing settings' : 'settings'}>
             <div className="date">
@@ -441,11 +439,10 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
         <div
           className={!isToolbarVisible ? 'editing export-container' : 'export-container'}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          onClick={handleMouseClick}
         >
           {isDropdownVisible && (
-            <Export entryTitle={entryTitle} entryText={draftText} />
+            <Export entryTitle={entryTitle} entryText={draftText} setIsDropdownVisible={setIsDropdownVisible} />
           )}
           <button className="export-button">
             <img src={exportIcon} alt="Export" />

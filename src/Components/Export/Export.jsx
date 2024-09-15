@@ -9,7 +9,7 @@ import './Export.css'
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-const Export = ({ entryTitle, entryText }) => {
+const Export = ({ entryTitle, entryText, setIsDropdownVisible}) => {
 
   const handleExportTxt = () => {
     let text = entryText
@@ -82,10 +82,14 @@ const Export = ({ entryTitle, entryText }) => {
 
   return (
     <div className='export-menu'>
-      <button onClick={handleExportTxt}>Export as TXT</button>
-      <button onClick={handleExportPdf}>Export as PDF</button>
-      <button onClick={handleExportCsv}>Export as CSV</button>
-      <button onClick={handleExportDocx}>Export as DOCX</button>
+      <div className='export-menu-content'>
+        <h4>Options</h4>
+        <button className='close-btn' onClick={() => {setIsDropdownVisible(false)}}>×</button>
+        <button onClick={handleExportTxt}>Export as TXT</button>
+        <button onClick={handleExportPdf}>Export as PDF</button>
+        <button onClick={handleExportCsv}>Export as CSV</button>
+        <button onClick={handleExportDocx}>Export as DOC</button>
+      </div>
     </div>
   );
 };

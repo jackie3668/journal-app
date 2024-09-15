@@ -16,6 +16,10 @@
   align-items: center;
 }
 
+.clock-widget .date-section p {
+  text-align: start;
+}
+
 .clock-widget .logo-icon img {
   width: 1.75rem;
   height: 1.75rem;
