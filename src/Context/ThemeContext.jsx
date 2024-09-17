@@ -15,10 +15,11 @@ export const ThemeProvider = ({ children }) => {
     ambient: {},
   }); 
 
+  // Fetch assets on component mount
   useEffect(() => {
     const fetchAssets = async () => {
       try {
-        const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/assets' || 'https://journal-app-backend-8szt.onrender.com/api/assets');
+        const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/assets');
         setAssets(response.data);
       } catch (err) {
         console.error('Error fetching assets:', err);
@@ -28,10 +29,14 @@ export const ThemeProvider = ({ children }) => {
     fetchAssets();
   }, []);
 
-  useEffect(() => {
-    console.log(selectedPrompt);
-    
-  },[selectedPrompt])
+
+  // useEffect(() => {
+  //   console.log('Current Sounds:', sounds);
+  // }, [sounds]);
+
+  // useEffect(() => {
+  //   console.log('Current Volumes:', volumes);
+  // }, [volumes]);
 
   const selectPreset = (preset) => {
     if (preset) {
@@ -66,7 +71,6 @@ export const ThemeProvider = ({ children }) => {
       });
 
       setVolumes(newVolumes);
-
     } else {
       setBackgroundName('');
       setTypingSoundName('');

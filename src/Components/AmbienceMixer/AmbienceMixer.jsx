@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTheme } from '../../Context/ThemeContext'; 
-import './AmbienceMixer.css'
+import './AmbienceMixer.css';
 import { Scrollbar } from 'react-scrollbars-custom';
 import LoadingScreen from '../LoadingScreen/LoadingScreen';
 
 const AmbienceMixer = ({ setSelectedMenu }) => {
-  const { sounds, setSounds, updateVolume } = useTheme(); 
+  const { sounds, setSounds, volumes, updateVolume } = useTheme();
   const [allSounds, setAllSounds] = useState([]); 
-  const [volumes, setVolumes] = useState({});
   const [categories, setCategories] = useState([]); 
   const [activeCategory, setActiveCategory] = useState('All'); 
   const [imagesLoadedCount, setImagesLoadedCount] = useState(0);
@@ -19,7 +18,7 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
   useEffect(() => {
     const fetchSounds = async () => {
       try {
-        const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/assets' || 'https://journal-app-backend-8szt.onrender.com/api/assets');
+        const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/assets');
         const soundAssets = response.data.filter(asset => asset.type === 'sound');
         setAllSounds(soundAssets);
 
@@ -33,19 +32,8 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
   }, []);
 
   useEffect(() => {
-    const matchedSounds = sounds
-      .map(name => allSounds.find(sound => sound.name === name))
-      .filter(Boolean);
-
-    const initialVolumes = matchedSounds.reduce((acc, sound) => {
-      acc[sound.name] = volumes[sound.name] || 0.1; 
-      return acc;
-    }, {});
-
-    setVolumes(initialVolumes);
-
     const newSoundPositions = [...soundPositions];
-    sounds.forEach((soundName, index) => {
+    sounds.forEach((soundName) => {
       const positionIndex = newSoundPositions.indexOf(soundName);
       if (positionIndex === -1) {
         const availablePosition = newSoundPositions.findIndex(pos => pos === null);
@@ -69,26 +57,19 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
           newPositions[availablePosition] = sound.name;
           return newPositions;
         });
-        setVolumes({ ...volumes, [sound.name]: 0.1 });
-        updateVolume('ambient', sound.name, 0.1);
+        updateVolume('ambient', sound.name, volumes.ambient[sound.name] || 0.1); 
       }
     }
   };
 
   const handleVolumeChange = (soundName, volume) => {
-    setVolumes({ ...volumes, [soundName]: volume });
     updateVolume('ambient', soundName, volume);
   };
 
   const handleRemoveSound = (soundName) => {
     setSounds(sounds.filter(s => s !== soundName));
-    setVolumes(prevVolumes => {
-      const newVolumes = { ...prevVolumes };
-      delete newVolumes[soundName];
-      return newVolumes;
-    });
     setSoundPositions(prevPositions => prevPositions.map(pos => (pos === soundName ? null : pos)));
-    updateVolume('ambient', soundName, 0);
+    updateVolume('ambient', soundName, 0); 
   };
 
   const filteredSounds = activeCategory === 'All'
@@ -105,28 +86,24 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
       return newCount;
     });
   };
-  
+
   const handleSliderChange = (e, soundName) => {
     const sliderHeight = e.target.clientHeight;
     const newVolume = 1 - e.nativeEvent.offsetY / sliderHeight;
-    setVolumes((prevVolumes) => ({
-      ...prevVolumes,
-      [soundName]: Math.max(0, Math.min(1, newVolume)),
-    }));
-    updateVolume('ambient', soundName, newVolume);
+    const boundedVolume = Math.max(0, Math.min(1, newVolume)); 
+    handleVolumeChange(soundName, boundedVolume);
   };
-  
+
   const handleSliderMove = (e, soundName) => {
     if (!isDragging) return;
     handleSliderChange(e, soundName);
   };
-  
+
   useEffect(() => {
     const handleMouseUp = () => setIsDragging(false);
     window.addEventListener('mouseup', handleMouseUp);
     return () => window.removeEventListener('mouseup', handleMouseUp);
   }, []);
-  
 
   return (
     <div className='ambience-mixer menu-container dark-glass'>
@@ -177,18 +154,18 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
               <div key={sound._id} className="sound-control clickable">
                 <div
                   className="custom-slider clickable"
-                  onMouseDown={(e) => handleSliderChange(e, sound.name)}
+                  onMouseDown={(e) => setIsDragging(true)}
                   onMouseMove={(e) => handleSliderMove(e, sound.name)}
                   onMouseUp={() => setIsDragging(false)}
                   onMouseLeave={() => setIsDragging(false)}
                 >
                   <div
                     className="active-track clickable"
-                    style={{ height: `${volumes[sound.name] * 100}%` }}
+                    style={{ height: `${(volumes.ambient[sound.name] || 0) * 100}%` }} 
                   ></div>
                   <div
                     className="custom-slider-thumb clickable"
-                    style={{ top: `${(1 - volumes[sound.name]) * 100}%` }}
+                    style={{ top: `${(1 - (volumes.ambient[sound.name] || 0)) * 100}%` }} 
                   ></div>
                 </div>
                 <img src={sound.imageUrl} alt={sound.name} className="sound-image" />
