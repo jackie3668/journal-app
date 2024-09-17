@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useTheme } from '../../Context/ThemeContext'; 
-import './AmbienceMixer.css';
+import 'rc-slider/assets/index.css'; // Import slider CSS
+import Slider from 'rc-slider'; // Import the slider component
 import { Scrollbar } from 'react-scrollbars-custom';
 import LoadingScreen from '../LoadingScreen/LoadingScreen';
+import './AmbienceMixer.css';
 
 const AmbienceMixer = ({ setSelectedMenu }) => {
   const { sounds, setSounds, volumes, updateVolume } = useTheme();
@@ -12,7 +14,6 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
   const [activeCategory, setActiveCategory] = useState('All'); 
   const [imagesLoadedCount, setImagesLoadedCount] = useState(0);
   const [loading, setLoading] = useState(true); 
-  const [isDragging, setIsDragging] = useState(false);
   const [soundPositions, setSoundPositions] = useState(new Array(8).fill(null)); 
 
   useEffect(() => {
@@ -62,8 +63,8 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
     }
   };
 
-  const handleVolumeChange = (soundName, volume) => {
-    updateVolume('ambient', soundName, volume);
+  const handleVolumeChange = (soundName, value) => {
+    updateVolume('ambient', soundName, value / 100); // rc-slider returns values between 0 and 100, convert it to 0-1
   };
 
   const handleRemoveSound = (soundName) => {
@@ -80,30 +81,11 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
     setImagesLoadedCount(prevCount => {
       const newCount = prevCount + 1;
       if (newCount === 14) { 
-        console.log('finished');
         setLoading(false); 
       }
       return newCount;
     });
   };
-
-  const handleSliderChange = (e, soundName) => {
-    const sliderHeight = e.target.clientHeight;
-    const newVolume = 1 - e.nativeEvent.offsetY / sliderHeight;
-    const boundedVolume = Math.max(0, Math.min(1, newVolume)); 
-    handleVolumeChange(soundName, boundedVolume);
-  };
-
-  const handleSliderMove = (e, soundName) => {
-    if (!isDragging) return;
-    handleSliderChange(e, soundName);
-  };
-
-  useEffect(() => {
-    const handleMouseUp = () => setIsDragging(false);
-    window.addEventListener('mouseup', handleMouseUp);
-    return () => window.removeEventListener('mouseup', handleMouseUp);
-  }, []);
 
   return (
     <div className='ambience-mixer menu-container dark-glass'>
@@ -143,31 +125,20 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
             if (!sound) {
               return (
                 <div key={index} className="sound-control inactive">
-                  <div className="custom-slider">
-                    <div className="custom-slider-thumb inactive"></div>
-                  </div>
                   <span>None selected</span>
                 </div>
               );
             }
             return (
               <div key={sound._id} className="sound-control clickable">
-                <div
+                <Slider
+                  vertical
+                  min={0}
+                  max={100}
+                  value={(volumes.ambient[sound.name] || 0) * 100} 
+                  onChange={(value) => handleVolumeChange(sound.name, value)}
                   className="custom-slider clickable"
-                  onMouseDown={(e) => setIsDragging(true)}
-                  onMouseMove={(e) => handleSliderMove(e, sound.name)}
-                  onMouseUp={() => setIsDragging(false)}
-                  onMouseLeave={() => setIsDragging(false)}
-                >
-                  <div
-                    className="active-track clickable"
-                    style={{ height: `${(volumes.ambient[sound.name] || 0) * 100}%` }} 
-                  ></div>
-                  <div
-                    className="custom-slider-thumb clickable"
-                    style={{ top: `${(1 - (volumes.ambient[sound.name] || 0)) * 100}%` }} 
-                  ></div>
-                </div>
+                />
                 <img src={sound.imageUrl} alt={sound.name} className="sound-image" />
                 <span>{sound.name}</span>
                 <button onClick={() => handleRemoveSound(sound.name)}>Remove</button>

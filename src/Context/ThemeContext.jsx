@@ -30,13 +30,13 @@ export const ThemeProvider = ({ children }) => {
   }, []);
 
 
-  // useEffect(() => {
-  //   console.log('Current Sounds:', sounds);
-  // }, [sounds]);
+  useEffect(() => {
+    console.log('Current Sounds:', sounds);
+  }, [sounds]);
 
-  // useEffect(() => {
-  //   console.log('Current Volumes:', volumes);
-  // }, [volumes]);
+  useEffect(() => {
+    console.log('Current Volumes:', volumes);
+  }, [volumes]);
 
   const selectPreset = (preset) => {
     if (preset) {

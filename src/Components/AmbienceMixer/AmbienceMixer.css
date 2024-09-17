@@ -77,7 +77,6 @@
   position: relative;
   width: 8px;
   height: 150px;
-  background-color:green;
   cursor: pointer;
   border-radius: 4px;
 }
@@ -113,11 +112,6 @@
 }
 
 .custom-slider {
-  position: relative;
-  width: 10px;
-  height: 15vh;
-  background-color: grey;
-  border-radius: 8px;
   cursor: pointer;
 }
 
