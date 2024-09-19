@@ -42,7 +42,6 @@ const AssetUploader = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [category, setCategory] = useState('Ambient');
   const [presetCategory, setPresetCategory] = useState('Cyberpunk');
-  const [videoCategory, setVideoCategory] = useState('Urban');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);

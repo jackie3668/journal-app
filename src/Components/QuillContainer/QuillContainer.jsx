@@ -62,14 +62,15 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       const strippedPrompt = selectedPrompt.replace(/^"(.*)"$/, '$1');
       setDraftText(strippedPrompt);
       setLastSavedText(strippedPrompt);
-      setSelectedPrompt(null); 
+      setInitialWordCount(calculateWordCount(extractPlainText(strippedPrompt || '')));
+
     } else {
       setEntryTitle('');
       setDraftText('');
       setTags([]);
       setSelectedFolder('Default');
     }
-  }, [selectedEntry, selectedPrompt, setSelectedPrompt]);
+  }, [selectedEntry]);
   
 
   useEffect(() => {
@@ -100,6 +101,10 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     }
 
     try {
+      console.log(draftText);
+      console.log(lastSavedText);
+      
+      
       console.log('Saving...');
       const url = selectedEntryId
         ? `https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`
@@ -148,6 +153,10 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       setIsTyping(false);
       if (onEntrySaved) {
         onEntrySaved();
+      }
+
+      if (selectedPrompt) {
+        setSelectedPrompt(null);
       }
 
     } catch (error) {

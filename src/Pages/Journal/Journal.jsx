@@ -112,8 +112,6 @@ const Journal = () => {
         params: { userId }
       });
       setFolders(response.data); 
-      console.log(response.data);
-      
     } catch (error) {
       console.error('Error fetching folders:', error);
     }
