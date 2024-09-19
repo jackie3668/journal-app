@@ -49,7 +49,7 @@
 }
 
 .mixer-panel {
-  padding-top: 5vh;
+  padding-top: 4vh;
   display: grid;
   justify-content: center;
   align-items: center;
@@ -81,6 +81,10 @@
   border-radius: 4px;
 }
 
+.sound-control img {
+  height: 2rem;
+}
+
 .custom-slider-thumb {
   position: absolute;
   width: 16px;
@@ -108,11 +112,15 @@
 }
 
 .sound-control.inactive span {
-  height: 15vh;
+  margin-top: 2.5rem;
 }
 
 .custom-slider {
   cursor: pointer;
+}
+
+.rc-slider-disabled {
+  background-color: transparent !important;
 }
 
 .custom-slider .active-track {
@@ -138,5 +146,5 @@
 .sound-control span {
   font-size: 0.875rem;
   text-align: center;
-  height: 3rem;
+  height: 2.5rem;
 }

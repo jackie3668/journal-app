@@ -168,10 +168,12 @@ const AssetUploader = () => {
         name: asset.name,
         url: asset.url,
         imageUrl: asset.imageUrl,
-        category: asset.category
+        category: asset.category,
+        type: asset.type 
       });
     }
   };
+  
   
   const handleUpdate = async () => {
     try {

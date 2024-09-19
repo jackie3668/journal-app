@@ -125,6 +125,13 @@ const AmbienceMixer = ({ setSelectedMenu }) => {
             if (!sound) {
               return (
                 <div key={index} className="sound-control inactive">
+                  <Slider
+                    vertical
+                    min={0}
+                    max={100}
+                    className="custom-slider inactive"
+                    disabled
+                  />
                   <span>None selected</span>
                 </div>
               );
