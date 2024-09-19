@@ -2,24 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { useTheme } from '../../Context/ThemeContext';
 import axios from 'axios';
 import './PresetWidget.css';
-import page from '../../Assets/Sounds/turnpage-99756.mp3'
+import page from '../../Assets/Sounds/turnpage-99756.mp3';
 import { Link } from 'react-router-dom';
 
 const PresetWidget = () => {
   const { selectPreset } = useTheme();
   const [presets, setPresets] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [loading, setLoading] = useState(true); // Added to track loading
+
+  // Helper function to preload images using promises
+  const preloadImage = (src) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+  };
 
   useEffect(() => {
     const fetchPresets = async () => {
       try {
-        const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/presets' || 'https://journal-app-backend-8szt.onrender.com/api/presets' );
-        setPresets(response.data);
-        response.data.slice(0, 5).forEach(preset => {
-          const img = new Image();
-          img.src = preset.imageUrl;
-        });
-        
+        const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/presets');
+        const fetchedPresets = response.data.slice(0, 5); // Limit to 5 presets
+
+        // Preload all preset images before setting them
+        await Promise.all(fetchedPresets.map(preset => preloadImage(preset.imageUrl)));
+
+        setPresets(fetchedPresets); // Set presets after images are loaded
+        setLoading(false); // Set loading to false when images are loaded
       } catch (error) {
         console.error('Error fetching presets:', error);
       }
@@ -29,14 +41,18 @@ const PresetWidget = () => {
   }, []);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      const interval = setInterval(() => {
-        setCurrentSlide(prevSlide => (prevSlide + 1) % presets.length);
-      }, 3000);
-      return () => clearInterval(interval);
-    }, 5000);
+    // Using requestAnimationFrame for smoother transitions
+    let animationFrameId;
+    const changeSlide = () => {
+      setCurrentSlide(prevSlide => (prevSlide + 1) % presets.length);
+      animationFrameId = setTimeout(changeSlide, 3000); // Change every 3 seconds
+    };
 
-    return () => clearTimeout(timeout);
+    if (presets.length > 0) {
+      changeSlide();
+    }
+
+    return () => clearTimeout(animationFrameId); // Cleanup on unmount
   }, [presets]);
 
   const handlePresetClick = (preset) => {
@@ -49,13 +65,16 @@ const PresetWidget = () => {
     setCurrentSlide(index);
   };
 
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading indicator until presets are ready
+  }
+
   return (
     <div className="preset-widget clickable">
       <div className="slider">
-        {presets.slice(0, 5).map((preset, index) => (
-          <Link to='./journal'>
+        {presets.map((preset, index) => (
+          <Link to='./journal' key={preset._id}>
             <div
-              key={preset._id}
               className={`preset-item ${index === currentSlide ? 'active' : ''}`}
               onClick={() => handlePresetClick(preset)}
               style={{ display: index === currentSlide ? 'block' : 'none' }}
@@ -71,7 +90,7 @@ const PresetWidget = () => {
           </Link>
         ))}
         <div className="dots">
-          {presets.slice(0, 5).map((_, index) => (
+          {presets.map((_, index) => (
             <div
               key={index}
               className={`custom-dot clickable ${index === currentSlide ? 'active' : ''}`}
