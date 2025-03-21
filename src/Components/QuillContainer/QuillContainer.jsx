@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { useAuth } from '../../Context/AuthContext';
@@ -14,6 +14,7 @@ import date from '../../Assets/UI/Journal/calendar.png';
 import folder from '../../Assets/UI/Journal/folder (1).png';
 import check from '../../Assets/UI/Journal/tick.png';
 import { Scrollbar } from 'react-scrollbars-custom';
+import { encryptEntryData, decryptEntryData } from '../../Utils/encryption';
 
 const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry, selectedEntryId, setSelectedEntryId, folders, onFoldersChange }) => {
   const { authState } = useAuth();
@@ -51,19 +52,23 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
 
   useEffect(() => {
     if (selectedEntry) {
-      setEntryTitle(selectedEntry.entryTitle || '');
-      setDraftText(selectedEntry.entryText || '');
+      const { decryptedTitle, decryptedText } = decryptEntryData(
+        selectedEntry.entryTitle,
+        selectedEntry.entryText
+      );
+  
+      setEntryTitle(decryptedTitle || '');
+      setDraftText(decryptedText || '');
       setTags(selectedEntry.tags || []);
       setSelectedFolder(selectedEntry.folderName || 'Default');
-      setInitialWordCount(calculateWordCount(extractPlainText(selectedEntry.entryText || '')));
-      setLastSavedTitle(selectedEntry.entryTitle || '');
-      setLastSavedText(selectedEntry.entryText || '');
+      setInitialWordCount(calculateWordCount(extractPlainText(decryptedText || '')));
+      setLastSavedTitle(decryptedTitle || '');
+      setLastSavedText(decryptedText || '');
     } else if (selectedPrompt) {
-      const strippedPrompt = selectedPrompt.replace(/^"(.*)"$/, '$1');
+      const strippedPrompt = selectedPrompt.replace(/^\"(.*)\"$/, '$1');
       setDraftText(strippedPrompt);
       setLastSavedText(strippedPrompt);
       setInitialWordCount(calculateWordCount(extractPlainText(strippedPrompt || '')));
-
     } else {
       setEntryTitle('');
       setDraftText('');
@@ -82,87 +87,69 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     }
   }, [isTyping]);
 
-  const handleSave = async () => {
-    const now = Date.now();
+const handleSave = async () => {
+  const now = Date.now();
 
-    if (now - lastSaveTime.current < 5000) {
-      return;
+  if (now - lastSaveTime.current < 5000) return;
+  lastSaveTime.current = now;
+
+  if (draftText === lastSavedText && entryTitle === lastSavedTitle) return;
+
+  if (!authState.isAuthenticated) {
+    localStorage.setItem('pendingEntry', draftText);
+    return;
+  }
+
+  try {
+    console.log('Saving with encryption...');
+
+    const url = selectedEntryId
+      ? `https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`
+      : 'https://journal-app-backend-8szt.onrender.com/api/entries';
+
+    const method = selectedEntryId ? 'PUT' : 'POST';
+    const { encryptedTitle, encryptedText } = encryptEntryData(entryTitle, draftText);
+
+    const savedEntry = await saveEntry({
+      userId: authState.user.sub,
+      entryTitle: encryptedTitle,
+      entryText: encryptedText,
+      folderName: selectedFolder,
+      tags,
+      createdAt: new Date(),
+    }, url, method);
+
+    setLastSavedTitle(entryTitle);
+    setLastSavedText(draftText);
+
+    setSelectedEntry((prevEntry) => (prevEntry && prevEntry._id === savedEntry._id ? savedEntry : prevEntry));
+
+    if (method === 'POST') {
+      setSelectedEntryId(savedEntry._id);
+      updateAchievements('incrementEntryCount', 1);
     }
 
-    lastSaveTime.current = now;
+    const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
+    if (wordDelta > 0) updateAchievements('incrementWordCount', wordDelta);
+    updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
 
-    if (draftText === lastSavedText && entryTitle === lastSavedTitle) {
-      return;
+    const newTags = tags.filter(tag => !loggedTagsRef.current.includes(tag));
+    const removedTags = loggedTagsRef.current.filter(tag => !tags.includes(tag));
+    if (newTags.length > 0) {
+      updateAchievements('updateTagUsage', newTags);
+      loggedTagsRef.current = [...loggedTagsRef.current, ...newTags].filter(tag => !removedTags.includes(tag));
     }
 
-    if (!authState.isAuthenticated) {
-      localStorage.setItem('pendingEntry', draftText);
-      return;
-    }
+    setInitialWordCount(wordCount);
+    setIsTyping(false);
+    if (onEntrySaved) onEntrySaved();
 
-    try {
-      console.log(draftText);
-      console.log(lastSavedText);
-      
-      
-      console.log('Saving...');
-      const url = selectedEntryId
-        ? `https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`
-        : 'https://journal-app-backend-8szt.onrender.com/api/entries';
+    if (selectedPrompt) setSelectedPrompt(null);
 
-      const method = selectedEntryId ? 'PUT' : 'POST';
-
-      const savedEntry = await saveEntry({
-        userId: authState.user.sub,
-        entryTitle: entryTitle || '',
-        entryText: draftText,
-        folderName: selectedFolder,
-        tags,
-        createdAt: new Date(),
-      }, url, method);
-
-      setLastSavedTitle(entryTitle);
-      setLastSavedText(draftText);
-      setSelectedEntry((prevEntry) => {
-        if (prevEntry && prevEntry._id === savedEntry._id) {
-          return savedEntry;
-        }
-        return prevEntry;
-      });
-
-      if (method === 'POST') {
-        setSelectedEntryId(savedEntry._id);
-        updateAchievements('incrementEntryCount', 1);
-      }
-
-      const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
-      if (wordDelta > 0) {
-        updateAchievements('incrementWordCount', wordDelta);
-      }
-      updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
-
-      const newTags = tags.filter(tag => !loggedTagsRef.current.includes(tag));
-      const removedTags = loggedTagsRef.current.filter(tag => !tags.includes(tag));
-
-      if (newTags.length > 0) {
-        updateAchievements('updateTagUsage', newTags);
-        loggedTagsRef.current = [...loggedTagsRef.current, ...newTags].filter(tag => !removedTags.includes(tag));
-      }
-
-      setInitialWordCount(wordCount);
-      setIsTyping(false);
-      if (onEntrySaved) {
-        onEntrySaved();
-      }
-
-      if (selectedPrompt) {
-        setSelectedPrompt(null);
-      }
-
-    } catch (error) {
-      console.error('Error saving journal entry:', error);
-    }
-  };
+  } catch (error) {
+    console.error('Error saving journal entry:', error);
+  }
+};
 
   const stopTyping = () => {
     setIsTyping(false); 

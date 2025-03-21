@@ -13,6 +13,7 @@ import filter from '../../Assets/UI/Journal/filter.png'
 import search from '../../Assets/UI/Journal/search-interface-symbol (1).png'
 import page from '../../Assets/Sounds/turnpage-99756.mp3'
 import deleteIcon from '../../Assets/UI/Journal/delete.png';
+import { decryptEntryData } from '../../Utils/encryption';
 
 const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, isOpen, onClose, onFoldersChange }) => {
   const { authState } = useAuth();
@@ -413,8 +414,11 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
                 {expandedFolders[folder.name] && (
                   <ul className="entries-list">
                     {entries[folder.name] && entries[folder.name].length > 0 ? (
-                      entries[folder.name].map((entry) => {
-                        const plainText = extractPlainText(entry.entryText);
+                      [...entries[folder.name]]
+                      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) 
+                      .map((entry) => {
+                        const { decryptedTitle, decryptedText } = decryptEntryData(entry.entryTitle, entry.entryText);
+                        const plainText = extractPlainText(decryptedText);
                         const preview = plainText.length > 25 ? plainText.slice(0, 25) + '...' : plainText;
                         return (
                           <li key={entry._id} className="entry-item" onClick={() => handleEntryClick(entry)}>
@@ -425,11 +429,9 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
                                 alt="Delete entry"
                                 onClick={() => handleEntryDeleteClick(entry._id)}
                               />
-
                               <h3 className="entry-title">
-                                {entry.entryTitle ? `${entry.entryTitle}` : 'No Title'}
+                                {decryptedTitle ? `${decryptedTitle}` : 'No Title'}
                               </h3>
-                              
                               <small className="entry-date">
                                 {new Date(entry.createdAt).toLocaleDateString('en-US', {
                                   year: 'numeric',
@@ -437,11 +439,9 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
                                   day: '2-digit'
                                 })}
                               </small>
-                              
                               <p className="entry-preview">{preview}</p>
                             </div>
                           </li>
-
                         );
                       })
                     ) : (

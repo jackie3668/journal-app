@@ -6,6 +6,7 @@ import PromptWidget from '../../Components/PromptWidget/PromptWidget';
 import AchievementsWidget from '../../Components/AchievementsWidget/AchievementsWidget';
 import CTAWidget from '../../Components/CTAWidget/CTAWidget';
 import { useLoading } from '../../Context/LoadingContext';
+import coffee from '../../Assets/UI/coffee-cup.png'
 import './Home.css';
 
 const Home = () => {
@@ -35,6 +36,10 @@ const Home = () => {
   return (
     <Scrollbar>
       <div className="widget-container">
+        <a href="https://buymeacoffee.com/jdrizzle" className="dono clickable floating" target="_blank" rel="noopener noreferrer">
+          <img src={coffee} alt="" />
+          Buy me a coffee
+        </a>
         <div className="widget widget1 glass">
           <ClockWidget setLoading={(isLoading) => handleWidgetLoading('clock', isLoading)} />
         </div>
