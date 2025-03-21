@@ -129,15 +129,26 @@ export const getAchievements = async (userId) => {
     }
 
     categoryProgress[achievement.category].push(achievement);
-  });
+    });
 
-  const closestAchievements = Object.values(categoryProgress)
+  let closestAchievements = Object.values(categoryProgress)
     .map(achievements => 
       achievements.sort((a, b) => b.progressPercentage - a.progressPercentage)[0]
     )
-    .filter(Boolean) 
-    .sort((a, b) => b.progressPercentage - a.progressPercentage) 
-    .slice(0, 3); 
+    .filter(Boolean)
+    .sort((a, b) => b.progressPercentage - a.progressPercentage);
+
+
+  if (closestAchievements.length < 3) {
+    const remaining = allAchievements
+      .filter(a => !closestAchievements.includes(a))
+      .sort((a, b) => b.progressPercentage - a.progressPercentage)
+      .slice(0, 3 - closestAchievements.length);
+    closestAchievements = closestAchievements.concat(remaining);
+  }
+
+  closestAchievements = closestAchievements.slice(0, 3);
+
     
   return {
     allAchievements,

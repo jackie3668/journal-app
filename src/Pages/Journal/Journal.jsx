@@ -98,14 +98,6 @@ const Journal = () => {
   };
   
 
-  const handleEntrySaved = () => {
-    setRefreshEntries(prev => !prev);
-  };
-
-  const handleFolderChange = (folderName) => {
-    setSelectedFolder(folderName);
-  };
-
   const handleMenuSelect = (menu) => {
     setSelectedMenu(menu);
     if (menu === 'drawer') {
@@ -130,11 +122,7 @@ const Journal = () => {
       console.error('Error fetching folders:', error);
     }
   };
-  
-  
-  const handleFolderAddedOrDeleted = () => {
-    fetchFolders(user.sub);
-  };
+
 
   return (
     <Scrollbar>

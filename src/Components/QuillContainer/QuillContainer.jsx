@@ -105,8 +105,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     if (!isFolderChanged && !isTitleChanged && !isTextChanged && !areTagsChanged) return;
     
     try {
-      
-      console.log('Saving with encryption...');
   
       const url = selectedEntryId
         ? `https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`
@@ -137,7 +135,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
       }
   
       if (isFolderChanged) {
-        console.log('Folder changed - entry moved');
         if (refreshData) refreshData();  
       }
   

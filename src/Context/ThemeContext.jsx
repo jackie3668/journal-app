@@ -15,7 +15,6 @@ export const ThemeProvider = ({ children }) => {
     ambient: {},
   }); 
 
-  // Fetch assets on component mount
   useEffect(() => {
     const fetchAssets = async () => {
       try {
@@ -31,11 +30,9 @@ export const ThemeProvider = ({ children }) => {
 
 
   useEffect(() => {
-    console.log('Current Sounds:', sounds);
   }, [sounds]);
 
   useEffect(() => {
-    console.log('Current Volumes:', volumes);
   }, [volumes]);
 
   const selectPreset = (preset) => {
@@ -52,7 +49,6 @@ export const ThemeProvider = ({ children }) => {
         setBackgroundUrl(backgroundAsset.url);
       } else {
         setBackgroundUrl('');
-        console.log('No Background URL found');
       }
 
       const newVolumes = {

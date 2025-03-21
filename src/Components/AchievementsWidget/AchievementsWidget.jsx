@@ -49,6 +49,7 @@ const AchievementsWidget = ({ setLoading }) => {
 
             await axios.post('https://journal-app-backend-8szt.onrender.com/api/achievements', initialAchievements);
             setAchievements(initialAchievements);
+            
           } else if (response?.status === 200) {
             setAchievements(response.data);
           }
@@ -56,6 +57,7 @@ const AchievementsWidget = ({ setLoading }) => {
           setError('Error fetching or creating achievements: ' + err.message);
         } finally {
           setLoading(false);
+          
         }
       };
 
@@ -73,6 +75,7 @@ const AchievementsWidget = ({ setLoading }) => {
       if (achievements && user && user.sub) {
         const { closestAchievements } = await getAchievements(user.sub);
         setClosestAchievements(closestAchievements);
+        
       }
     };
 
