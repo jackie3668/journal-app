@@ -16,7 +16,7 @@ import check from '../../Assets/UI/Journal/tick.png';
 import { Scrollbar } from 'react-scrollbars-custom';
 import { encryptEntryData, decryptEntryData } from '../../Utils/encryption';
 
-const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry, selectedEntryId, setSelectedEntryId, folders, onFoldersChange }) => {
+const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selectedEntry, selectedEntryId, setSelectedEntryId, folders, refreshData, forceRefresh }) => {
   const { authState } = useAuth();
   const { selectedPrompt, setSelectedPrompt } = useTheme();
   const { updateAchievements } = useAchievements();
@@ -77,7 +77,6 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     }
   }, [selectedEntry]);
   
-
   useEffect(() => {
     if (isTyping) {
       const timerId = setInterval(() => {
@@ -87,69 +86,83 @@ const QuillContainer = ({ handleKeyDown, onEntrySaved, setSelectedEntry, selecte
     }
   }, [isTyping]);
 
-const handleSave = async () => {
-  const now = Date.now();
-
-  if (now - lastSaveTime.current < 5000) return;
-  lastSaveTime.current = now;
-
-  if (draftText === lastSavedText && entryTitle === lastSavedTitle) return;
-
-  if (!authState.isAuthenticated) {
-    localStorage.setItem('pendingEntry', draftText);
-    return;
-  }
-
-  try {
-    console.log('Saving with encryption...');
-
-    const url = selectedEntryId
-      ? `https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`
-      : 'https://journal-app-backend-8szt.onrender.com/api/entries';
-
-    const method = selectedEntryId ? 'PUT' : 'POST';
-    const { encryptedTitle, encryptedText } = encryptEntryData(entryTitle, draftText);
-
-    const savedEntry = await saveEntry({
-      userId: authState.user.sub,
-      entryTitle: encryptedTitle,
-      entryText: encryptedText,
-      folderName: selectedFolder,
-      tags,
-      createdAt: new Date(),
-    }, url, method);
-
-    setLastSavedTitle(entryTitle);
-    setLastSavedText(draftText);
-
-    setSelectedEntry((prevEntry) => (prevEntry && prevEntry._id === savedEntry._id ? savedEntry : prevEntry));
-
-    if (method === 'POST') {
-      setSelectedEntryId(savedEntry._id);
-      updateAchievements('incrementEntryCount', 1);
+  const handleSave = async () => {
+    const now = Date.now();
+    if (now - lastSaveTime.current < 3000) return;
+    lastSaveTime.current = now;
+  
+    if (draftText === lastSavedText && entryTitle === lastSavedTitle && selectedFolder === (selectedEntry?.folderName || 'Default')) return;
+  
+    if (!authState.isAuthenticated) {
+      localStorage.setItem('pendingEntry', draftText);
+      return;
     }
-
-    const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
-    if (wordDelta > 0) updateAchievements('incrementWordCount', wordDelta);
-    updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
-
-    const newTags = tags.filter(tag => !loggedTagsRef.current.includes(tag));
-    const removedTags = loggedTagsRef.current.filter(tag => !tags.includes(tag));
-    if (newTags.length > 0) {
-      updateAchievements('updateTagUsage', newTags);
-      loggedTagsRef.current = [...loggedTagsRef.current, ...newTags].filter(tag => !removedTags.includes(tag));
+    const isFolderChanged = selectedEntry && selectedFolder !== (selectedEntry.folderName || 'Default');
+    const isTitleChanged = entryTitle !== (selectedEntry?.decryptedTitle || '');
+    const isTextChanged = draftText !== lastSavedText;
+    const areTagsChanged = JSON.stringify(tags) !== JSON.stringify(selectedEntry?.tags || []);
+    
+    if (!isFolderChanged && !isTitleChanged && !isTextChanged && !areTagsChanged) return;
+    
+    try {
+      
+      console.log('Saving with encryption...');
+  
+      const url = selectedEntryId
+        ? `https://journal-app-backend-8szt.onrender.com/api/entries/${selectedEntryId}`
+        : 'https://journal-app-backend-8szt.onrender.com/api/entries';
+  
+      const method = selectedEntryId ? 'PUT' : 'POST';
+      const { encryptedTitle, encryptedText } = encryptEntryData(entryTitle, draftText);
+  
+      const isFolderChanged = selectedEntry && selectedFolder !== (selectedEntry.folderName || 'Default');
+  
+      const savedEntry = await saveEntry({
+        userId: authState.user.sub,
+        entryTitle: encryptedTitle,
+        entryText: encryptedText,
+        folderName: selectedFolder, 
+        tags,
+        createdAt: new Date(),
+      }, url, method);
+  
+      setLastSavedTitle(entryTitle);
+      setLastSavedText(draftText);
+  
+      setSelectedEntry((prevEntry) => (prevEntry && prevEntry._id === savedEntry._id ? savedEntry : prevEntry));
+  
+      if (method === 'POST') {
+        setSelectedEntryId(savedEntry._id);
+        updateAchievements('incrementEntryCount', 1);
+      }
+  
+      if (isFolderChanged) {
+        console.log('Folder changed - entry moved');
+        if (refreshData) refreshData();  
+      }
+  
+      const wordDelta = selectedEntry ? wordCount - initialWordCount : wordCount;
+      if (wordDelta > 0) updateAchievements('incrementWordCount', wordDelta);
+      updateAchievements('incrementTimeSpentWriting', elapsedTime / 1000);
+  
+      const newTags = tags.filter(tag => !loggedTagsRef.current.includes(tag));
+      const removedTags = loggedTagsRef.current.filter(tag => !tags.includes(tag));
+      if (newTags.length > 0) {
+        updateAchievements('updateTagUsage', newTags);
+        loggedTagsRef.current = [...loggedTagsRef.current, ...newTags].filter(tag => !removedTags.includes(tag));
+      }
+  
+      if (onEntrySaved) onEntrySaved();
+      setInitialWordCount(wordCount);
+      setIsTyping(false);
+      if (refreshData) refreshData();
+      if (forceRefresh) forceRefresh();
+      if (selectedPrompt) setSelectedPrompt(null);
+  
+    } catch (error) {
+      console.error('Error saving journal entry:', error);
     }
-
-    setInitialWordCount(wordCount);
-    setIsTyping(false);
-    if (onEntrySaved) onEntrySaved();
-
-    if (selectedPrompt) setSelectedPrompt(null);
-
-  } catch (error) {
-    console.error('Error saving journal entry:', error);
-  }
-};
+  };
 
   const stopTyping = () => {
     setIsTyping(false); 
@@ -237,16 +250,14 @@ const handleSave = async () => {
   
     try {
       const updatedFolders = await addNewFolder(authState.user.sub, newFolderName);
-      
-      setNewFolderName(''); 
-      setShowNewFolderInput(false); 
-      updateAchievements('incrementFolderCount', 1)
-
-  
-      onFoldersChange();
+      setNewFolderName('');
+      setShowNewFolderInput(false);
+      updateAchievements('incrementFolderCount', 1);
+      if (refreshData) refreshData(); 
     } catch (error) {
       console.error('Error adding new folder:', error);
     }
+    handleSave()
   };
   
   
@@ -308,6 +319,7 @@ const handleSave = async () => {
     } else {
       setActiveSetting('folder');
     }
+    handleSave()
   };
 
   const handleMouseMove = () => {
@@ -383,6 +395,7 @@ const handleSave = async () => {
                           onClick={() => {
                             setSelectedFolder(folder.name);
                             setActiveSetting(null);
+                            handleSave();
                           }}
                           className={selectedFolder === folder.name ? 'selected' : ''}
                         >

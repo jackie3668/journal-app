@@ -17,8 +17,9 @@ const Journal = () => {
   const { user } = authState;
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [selectedEntryId, setSelectedEntryId] = useState(null);
-  const [entries, setEntries] = useState([]);
+  const [entries, setEntries] = useState({});
   const [folders, setFolders] = useState([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(false); 
   const [refreshEntries, setRefreshEntries] = useState(false);
   const [selectedFolder, setSelectedFolder] = useState('Default');
   const [typingSound, setTypingSound] = useState({ url: '', volume: 1 });
@@ -29,11 +30,16 @@ const Journal = () => {
   const drawerRef = useRef(null);
 
   useEffect(() => {
-    if (user) {
-      fetchEntries(selectedFolder, user.sub);
-    }
-  }, [refreshEntries, selectedFolder, user]);
-
+    fetchEntries();
+    fetchFolders();
+  }, [refreshTrigger, user]);
+  
+  const triggerRefresh = () => setRefreshTrigger(prev => !prev);
+  const forceRefresh = () => setRefreshTrigger(prev => prev + 1);
+  useEffect(() => {
+    fetchEntries();  
+  }, [refreshTrigger]);
+  
   useEffect(() => {
     if (user) {
       fetchFolders(user.sub); 
@@ -74,16 +80,23 @@ const Journal = () => {
     }
   };
 
-  const fetchEntries = async (folderName, userId) => {
+  const fetchEntries = async () => {
+    if (!user) return;
     try {
-      const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/entries' || 'https://journal-app-backend-8szt.onrender.com/api/entries', {
-        params: { folderName, userId }
-      });      
-      setEntries(response.data);
+      const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/entries', {
+        params: { userId: user.sub }
+      });
+      const groupedEntries = response.data.reduce((acc, entry) => {
+        acc[entry.folderName] = acc[entry.folderName] || [];
+        acc[entry.folderName].push(entry);
+        return acc;
+      }, {});
+      setEntries(groupedEntries);
     } catch (error) {
       console.error('Error fetching entries:', error);
     }
   };
+  
 
   const handleEntrySaved = () => {
     setRefreshEntries(prev => !prev);
@@ -106,16 +119,18 @@ const Journal = () => {
     setSelectedMenu(''); 
   };
 
-  const fetchFolders = async (userId) => {
+  const fetchFolders = async () => {
+    if (!user) return;
     try {
       const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/folders', {
-        params: { userId }
+        params: { userId: user.sub }
       });
-      setFolders(response.data); 
+      setFolders(response.data);
     } catch (error) {
       console.error('Error fetching folders:', error);
     }
   };
+  
   
   const handleFolderAddedOrDeleted = () => {
     fetchFolders(user.sub);
@@ -125,15 +140,16 @@ const Journal = () => {
     <Scrollbar>
       <div className='journal-container'>
         <div className="editor">
-          <QuillContainer 
+          <QuillContainer
             handleKeyDown={handleKeyDown}
-            setSelectedEntry={setSelectedEntry}
             selectedEntry={selectedEntry}
-            onEntrySaved={handleEntrySaved}
+            setSelectedEntry={setSelectedEntry}
             selectedEntryId={selectedEntryId}
             setSelectedEntryId={setSelectedEntryId}
-            folders={folders} 
-            onFoldersChange={handleFolderAddedOrDeleted} 
+            folders={folders}
+            entries={entries}
+            refreshData={triggerRefresh}
+            forceRefresh={forceRefresh} 
           />
         </div>
         <div className="menu">
@@ -145,11 +161,11 @@ const Journal = () => {
               isOpen={isDrawerOpen}
               onClose={() => setIsDrawerOpen(false)}
               onEntrySelect={handleSelectEntry}
-              onEntrySaved={handleEntrySaved}
               selectedFolder={selectedFolder}
-              onFolderChange={handleFolderChange}
-              folders={folders} 
-              onFoldersChange={handleFolderAddedOrDeleted} 
+              entries={entries}
+              folders={folders}
+              refreshData={triggerRefresh}
+              refreshTrigger={refreshTrigger} 
             />
           </div>
         )}

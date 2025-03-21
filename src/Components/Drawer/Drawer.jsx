@@ -15,11 +15,10 @@ import page from '../../Assets/Sounds/turnpage-99756.mp3'
 import deleteIcon from '../../Assets/UI/Journal/delete.png';
 import { decryptEntryData } from '../../Utils/encryption';
 
-const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, isOpen, onClose, onFoldersChange }) => {
+const Drawer = ({ onEntrySelect, refreshData, folders, isOpen, onClose, refreshTrigger }) => {
   const { authState } = useAuth();
   const { updateAchievements } = useAchievements();
   const { user, isAuthenticated, isLoading } = authState;
-  const [folders, setFolders] = useState([]);
   const [entries, setEntries] = useState({});
   const [newFolderName, setNewFolderName] = useState('');
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
@@ -54,23 +53,11 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
   };
 
   useEffect(() => {
-    const fetchFolders = async () => {
-      if (!isAuthenticated || isLoading) {
-        return;
-      }
-
-      try {
-        const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/folders' || 'https://journal-app-backend-8szt.onrender.com/api/folders', {
-          params: { userId: user.sub }
-        });        
-        setFolders(response.data);       
-      } catch (error) {
-        console.error('Error fetching folders:', error);
-      } 
+    const fetchEntries = async () => {
     };
-
-    fetchFolders();
-  }, [isAuthenticated, isLoading, user, onEntrySaved]);
+    fetchEntries();
+  }, [refreshTrigger]);
+  
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -105,6 +92,21 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
     };
   }, [addFolderRef]);
 
+  const fetchEntries = async () => {
+    if (!isAuthenticated || isLoading) return;
+  
+    const newEntries = {};
+    for (const folder of folders) {
+      const folderEntries = await fetchEntriesForFolder(folder.name);
+      newEntries[folder.name] = folderEntries;
+    }
+    setEntries(newEntries);
+  };
+  
+  useEffect(() => {
+    fetchEntries();  
+  }, [refreshTrigger, folders]);
+  
 
   const fetchEntriesForFolder = async (folderName, selectedTags = []) => {
     if (!isAuthenticated || isLoading) {
@@ -163,30 +165,21 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
   };
 
   const handleAddNewFolder = async () => {
-    if (!newFolderName.trim() || !isAuthenticated || isLoading) {
-      return;
-    }
+    if (!newFolderName.trim()) return;
     try {
-      await axios.post('https://journal-app-backend-8szt.onrender.com/api/folders' || 'https://journal-app-backend-8szt.onrender.com/api/folders', {
+      await axios.post('https://journal-app-backend-8szt.onrender.com/api/folders', {
         name: newFolderName,
-        userId: user.sub
+        userId: user.sub,
       });
       setNewFolderName('');
       setShowNewFolderInput(false);
       updateAchievements('incrementFolderCount', 1);
-      onFoldersChange()
-      const response = await axios.get('https://journal-app-backend-8szt.onrender.com/api/folders' || 'https://journal-app-backend-8szt.onrender.com/api/folders', {
-        params: { userId: user.sub }
-      });
-      setFolders(response.data);
-
-      if (typeof onFolderChange === 'function') {
-        onFolderChange(selectedFolder);
-      }
-    } catch (error) {
-      console.error('Error adding new folder:', error.response ? error.response.data : error.message);
+      if (refreshData) refreshData();  
+    } catch (err) {
+      console.error('Failed to add folder', err);
     }
   };
+  
 
   const toggleFilterDropdown = () => {
     setShowFilterDropdown(prev => !prev);
@@ -244,29 +237,35 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
   const handleFolderDeleteClick = (folderId) => {
     setFolderToDelete(folderId);
     setShowModal(true);
-    onFoldersChange();
   };
-
+  
   const deleteFolder = async (folderId) => {
     try {
       await axios.delete(`https://journal-app-backend-8szt.onrender.com/api/folders/${folderId}`, {
         params: { userId: user.sub } 
       });
       const updatedFolders = folders.filter(folder => folder._id !== folderId);
-      setFolders(updatedFolders);
       updateAchievements('decrementFolderCount', 1);
     } catch (error) {
       console.error('Error deleting folder:', error.response ? error.response.data : error.message);
     }
   };  
   
-  const confirmDelete = () => {
-    if (folderToDelete) {
-      deleteFolder(folderToDelete);
-      setFolderToDelete(null);
+  const confirmDelete = async () => {
+    if (!folderToDelete) return;
+    try {
+      await axios.delete(`https://journal-app-backend-8szt.onrender.com/api/folders/${folderToDelete}`, {
+        params: { userId: user.sub },
+      });
+      updateAchievements('decrementFolderCount', 1);
+      if (refreshData) refreshData();
+    } catch (err) {
+      console.error('Error deleting folder', err);
     }
     setShowModal(false);
+    setFolderToDelete(null);
   };
+  
 
   const closeModal = () => {
     setFolderToDelete(null);
@@ -279,25 +278,26 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
   };
 
   const confirmEntryDelete = async () => {
-    if (entryToDelete) {
-      try {
-        await axios.delete(`https://journal-app-backend-8szt.onrender.com/api/entries/${entryToDelete}`, {
-          params: { userId: user.sub } 
-        });
+    if (!entryToDelete) return;
+    try {
+      await axios.delete(`https://journal-app-backend-8szt.onrender.com/api/entries/${entryToDelete}`, {
+        params: { userId: user.sub },
+      });
   
-        const updatedEntries = entries[selectedFolder].filter(entry => entry._id !== entryToDelete);
-        setEntries({ ...entries, [selectedFolder]: updatedEntries });
-  
-        if (typeof onEntrySelect === 'function') {
-          onEntrySelect(null);
+      setEntries((prevEntries) => {
+        const updatedEntries = { ...prevEntries };
+        for (const folder in updatedEntries) {
+          updatedEntries[folder] = updatedEntries[folder].filter(entry => entry._id !== entryToDelete);
         }
+        return updatedEntries;
+      });
   
-      } catch (error) {
-        console.error('Error deleting entry:', error.response ? error.response.data : error.message);
-      }
+      if (refreshData) refreshData();  
+    } catch (err) {
+      console.error('Error deleting entry', err);
     }
-    setEntryToDelete(null);  
-    setShowEntryModal(false);  
+    setShowEntryModal(false);
+    setEntryToDelete(null);
   };
   
   const closeEntryModal = () => {
@@ -386,51 +386,56 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
 
         <Scrollbar style={{ height: '60vh' }}>
           <ul className='folder-list'>
-            {folders.map((folder) => (
-              <li key={folder._id} className="folder-item">
-                <div
-                  onMouseEnter={() => handleFolderHover(folder.name)}
-                  onMouseLeave={() => handleFolderLeave(folder.name)}
-                  className={`folder-header clickable ${expandedFolders[folder.name] ? 'active' : ''}`}
-                >
-                  <img 
-                    src={(hoveredFolder === folder.name || expandedFolders[folder.name]) ? arrow : folderIcon}
-                    className='folder-icon'
-                    alt="" 
-                    onClick={() => handleFolderClick(folder)}
+          {folders.map((folder) => (
+            <li key={folder._id} className="folder-item">
+              <div
+                onMouseEnter={() => handleFolderHover(folder.name)}
+                onMouseLeave={handleFolderLeave}
+                className={`folder-header clickable ${expandedFolders[folder.name] ? 'active' : ''}`}
+              >
+                <img
+                  src={(hoveredFolder === folder.name || expandedFolders[folder.name]) ? arrow : folderIcon}
+                  className="folder-icon"
+                  alt=""
+                  onClick={() => handleFolderClick(folder)}
+                />
+                <p onClick={() => handleFolderClick(folder)}>{folder.name}</p>
+
+                {folder.name !== 'Default' && (
+                  <img
+                    src={deleteIcon}
+                    className="del clickable"
+                    alt="Delete folder"
+                    onClick={() => handleFolderDeleteClick(folder._id)}
                   />
-                  <p onClick={() => handleFolderClick(folder)}>{folder.name}</p>
+                )}
+              </div>
 
-                  {folder.name !== 'Default' && (
-                    <img
-                      src={deleteIcon}
-                      className='del clickable'
-                      alt="Delete folder"
-                      onClick={() => handleFolderDeleteClick(folder._id)} 
-                    />
-                  )}
-                </div>
-
-                {expandedFolders[folder.name] && (
-                  <ul className="entries-list">
-                    {entries[folder.name] && entries[folder.name].length > 0 ? (
-                      [...entries[folder.name]]
+              {expandedFolders[folder.name] && (
+                <ul className="entries-list">
+                  {entries[folder.name]?.length > 0 ? (
+                    entries[folder.name]
+                      .slice() 
                       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) 
                       .map((entry) => {
                         const { decryptedTitle, decryptedText } = decryptEntryData(entry.entryTitle, entry.entryText);
                         const plainText = extractPlainText(decryptedText);
-                        const preview = plainText.length > 25 ? plainText.slice(0, 25) + '...' : plainText;
+                        const preview = plainText.length > 25 ? `${plainText.slice(0, 25)}...` : plainText;
+
                         return (
                           <li key={entry._id} className="entry-item" onClick={() => handleEntryClick(entry)}>
                             <div className="entry-content">
                               <img
                                 src={deleteIcon}
-                                className='del clickable'
+                                className="del clickable"
                                 alt="Delete entry"
-                                onClick={() => handleEntryDeleteClick(entry._id)}
+                                onClick={(e) => {
+                                  e.stopPropagation(); 
+                                  handleEntryDeleteClick(entry._id);
+                                }}
                               />
                               <h3 className="entry-title">
-                                {decryptedTitle ? `${decryptedTitle}` : 'No Title'}
+                                {decryptedTitle || 'No Title'}
                               </h3>
                               <small className="entry-date">
                                 {new Date(entry.createdAt).toLocaleDateString('en-US', {
@@ -444,13 +449,14 @@ const Drawer = ({ onEntrySelect, onEntrySaved, selectedFolder, onFolderChange, i
                           </li>
                         );
                       })
-                    ) : (
-                      <></>
-                    )}
-                  </ul>
-                )}
-              </li>
-            ))}
+                  ) : (
+                    <li className="empty-entry">No Entries</li>
+                  )}
+                </ul>
+              )}
+            </li>
+          ))}
+
           </ul>
         </Scrollbar>
       </div>
